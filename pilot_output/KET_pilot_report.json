@@ -1,0 +1,42 @@
+{
+  "site": "KET",
+  "test_date": "2025-08-13T16:44:29.731164",
+  "data_summary": {
+    "poles": 1574,
+    "conductors": 1572,
+    "connections": 0,
+    "transformers": 22,
+    "network_length_km": 94.1984069999999
+  },
+  "cleaning_summary": {
+    "invalid_references_fixed": 0,
+    "missing_cable_sizes_filled": 626,
+    "duplicate_poles_removed": 0,
+    "orphaned_connections_removed": 0,
+    "coordinates_fixed": 0
+  },
+  "topology_summary": {
+    "is_radial": true,
+    "is_connected": false,
+    "num_components": 7,
+    "has_cycles": false
+  },
+  "voltage_analysis": {
+    "max_drop_percent": 0.0,
+    "violations": 0,
+    "threshold_percent": 7.0
+  },
+  "validation": {
+    "passed": false,
+    "issues": {
+      "is_valid": false,
+      "errors": [
+        "Network has 7 disconnected components",
+        "No transformer found in network"
+      ],
+      "warnings": [],
+      "node_count": 1574,
+      "edge_count": 1572
+    }
+  }
+}
