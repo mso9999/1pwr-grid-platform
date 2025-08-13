@@ -1,0 +1,7452 @@
+{
+  "kml_stats": {
+    "poles_mv": 626,
+    "poles_lv": 949,
+    "customers": 1279,
+    "conductors_mv": 623,
+    "conductors_lv": 952,
+    "droplines": 195
+  },
+  "validation_results": {
+    "pole_matches": 1574,
+    "pole_mismatches": [
+      "KET_17_GA120 "
+    ],
+    "conductor_matches": 1575,
+    "conductor_invalid": [
+      {
+        "from": "KET_17_IB13",
+        "to": "KET 2246 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB13",
+        "to": "KET 2247 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB12",
+        "to": "KET 2250 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB12",
+        "to": "KET 2251 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB7",
+        "to": "KET 2258 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB3",
+        "to": "KET 2261 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB3",
+        "to": "KET 2262 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB3",
+        "to": "KET 2263 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB5",
+        "to": "KET 2264 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB5",
+        "to": "KET 2265 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB3",
+        "to": "KET 2266 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB1",
+        "to": "KET 2256 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB1",
+        "to": "KET 2257 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB8",
+        "to": "KET 2248 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB213",
+        "to": "KET 2255 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB9",
+        "to": "KET 2249 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB2",
+        "to": "KET 2253 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IB2",
+        "to": "KET 2254 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA78",
+        "to": "KET 2228 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA78",
+        "to": "KET 2229 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA72",
+        "to": "KET 2231 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA72",
+        "to": "KET 2232 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA77",
+        "to": "KET 2233 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA14",
+        "to": "KET 2238 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA10",
+        "to": "KET 2239 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA8",
+        "to": "KET 2240 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA8",
+        "to": "KET 2241 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA72",
+        "to": "KET 2259 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA74",
+        "to": "KET 2260 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA13",
+        "to": "KET 2236 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IA6",
+        "to": "KET 2237 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA15",
+        "to": "KET 5000 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA12",
+        "to": "KET 5001 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA11",
+        "to": "KET 5002 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA10",
+        "to": "KET 5003 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA9",
+        "to": "KET 5004 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA9",
+        "to": "KET 5005 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA16",
+        "to": "KET 5006 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA16",
+        "to": "KET 5007 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA16",
+        "to": "KET 5008 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA17",
+        "to": "KET 5009 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AA18",
+        "to": "KET 5010 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB3",
+        "to": "KET 0930HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB3",
+        "to": "KET 0931HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB1",
+        "to": "KET 0932HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB1",
+        "to": "KET 0933HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB2",
+        "to": "KET 0934HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB10",
+        "to": "KET 0935HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB10",
+        "to": "KET 0936HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB11",
+        "to": "KET 0938SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB6",
+        "to": "KET 0940HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB6",
+        "to": "KET 0941SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB5",
+        "to": "KET 0942HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB4",
+        "to": "KET 0943HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB4",
+        "to": "KET 0944HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB4",
+        "to": "KET 0945HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB7",
+        "to": "KET 0928CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AB7",
+        "to": "KET 0929HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC4",
+        "to": "KET 0907HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC2",
+        "to": "KET 0920HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC3",
+        "to": "KET 0908HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC3",
+        "to": "KET 0909HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC5",
+        "to": "KET 0901HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC5",
+        "to": "KET 0902HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC5",
+        "to": "KET 0903HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC5",
+        "to": "KET 0904HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC5",
+        "to": "KET 0905HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC6",
+        "to": "KET 0910HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC7",
+        "to": "KET 0911HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC7",
+        "to": "KET 0912HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC7",
+        "to": "KET 0913HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC9",
+        "to": "KET 0914HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC10",
+        "to": "KET 0915HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC12",
+        "to": "KET 0917HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC13",
+        "to": "KET 0918HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC4",
+        "to": "KET 0906HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CC7",
+        "to": "KET 1000HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 01001HH1",
+        "to": "KET_26_CC14",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_26_CC11",
+        "to": "KET 0916HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB6",
+        "to": "KET 1672HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BB1",
+        "to": "KET 5023 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BB1",
+        "to": "KET 5024 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BB1",
+        "to": "KET 5025 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BB2",
+        "to": "KET 5026 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA111",
+        "to": "KET 2113 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA111",
+        "to": "KET 2116 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA108",
+        "to": "KET 2117 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA107",
+        "to": "KET 2118 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA109",
+        "to": "KET 2119 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA109",
+        "to": "KET 2120 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA106",
+        "to": "KET 2121 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA106",
+        "to": "KET 2122 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA112",
+        "to": "KET 2123 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA100",
+        "to": "KET 2126 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA101",
+        "to": "KET 2127 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA102",
+        "to": "KET 2128 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA105",
+        "to": "KET 2129 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA105",
+        "to": "KET 2130 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA104",
+        "to": "KET 2131 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA104",
+        "to": "KET 2132 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GA104",
+        "to": "KET 2133 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB3",
+        "to": "KET 1134 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB4",
+        "to": "KET 1135 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB5",
+        "to": "KET 1136 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB1",
+        "to": "KET 1137 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB1",
+        "to": "KET 1138 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB1",
+        "to": "KET 1139 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB1",
+        "to": "KET 1140 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB5",
+        "to": "KET 1141 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB6",
+        "to": "KET 1142 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB7",
+        "to": "KET 1143 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB7",
+        "to": "KET 1144 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB8",
+        "to": "KET 1145 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AB6",
+        "to": "KET 1146 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB7",
+        "to": "KET 797 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB7",
+        "to": "KET 798 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB7",
+        "to": "KET 799 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB6",
+        "to": "KET 800 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB5",
+        "to": "KET 801 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB3",
+        "to": "KET 802 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AB1",
+        "to": "KET 804 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA1",
+        "to": "KET 966 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA9",
+        "to": "KET 977 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA9",
+        "to": "KET 978 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA8",
+        "to": "KET 979 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA8",
+        "to": "KET 980 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA4",
+        "to": "KET 981 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA4",
+        "to": "KET 982 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA5",
+        "to": "KET 983 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA6",
+        "to": "KET 984 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA5",
+        "to": "KET 985 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA3",
+        "to": "KET 986 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA7",
+        "to": "KET 987 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA8",
+        "to": "KET 988 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA8",
+        "to": "KET 989 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AA8",
+        "to": "KET 990 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BB3",
+        "to": "KET 290 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BB3",
+        "to": "KET 291 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BB1",
+        "to": "KET 292 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA6",
+        "to": "KET 328 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA6",
+        "to": "KET 329 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA5",
+        "to": "KET 330 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA5",
+        "to": "KET 331 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA3",
+        "to": "KET 332 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA4",
+        "to": "KET 333 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA4",
+        "to": "KET 334 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA1",
+        "to": "KET 363 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DA1",
+        "to": "KET 364 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB7",
+        "to": "KET 2252 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB4",
+        "to": "KET 2267 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB4",
+        "to": "KET 2268 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB3",
+        "to": "KET 2269 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB3",
+        "to": "KET 2274 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB2",
+        "to": "KET 2273 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB1",
+        "to": "KET 2275 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB5",
+        "to": "KET 2270 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB5",
+        "to": "KET 2271 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HB5",
+        "to": "KET 2272 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AA8",
+        "to": "KET 1055HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AA10",
+        "to": "KET 1056HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AA4",
+        "to": "KET 1057HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AA7",
+        "to": "KET 1059HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AA1",
+        "to": "KET 1061HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 1058HH1",
+        "to": "KET_12_AA4",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_31_AA4",
+        "to": "KET 1658 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AA4",
+        "to": "KET 1659 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AA4",
+        "to": "KET 1660 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AA1",
+        "to": "KET 1661 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BA4",
+        "to": "KET 2289 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BA8",
+        "to": "KET 2306 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BA8",
+        "to": "KET 2307 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB8",
+        "to": "KET 0206 SCH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB4",
+        "to": "KET 0208 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB3",
+        "to": "KET 0207 SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB1",
+        "to": "KET 0213 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB1",
+        "to": "KET 0214 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB1",
+        "to": "KET 0215 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB1",
+        "to": "KET 0217 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BB1",
+        "to": "KET 0218 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB3",
+        "to": "KET 1072HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB3",
+        "to": "KET 1073HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB4",
+        "to": "KET 1074HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB4",
+        "to": "KET 1075HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB4",
+        "to": "KET 1076HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB4",
+        "to": "KET 1077HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB5",
+        "to": "KET 1078SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB6",
+        "to": "KET 1079HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BB6",
+        "to": "KET 1080HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA2",
+        "to": "KET 0172 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA7",
+        "to": "KET 0173 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA5",
+        "to": "KET 0159 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA5",
+        "to": "KET 0170 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA11",
+        "to": "KET 0160 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA11",
+        "to": "KET 0161 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA11",
+        "to": "KET 0167 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA9",
+        "to": "KET 0174 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA9",
+        "to": "KET 0175 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA6",
+        "to": "KET 0171 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA12",
+        "to": "KET 0154 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA12",
+        "to": "KET 0155 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA12",
+        "to": "KET 0156 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA12",
+        "to": "KET 0157 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA4",
+        "to": "KET 0158 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA4",
+        "to": "KET 0169 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA8",
+        "to": "KET 0168 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA10",
+        "to": "KET 0166 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA14",
+        "to": "KET 0162 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA14",
+        "to": "KET 0163 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA15",
+        "to": "KET 0164 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AA15",
+        "to": "KET 0165 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA1",
+        "to": "KET 0216 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA1",
+        "to": "KET 0219 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA1",
+        "to": "KET 0220 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA1",
+        "to": "KET 0221 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA1",
+        "to": "KET 0222 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA2",
+        "to": "KET 0223 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA2",
+        "to": "KET 0224 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA2",
+        "to": "KET 0225 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA3",
+        "to": "KET 0226 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA3",
+        "to": "KET 0227 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA3",
+        "to": "KET 0228 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA3",
+        "to": "KET 0229 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0230 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0231 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0232 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0233 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0234 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA6",
+        "to": "KET 0235 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA9",
+        "to": "KET 0238 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA11",
+        "to": "KET 0236 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA11",
+        "to": "KET 0237 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA10",
+        "to": "KET 0239 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA7",
+        "to": "KET 0240 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA7",
+        "to": "KET 0241 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA7",
+        "to": "KET 0242 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA4",
+        "to": "KET 0243 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BA8",
+        "to": "KET 0244 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 0946HH1",
+        "to": "KET_26_M6A",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_26_AA1",
+        "to": "KET 0947HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA1",
+        "to": "KET 0948HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA2",
+        "to": "KET 0949HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA2",
+        "to": "KET 0950HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA4",
+        "to": "KET 0886HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA5",
+        "to": "KET 0887HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA6",
+        "to": "KET 0888HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA7",
+        "to": "KET 0889HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA8",
+        "to": "KET 0890HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA9",
+        "to": "KET 0891HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA9",
+        "to": "KET 0892HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA9",
+        "to": "KET 0893HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA9",
+        "to": "KET 0894HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA10",
+        "to": "KET 0951HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA10",
+        "to": "KET 0952HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA11",
+        "to": "KET 0953HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA11",
+        "to": "KET 0954SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA16",
+        "to": "KET 0849HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA16",
+        "to": "KET 0885HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA18",
+        "to": "KET 0848HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA12",
+        "to": "KET 0955HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA15",
+        "to": "KET 0956HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA15",
+        "to": "KET 0957HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA19",
+        "to": "KET 0846HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_AA20",
+        "to": "KET 0847HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC122",
+        "to": "KET 2115 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC123",
+        "to": "KET 2100 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC123",
+        "to": "KET 2101 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC119",
+        "to": "KET 2110 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC119",
+        "to": "KET 2111 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC122",
+        "to": "KET 2114 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC132",
+        "to": "KET 1186 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC135",
+        "to": "KET 1188 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC135",
+        "to": "KET 1189 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC126",
+        "to": "KET 1180 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC127",
+        "to": "KET 1181 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC128",
+        "to": "KET 1182 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC129",
+        "to": "KET 1183 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GC133",
+        "to": "KET 1187 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC21",
+        "to": "KET 2158 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC21",
+        "to": "KET 2159 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC20",
+        "to": "KET 2160 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC20",
+        "to": "KET 2161 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC18",
+        "to": "KET 2169 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC17",
+        "to": "KET 2170 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC23",
+        "to": "KET 2180 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC23",
+        "to": "KET 2181 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB116",
+        "to": "KET 2103 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB115",
+        "to": "KET 2104 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB115",
+        "to": "KET 2105 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB116",
+        "to": "KET 2106 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB1111",
+        "to": "KET 2107 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB115",
+        "to": "KET 2108 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB114",
+        "to": "KET 2109 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_GB113",
+        "to": "KET 2112 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB1",
+        "to": "KET 0921HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB1",
+        "to": "KET 0922HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB1",
+        "to": "KET 0923HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB2",
+        "to": "KET 0895HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB2",
+        "to": "KET 0897HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB3",
+        "to": "KET 0896HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB4",
+        "to": "KET 0898HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB4",
+        "to": "KET 0900HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB5",
+        "to": "KET 0875HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB6",
+        "to": "KET 0873HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB8",
+        "to": "KET 0876HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB9",
+        "to": "KET 0877HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CB9",
+        "to": "KET 0878HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 0874HH1",
+        "to": "KET_26_CB7",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_26_CB7",
+        "to": "KET 0874HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA17",
+        "to": "KET 275 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA10",
+        "to": "KET 276 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA10",
+        "to": "KET 278 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA1",
+        "to": "KET 279 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA4",
+        "to": "KET 280 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA4",
+        "to": "KET 281 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA7",
+        "to": "KET 284 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA7",
+        "to": "KET 285 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_BA18",
+        "to": "KET 287 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0110 SCH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AB1",
+        "to": "KET 0116 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AB2",
+        "to": "KET 0120 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AB5",
+        "to": "KET 0122 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AB7",
+        "to": "KET 0127 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0131 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB1",
+        "to": "KET 0132 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0133 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB3",
+        "to": "KET 0135 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AB1",
+        "to": "KET 0139 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB3",
+        "to": "KET 0140 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB1",
+        "to": "KET 0141 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB3",
+        "to": "KET 0143 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB1",
+        "to": "KET 0144 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB1",
+        "to": "KET 0145 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0146 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0152 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BB2",
+        "to": "KET 0153 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AB2",
+        "to": "KET 1645 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AB3",
+        "to": "KET 1644 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA7",
+        "to": "KET 0937HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA1",
+        "to": "KET 0924HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA2",
+        "to": "KET 0925HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA2",
+        "to": "KET 0926HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA3",
+        "to": "KET 0927HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_CA10",
+        "to": "KET 0939HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB14",
+        "to": "KET 4017 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB13",
+        "to": "KET 4018 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB14",
+        "to": "KET 4019 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB8",
+        "to": "KET 4020 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB9",
+        "to": "KET 4021 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB7",
+        "to": "KET 4022 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB7",
+        "to": "KET 4023 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB3",
+        "to": "KET 4024 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AB5",
+        "to": "KET 4030 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AC14",
+        "to": "KET 5028 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AC16",
+        "to": "KET 5029 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AC16",
+        "to": "KET 5030 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA1",
+        "to": "KET 416 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA2",
+        "to": "KET 417 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA2",
+        "to": "KET 418 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA2",
+        "to": "KET 419 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA3",
+        "to": "KET 420 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA3",
+        "to": "KET 421 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA3",
+        "to": "KET 422 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA7",
+        "to": "KET 423 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA7",
+        "to": "KET 424 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA5",
+        "to": "KET 425 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA7",
+        "to": "KET 426 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA7",
+        "to": "KET 427 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA4",
+        "to": "KET 428 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA6",
+        "to": "KET 429 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BA8",
+        "to": "KET 430 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC19",
+        "to": "KET 2165 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB14",
+        "to": "KET 2166 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC19",
+        "to": "KET 2168 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB13",
+        "to": "KET 2172 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB13",
+        "to": "KET 2173 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DC6",
+        "to": "KET 2177 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FC97",
+        "to": "KET 2197 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FC90",
+        "to": "KET 2198 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FC97",
+        "to": "KET 2199 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FC92",
+        "to": "KET 2200 HC",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FC92",
+        "to": "KET 2206 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB4",
+        "to": "KET 2292 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB4",
+        "to": "KET 2293 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB3",
+        "to": "KET 2294 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB3",
+        "to": "KET 2295 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB2",
+        "to": "KET 2296 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CB1",
+        "to": "KET 2297 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB1",
+        "to": "KET 0176 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB4",
+        "to": "KET 0177 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB4",
+        "to": "KET 0178 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB2",
+        "to": "KET 0179 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB2",
+        "to": "KET 0180 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB8",
+        "to": "KET 0183 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB8",
+        "to": "KET 0184 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB5",
+        "to": "KET 0181 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_AB5",
+        "to": "KET 0182 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA8",
+        "to": "KET 432 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA2",
+        "to": "KET 440 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA2",
+        "to": "KET 441 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA1",
+        "to": "KET 443 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA10",
+        "to": "KET 438 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA4",
+        "to": "KET 436 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA4",
+        "to": "KET 437 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA4",
+        "to": "KET 439 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA3",
+        "to": "KET 431 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA7",
+        "to": "KET 435 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA5",
+        "to": "KET 433 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA5",
+        "to": "KET 434 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC9",
+        "to": "KET 0189 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC9",
+        "to": "KET 0196 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC2",
+        "to": "KET 0209 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC10",
+        "to": "KET 0188 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC10",
+        "to": "KET 0190 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC10",
+        "to": "KET 0191 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC10",
+        "to": "KET 0192 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC8",
+        "to": "KET 0185 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC8",
+        "to": "KET 0186 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC8",
+        "to": "KET 0187 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC8",
+        "to": "KET 0197 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC7",
+        "to": "KET 0193 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC7",
+        "to": "KET 0194 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC7",
+        "to": "KET 0195 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC6",
+        "to": "KET 0205 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC5",
+        "to": "KET 0198 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC5",
+        "to": "KET 0200 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC5",
+        "to": "KET 0201 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC5",
+        "to": "KET 0204 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC4",
+        "to": "KET 0199 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC4",
+        "to": "KET 0202 SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC4",
+        "to": "KET 0203 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC1",
+        "to": "KET 0210 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC1",
+        "to": "KET 0211 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_15_BC1",
+        "to": "KET 0212 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA14",
+        "to": "KET 0108 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA6",
+        "to": "KET 0109 SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA10",
+        "to": "KET 0111 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA8",
+        "to": "KET 0112 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA11",
+        "to": "KET 0113 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA2",
+        "to": "KET 0114 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA1",
+        "to": "KET 0115 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA1",
+        "to": "KET 0117 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA1",
+        "to": "KET 0118 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA1",
+        "to": "KET 0119 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0121 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA4",
+        "to": "KET 0123 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA12",
+        "to": "KET 0124 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA13",
+        "to": "KET 0125 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA13",
+        "to": "KET 0126 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0128 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0129 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0130 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0134 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA13",
+        "to": "KET 0136 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA13",
+        "to": "KET 0137 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA13",
+        "to": "KET 0138 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_BA1",
+        "to": "KET 0147 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_03_AA9",
+        "to": "KET 0151 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB3",
+        "to": "KET 1572 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB1",
+        "to": "KET 1573 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB3",
+        "to": "KET 1574 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB5",
+        "to": "KET 1575 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB5",
+        "to": "KET 1576 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB6",
+        "to": "KET 1577 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB9",
+        "to": "KET 1578 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB8",
+        "to": "KET 1579 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB7",
+        "to": "KET 1580 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB7",
+        "to": "KET 1581 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB7",
+        "to": "KET 1582 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB13",
+        "to": "KET 1584 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AB14",
+        "to": "KET 1585 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA10",
+        "to": "KET 1550 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA10",
+        "to": "KET 1551 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA10",
+        "to": "KET 1552 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA9",
+        "to": "KET 1553 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA9",
+        "to": "KET 1554 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA9",
+        "to": "KET 1555 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA9",
+        "to": "KET 1556 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA8",
+        "to": "KET 1557 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA8",
+        "to": "KET 1558 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA8",
+        "to": "KET 1559 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA8",
+        "to": "KET 1560 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA6",
+        "to": "KET 1561 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA7",
+        "to": "KET 1562 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA7",
+        "to": "KET 1563 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA4",
+        "to": "KET 1564 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA4",
+        "to": "KET 1565 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA3",
+        "to": "KET 1566 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA3",
+        "to": "KET 1567 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AA3",
+        "to": "KET 1568 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC2",
+        "to": "KET 711 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC2",
+        "to": "KET 712 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC2",
+        "to": "KET 713 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC1",
+        "to": "KET 714 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC1",
+        "to": "KET 715 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC2",
+        "to": "KET 716 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC3",
+        "to": "KET 717 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC1",
+        "to": "KET 718 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC4",
+        "to": "KET 723 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC4",
+        "to": "KET 724 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC5",
+        "to": "KET 725 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC5",
+        "to": "KET 726 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC5",
+        "to": "KET 727 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AC5",
+        "to": "KET 728 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA5",
+        "to": "KET 1069HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA7",
+        "to": "KET 1070HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA7",
+        "to": "KET 1071HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA1",
+        "to": "KET 1081HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA1",
+        "to": "KET 1082HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA1",
+        "to": "KET 1083HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA6",
+        "to": "KET 1085HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA8",
+        "to": "KET 1086HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_BA8",
+        "to": "KET 1087HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 1084HH1",
+        "to": "KET_12_BA6",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_18_BA3",
+        "to": "KET 5016 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA2",
+        "to": "KET 5017 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA1",
+        "to": "KET 5018 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA1",
+        "to": "KET 5019 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA1",
+        "to": "KET 5020 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA1",
+        "to": "KET 5021 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA1",
+        "to": "KET 5022 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_BA4",
+        "to": "KET 5027 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AA7",
+        "to": "KET 4025 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AA9",
+        "to": "KET 4027 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AA11",
+        "to": "KET 4028 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AA11",
+        "to": "KET 4029 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA1",
+        "to": "KET 398 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA1",
+        "to": "KET 399 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA1",
+        "to": "KET 400 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA2",
+        "to": "KET 401 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA2",
+        "to": "KET 402 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA4",
+        "to": "KET 403 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA3",
+        "to": "KET 404 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA3",
+        "to": "KET 405 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CA5",
+        "to": "KET 406 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB15",
+        "to": "KET 0049 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB1",
+        "to": "KET 0054 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB2",
+        "to": "KET 0055 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB2",
+        "to": "KET 0056 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB2",
+        "to": "KET 0057 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB5",
+        "to": "KET 0058 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB5",
+        "to": "KET 0059 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB9",
+        "to": "KET 0060 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB11",
+        "to": "KET 0061 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB14",
+        "to": "KET 0062 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB14",
+        "to": "KET 0063 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB14",
+        "to": "KET 0064 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB14",
+        "to": "KET 0065 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB12",
+        "to": "KET 0066 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB12",
+        "to": "KET 0067 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB11",
+        "to": "KET 0068 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB10",
+        "to": "KET 0069 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB3",
+        "to": "KET 0070 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB7",
+        "to": "KET 0071 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB7",
+        "to": "KET 0072 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB8",
+        "to": "KET 0073 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB8",
+        "to": "KET 0074 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BB6",
+        "to": "KET 0075 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB10",
+        "to": "KET 0076 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB10",
+        "to": "KET 0077 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB11",
+        "to": "KET 0078 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB11",
+        "to": "KET 0079 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB6",
+        "to": "KET 0080 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB8",
+        "to": "KET 0081 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB13",
+        "to": "KET 0082 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB1",
+        "to": "KET 0083 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB5",
+        "to": "KET 0084 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB5",
+        "to": "KET 0085 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB5",
+        "to": "KET 0086 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB3",
+        "to": "KET 0087 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB5",
+        "to": "KET 0088 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB7",
+        "to": "KET 0089 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB7",
+        "to": "KET 0090 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB7",
+        "to": "KET 0091 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB7",
+        "to": "KET 0092 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB7",
+        "to": "KET 0093 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB9",
+        "to": "KET 0094 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB9",
+        "to": "KET 0095 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AB14",
+        "to": "KET 0096 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA8",
+        "to": "KET 1111 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA8",
+        "to": "KET 1112 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA8",
+        "to": "KET 1113 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA6",
+        "to": "KET 1114 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA6",
+        "to": "KET 1115 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA5",
+        "to": "KET 1116 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA5",
+        "to": "KET 1117 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA4",
+        "to": "KET 1118 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA5",
+        "to": "KET 1119 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1120 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1121 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA3",
+        "to": "KET 1122 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA3",
+        "to": "KET 1123 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA4",
+        "to": "KET 1124 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA4",
+        "to": "KET 1125 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1126 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1127 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA1",
+        "to": "KET 1128 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1129 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA1",
+        "to": "KET 1130 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA2",
+        "to": "KET 1131 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA3",
+        "to": "KET 1132 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_21_AA1",
+        "to": "KET 1133 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AC3",
+        "to": "KET 1165 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AC3",
+        "to": "KET 1166 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AC1",
+        "to": "KET 1169 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AA1",
+        "to": "KET 442 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB5",
+        "to": "KET 446 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB5",
+        "to": "KET 447 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB4",
+        "to": "KET 448 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB2",
+        "to": "KET 449 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB4",
+        "to": "KET 450 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB6",
+        "to": "KET 451 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB6",
+        "to": "KET 452 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB6",
+        "to": "KET 453 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB7",
+        "to": "KET 454 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB7",
+        "to": "KET 455 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB7",
+        "to": "KET 456 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB11",
+        "to": "KET 457 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB11",
+        "to": "KET 458 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB10",
+        "to": "KET 459 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB9",
+        "to": "KET 460 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB9",
+        "to": "KET 461 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB9",
+        "to": "KET 462 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB9",
+        "to": "KET 463 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB9",
+        "to": "KET 464 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB10",
+        "to": "KET 465 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB1",
+        "to": "KET 444 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_AB3",
+        "to": "KET 445 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC1",
+        "to": "KET 962 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC1",
+        "to": "KET 963 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC1",
+        "to": "KET 964 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC1",
+        "to": "KET 965 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC2",
+        "to": "KET 967 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC3",
+        "to": "KET 968 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC3",
+        "to": "KET 969 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC3",
+        "to": "KET 970 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC3",
+        "to": "KET 971 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AC4",
+        "to": "KET 972 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AB1",
+        "to": "KET 719 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AB1",
+        "to": "KET 720 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AB1",
+        "to": "KET 721 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AB1",
+        "to": "KET 722 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AA1",
+        "to": "KET 1170 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AA2",
+        "to": "KET 1173 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AA2",
+        "to": "KET 1174 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_23_AA2",
+        "to": "KET 1175 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB13",
+        "to": "KET 0861HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB15",
+        "to": "KET 0862HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB17",
+        "to": "KET 0863HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB17",
+        "to": "KET 0864HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB5",
+        "to": "KET 0865HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB4",
+        "to": "KET 0866HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB20",
+        "to": "KET 0867HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB11",
+        "to": "KET 0869HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB16",
+        "to": "KET 0870HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB16",
+        "to": "KET 0871HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB11",
+        "to": "KET 0872HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB12",
+        "to": "KET 0879HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB8",
+        "to": "KET 0880HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB8",
+        "to": "KET 0881HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB7",
+        "to": "KET 0882HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB7",
+        "to": "KET 0883HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB1",
+        "to": "KET 0856HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB1",
+        "to": "KET 0857HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB2",
+        "to": "KET 0858HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB2",
+        "to": "KET 0859HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BB3",
+        "to": "KET 0860HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC1",
+        "to": "KET 1064HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC1",
+        "to": "KET 1065HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC3",
+        "to": "KET 1067HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC4",
+        "to": "KET 1068HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC8",
+        "to": "KET 1088HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AC6",
+        "to": "KET 1089HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 1066HH1",
+        "to": "KET_12_AC3",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_12_AC3",
+        "to": "KET 1066HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA1",
+        "to": "KET 2298 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA1",
+        "to": "KET 2301 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA3",
+        "to": "KET 2299 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA5",
+        "to": "KET 2302 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA5",
+        "to": "KET 2303 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA6",
+        "to": "KET 2304 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA8",
+        "to": "KET 2283 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA7",
+        "to": "KET 2305 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_CA2",
+        "to": "KET 2300 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB4",
+        "to": "KET 369 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB4",
+        "to": "KET 370 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB4",
+        "to": "KET 371 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB4",
+        "to": "KET 372 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB2",
+        "to": "KET 373 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB2",
+        "to": "KET 374 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB1",
+        "to": "KET 375 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EB1",
+        "to": "KET 376 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC61",
+        "to": "KET 2134 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC61",
+        "to": "KET 2135 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC63",
+        "to": "KET 2136 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC63",
+        "to": "KET 2137 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC58",
+        "to": "KET 2138 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC57",
+        "to": "KET 2139 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC57",
+        "to": "KET 2140 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC533",
+        "to": "KET 2141 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC533",
+        "to": "KET 2142 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC533",
+        "to": "KET 2143 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC55",
+        "to": "KET 2144 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC53",
+        "to": "KET 2145 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC53",
+        "to": "KET 2146 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC52",
+        "to": "KET 2147 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC52",
+        "to": "KET 2148 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EC50",
+        "to": "KET 2149 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA5",
+        "to": "KET 2279 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA5",
+        "to": "KET 2280 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA6",
+        "to": "KET 2281 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA7",
+        "to": "KET 2282 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA4",
+        "to": "KET 2277 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA4",
+        "to": "KET 2278 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_HA2",
+        "to": "KET 2276 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB11",
+        "to": "KET 1204 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB13",
+        "to": "KET 1205 HHS",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB15",
+        "to": "KET 1206 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB13",
+        "to": "KET 1207 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB13",
+        "to": "KET 1208 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB15",
+        "to": "KET 1209 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB15",
+        "to": "KET 1210 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB15",
+        "to": "KET 1211 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB10",
+        "to": "KET 1212 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB4",
+        "to": "KET 1213 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB4",
+        "to": "KET 1214 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB4",
+        "to": "KET 1215 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB5",
+        "to": "KET 1216 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB5",
+        "to": "KET 1217 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB7",
+        "to": "KET 1218 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB7",
+        "to": "KET 1219 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB8",
+        "to": "KET 1220 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB8",
+        "to": "KET 1221 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB8",
+        "to": "KET 1222 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB8",
+        "to": "KET 1223 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB8",
+        "to": "KET 1224 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB6",
+        "to": "KET 1225 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB9",
+        "to": "KET 1226 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB9",
+        "to": "KET 1227 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB12",
+        "to": "KET 1228 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB14",
+        "to": "KET 1229 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB16",
+        "to": "KET 1230 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB16",
+        "to": "KET 1231 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB14",
+        "to": "KET 1232 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB17",
+        "to": "KET 1233 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BB9",
+        "to": "KET 1234 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA16",
+        "to": "KET 0031 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA13",
+        "to": "KET 0032 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA15",
+        "to": "KET 0033 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA14",
+        "to": "KET 0034 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA13",
+        "to": "KET 0035 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA10",
+        "to": "KET 0036 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA7",
+        "to": "KET 0037 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA12",
+        "to": "KET 0038 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA12",
+        "to": "KET 0039 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA7",
+        "to": "KET 0040 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA9",
+        "to": "KET 0041 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA10",
+        "to": "KET 0042 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA8",
+        "to": "KET 0043 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA6",
+        "to": "KET 0044 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA8",
+        "to": "KET 0045 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA6",
+        "to": "KET 0046 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA4",
+        "to": "KET 0047 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA4",
+        "to": "KET 0048 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA5",
+        "to": "KET 0050 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA2",
+        "to": "KET 0051 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA2",
+        "to": "KET 0052 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_BA1",
+        "to": "KET 0053 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA1",
+        "to": "KET 0097 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA3",
+        "to": "KET 0099 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA3",
+        "to": "KET 0100 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA3",
+        "to": "KET 0101 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA4",
+        "to": "KET 0102 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA7",
+        "to": "KET 0103 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA5",
+        "to": "KET 0104 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA6",
+        "to": "KET 0105 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA9",
+        "to": "KET 0106 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_02_AA10",
+        "to": "KET 0107 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA13",
+        "to": "KET 0824HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA13",
+        "to": "KET 0826HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA13",
+        "to": "KET 0828HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA22",
+        "to": "KET 0829HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA15",
+        "to": "KET 0842HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA19",
+        "to": "KET 0844HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA19",
+        "to": "KET 0845HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA8",
+        "to": "KET 0851HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA8",
+        "to": "KET 0852HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA8",
+        "to": "KET 0884HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA5",
+        "to": "KET 0850HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA5",
+        "to": "KET 0853HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA5",
+        "to": "KET 0854HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA5",
+        "to": "KET 0855HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA21",
+        "to": "KET 0841HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA12",
+        "to": "KET 0839HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA14",
+        "to": "KET 0843HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA14",
+        "to": "KET 0840HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA1",
+        "to": "KET 0834HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA1",
+        "to": "KET 0835HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA1",
+        "to": "KET 0836HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA3",
+        "to": "KET 0837HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA3",
+        "to": "KET 0838HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA4",
+        "to": "KET 0833HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA10",
+        "to": "KET 0831HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA10",
+        "to": "KET 0832HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA11",
+        "to": "KET 0825HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_26_BA7",
+        "to": "KET 0827HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA14",
+        "to": "KET 1235 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA13",
+        "to": "KET 1236 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA10",
+        "to": "KET 1237 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA10",
+        "to": "KET 1238 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA10",
+        "to": "KET 1239 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA12",
+        "to": "KET 1240 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA7",
+        "to": "KET 1241 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA6",
+        "to": "KET 1242 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA6",
+        "to": "KET 1243 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_BA5",
+        "to": "KET 1244 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC5",
+        "to": "KET 387 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC4",
+        "to": "KET 388 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC5",
+        "to": "KET 389 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC6",
+        "to": "KET 390 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC2",
+        "to": "KET 391 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC2",
+        "to": "KET 392 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC2",
+        "to": "KET 393 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CC1",
+        "to": "KET 394 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA24",
+        "to": "KET 2182 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA25",
+        "to": "KET 2183 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA25",
+        "to": "KET 2184 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA26",
+        "to": "KET 2185 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA27",
+        "to": "KET 2186 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA29",
+        "to": "KET 2187 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA32",
+        "to": "KET 2188 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA30",
+        "to": "KET 2189 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA33",
+        "to": "KET 2190 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EA33",
+        "to": "KET 2192 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB8",
+        "to": "KET 1163 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB5",
+        "to": "KET 1171 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA1",
+        "to": "KET 1184 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA1",
+        "to": "KET 1185 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA1",
+        "to": "KET 1186 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA7",
+        "to": "KET 1187 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA7",
+        "to": "KET 1188 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA7",
+        "to": "KET 1189 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA7",
+        "to": "KET 1190 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA8",
+        "to": "KET 1191 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA8",
+        "to": "KET 1192 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA9",
+        "to": "KET 1193 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA9",
+        "to": "KET 1194 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA9",
+        "to": "KET 1195 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA9",
+        "to": "KET 1196 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA6",
+        "to": "KET 1197 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA6",
+        "to": "KET 1198 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA3",
+        "to": "KET 1199 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA3",
+        "to": "KET 1200 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA4",
+        "to": "KET 1201 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA4",
+        "to": "KET 1202 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA4",
+        "to": "KET 1203 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB140",
+        "to": "KET 2163 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB140",
+        "to": "KET 2164 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB14",
+        "to": "KET 2167 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DB13",
+        "to": "KET 2171 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BA1",
+        "to": "KET 1153 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BA1",
+        "to": "KET 1154 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BA5",
+        "to": "KET 1155 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BA4",
+        "to": "KET 1156 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB9",
+        "to": "KET 1586 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB9",
+        "to": "KET 1587 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB9",
+        "to": "KET 1588 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB8",
+        "to": "KET 1589 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB5",
+        "to": "KET 1590 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB5",
+        "to": "KET 1591 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB2",
+        "to": "KET 1592 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB2",
+        "to": "KET 1593 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AB2",
+        "to": "KET 1594 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB2",
+        "to": "KET 348 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB3",
+        "to": "KET 349 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB3",
+        "to": "KET 350 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB4",
+        "to": "KET 351 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB4",
+        "to": "KET 352 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FB6",
+        "to": "KET 353 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA4",
+        "to": "KET 1655 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA4",
+        "to": "KET 1656 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA4",
+        "to": "KET 1657 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA2",
+        "to": "KET 1650 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA2",
+        "to": "KET 1653 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA2",
+        "to": "KET 1654 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA3",
+        "to": "KET 1651 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA3",
+        "to": "KET 1652 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA1",
+        "to": "KET 1647 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA1",
+        "to": "KET 1648 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_30_AA1",
+        "to": "KET 1649 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA11",
+        "to": "KET 293 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA6",
+        "to": "KET 294 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA5",
+        "to": "KET 295 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA14",
+        "to": "KET 296 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA13",
+        "to": "KET 297 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA10",
+        "to": "KET 298 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA10",
+        "to": "KET 299 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA7",
+        "to": "KET 300 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA2",
+        "to": "KET 301 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA2",
+        "to": "KET 302 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA2",
+        "to": "KET 303 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA1",
+        "to": "KET 304 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AA9",
+        "to": "KET 327 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB6",
+        "to": "KET 1147 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB6",
+        "to": "KET 1148 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB6",
+        "to": "KET 1149 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB4",
+        "to": "KET 1150 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB4",
+        "to": "KET 1151 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB2",
+        "to": "KET 1157 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB1",
+        "to": "KET 1158 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB3",
+        "to": "KET 1159 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB3",
+        "to": "KET 1160 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_BB3",
+        "to": "KET 1161 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB44",
+        "to": "KET 2150 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB45",
+        "to": "KET 2151 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB45",
+        "to": "KET 2152 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB48",
+        "to": "KET 2153 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB431",
+        "to": "KET 2154 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB46",
+        "to": "KET 2155 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB46",
+        "to": "KET 2156 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB37",
+        "to": "KET 2191 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB36",
+        "to": "KET 2193 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB36",
+        "to": "KET 2194 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB36",
+        "to": "KET 2195 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB431",
+        "to": "KET 2321 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB431",
+        "to": "KET 2322 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB47",
+        "to": "KET 2323 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_EB47",
+        "to": "KET 2324 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA5",
+        "to": "KET 1633 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA6",
+        "to": "KET 1634 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA8",
+        "to": "KET 1635 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA8",
+        "to": "KET 1636 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA6",
+        "to": "KET 1637 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA10",
+        "to": "KET 1638 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA9",
+        "to": "KET 1639 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA10",
+        "to": "KET 1640 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA10",
+        "to": "KET 1641 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA11",
+        "to": "KET 1642 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AA12",
+        "to": "KET 1643 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA1",
+        "to": "KET 1595 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA2",
+        "to": "KET 1596 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA2",
+        "to": "KET 1597 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA7",
+        "to": "KET 1598 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1599 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1600 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1601 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1602 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1603 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA10",
+        "to": "KET 1604 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA3",
+        "to": "KET 1605 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA4",
+        "to": "KET 1606 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA4",
+        "to": "KET 1607 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA8",
+        "to": "KET 1608 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA9",
+        "to": "KET 1609 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA6",
+        "to": "KET 1610 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA6",
+        "to": "KET 1611 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA6",
+        "to": "KET 1612 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA5",
+        "to": "KET 1613 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA11",
+        "to": "KET 1614 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA5",
+        "to": "KET 1615 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA12",
+        "to": "KET 1616 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_28_AA13",
+        "to": "KET 1617 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB91",
+        "to": "KET 2202 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB91",
+        "to": "KET 2204 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB91",
+        "to": "KET 2205 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB861",
+        "to": "KET 2207 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB861",
+        "to": "KET 2208 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB861",
+        "to": "KET 2209 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FB861",
+        "to": "KET 2211 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA4",
+        "to": "KET 692 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA4",
+        "to": "KET 693 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA4",
+        "to": "KET 694 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA4",
+        "to": "KET 695 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA2",
+        "to": "KET 696 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA2",
+        "to": "KET 697 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA3",
+        "to": "KET 698 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA3",
+        "to": "KET 699 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA5",
+        "to": "KET 700 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA5",
+        "to": "KET 701 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA6",
+        "to": "KET 702 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA6",
+        "to": "KET 703 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA7",
+        "to": "KET 704 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA7",
+        "to": "KET 705 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA7",
+        "to": "KET 706 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA1",
+        "to": "KET 707 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA1",
+        "to": "KET 708 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA1",
+        "to": "KET 709 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_14_AA1",
+        "to": "KET 710 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA7",
+        "to": "KET 335 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA7",
+        "to": "KET 336 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA5",
+        "to": "KET 337 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA5",
+        "to": "KET 338 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA2",
+        "to": "KET 339 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA1",
+        "to": "KET 340 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA1",
+        "to": "KET 341 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA1",
+        "to": "KET 342 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA1",
+        "to": "KET 343 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA6",
+        "to": "KET 344 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA6",
+        "to": "KET 345 SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA6",
+        "to": "KET 346 HC",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA6",
+        "to": "KET 347 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA9",
+        "to": "KET 365 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA8",
+        "to": "KET 366 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_FA4",
+        "to": "KET 367 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA1",
+        "to": "KET 380 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA3",
+        "to": "KET 381 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA6",
+        "to": "KET 382 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA2",
+        "to": "KET 383 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA2",
+        "to": "KET 384 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA4",
+        "to": "KET 385 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EA7",
+        "to": "KET 386 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB10",
+        "to": "KET 4000 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB10",
+        "to": "KET 4001 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB10",
+        "to": "KET 4002 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB11",
+        "to": "KET 4003 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB11",
+        "to": "KET 4004 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB21",
+        "to": "KET 4005 CHU",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB12",
+        "to": "KET 4006 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB12",
+        "to": "KET 4007 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB13",
+        "to": "KET 4008 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB19",
+        "to": "KET 4014 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BB22",
+        "to": "KET 4015 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_AA9",
+        "to": "KET 4026 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DA9",
+        "to": "KET 2174 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DA10",
+        "to": "KET 2175 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_DA5",
+        "to": "KET 2178 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA85",
+        "to": "KET 2201 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA85",
+        "to": "KET 2210 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA84",
+        "to": "KET 2212 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA84",
+        "to": "KET 2213 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA83",
+        "to": "KET 2214 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA83",
+        "to": "KET 2215 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA82",
+        "to": "KET 2216 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA82",
+        "to": "KET 2217 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA81",
+        "to": "KET 2218 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA81",
+        "to": "KET 2219 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA81",
+        "to": "KET 2220 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA83",
+        "to": "KET 2222 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA82",
+        "to": "KET 2223 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA81",
+        "to": "KET 2224 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA80",
+        "to": "KET 2225 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA79",
+        "to": "KET 2227 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_FA80",
+        "to": "KET 2230 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA14",
+        "to": "KET 4009 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA15",
+        "to": "KET 4010 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA16",
+        "to": "KET 4011 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA14",
+        "to": "KET 4012 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA14",
+        "to": "KET 4013 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_19_BA18",
+        "to": "KET 4016 SCP",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AB4",
+        "to": "KET 5011 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AB4",
+        "to": "KET 5012 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AB3",
+        "to": "KET 5013 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AB3",
+        "to": "KET 5014 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_18_AB4",
+        "to": "KET 5015 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AC2",
+        "to": "KET 1569 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AC2",
+        "to": "KET 1570 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_27_AC2",
+        "to": "KET 1571 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB9",
+        "to": "KET 2284 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB8",
+        "to": "KET 2285 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB6",
+        "to": "KET 2286 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB2",
+        "to": "KET 2287 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB3",
+        "to": "KET 2288 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB7",
+        "to": "KET 2290 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_BB7",
+        "to": "KET 2291 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB2",
+        "to": "KET 958 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB1",
+        "to": "KET 959 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB1",
+        "to": "KET 960 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB1",
+        "to": "KET 961 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB5",
+        "to": "KET 973 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB5",
+        "to": "KET 974 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB7",
+        "to": "KET 975 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_13_AB7",
+        "to": "KET 976 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA6",
+        "to": "KET 0251HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA4",
+        "to": "KET 0252HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA4",
+        "to": "KET 0253HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA8",
+        "to": "KET 0254HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA8",
+        "to": "KET 0255HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA8",
+        "to": "KET 0256HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA7",
+        "to": "KET 0257HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA2",
+        "to": "KET 0258HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA4",
+        "to": "KET 0259HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AA6",
+        "to": "KET 0260SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB2",
+        "to": "KET 0956 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB2",
+        "to": "KET 0957 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB3",
+        "to": "KET 0958 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB2",
+        "to": "KET 0959 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB12",
+        "to": "KET 0961 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB12",
+        "to": "KET 0962 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB7",
+        "to": "KET 0963 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB4",
+        "to": "KET 0964 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AB11",
+        "to": "KET 0965 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB1",
+        "to": "KET 308 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB1",
+        "to": "KET 309 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB2",
+        "to": "KET 310 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB2",
+        "to": "KET 311 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB2",
+        "to": "KET 312 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB4",
+        "to": "KET 313 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB4",
+        "to": "KET 314 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB4",
+        "to": "KET 315 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB4",
+        "to": "KET 316 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB6",
+        "to": "KET 317 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB7",
+        "to": "KET 318 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AB8",
+        "to": "KET 319 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET 320 HH1",
+        "to": "KET_05_AB8",
+        "from_valid": false,
+        "to_valid": true
+      },
+      {
+        "from": "KET_25_AA7",
+        "to": "KET 0948 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA5",
+        "to": "KET 0949 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA5",
+        "to": "KET 0950 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA3",
+        "to": "KET 0951 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA2",
+        "to": "KET 0952 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA1",
+        "to": "KET 0953 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA1",
+        "to": "KET 0954 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA1",
+        "to": "KET 0955 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_25_AA1",
+        "to": "KET 0960 HH",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB8",
+        "to": "KET 0245HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB8",
+        "to": "KET 0246SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB4",
+        "to": "KET 0247HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB6",
+        "to": "KET 0248HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB6",
+        "to": "KET 0249HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB6",
+        "to": "KET 0250HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB3",
+        "to": "KET 0261HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB5",
+        "to": "KET 0262HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB7",
+        "to": "KET 0263HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB5",
+        "to": "KET 0264HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB10",
+        "to": "KET 0265HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB10",
+        "to": "KET 0266HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB2",
+        "to": "KET 0267HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB2",
+        "to": "KET 0268HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB2",
+        "to": "KET 0269HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB1",
+        "to": "KET 0270HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB1",
+        "to": "KET 0271HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB2",
+        "to": "KET 0272HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_04_AB10",
+        "to": "KET 0273HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_AA2",
+        "to": "KET 1163 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_22_AA2",
+        "to": "KET 1164 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB8",
+        "to": "KET 1164 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB8",
+        "to": "KET 1165 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB7",
+        "to": "KET 1166 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB6",
+        "to": "KET 1167 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB5",
+        "to": "KET 1168 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB5",
+        "to": "KET 1169 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB5",
+        "to": "KET 1170 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB4",
+        "to": "KET 1172 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB3",
+        "to": "KET 1173 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB3",
+        "to": "KET 1174 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB3",
+        "to": "KET 1175 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1176 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1177 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1178 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1179 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1180 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AB1",
+        "to": "KET 1181 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA1",
+        "to": "KET 1182 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_20_AA1",
+        "to": "KET 1183 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC4",
+        "to": "KET 803 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC4",
+        "to": "KET 805 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC4",
+        "to": "KET 806 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC2",
+        "to": "KET 807 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC2",
+        "to": "KET 808 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC1",
+        "to": "KET 809 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC3",
+        "to": "KET 810 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC3",
+        "to": "KET 811 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC3",
+        "to": "KET 812 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC5",
+        "to": "KET 813 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC12",
+        "to": "KET 814 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC12",
+        "to": "KET 815 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC12",
+        "to": "KET 816 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC10",
+        "to": "KET 817 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 818 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 819 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 820 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 821 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 822 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_06_AC9",
+        "to": "KET 823 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB8",
+        "to": "KET 1618 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB8",
+        "to": "KET 1619 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB3",
+        "to": "KET 1620 HH3",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB7",
+        "to": "KET 1621 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB7",
+        "to": "KET 1622 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB7",
+        "to": "KET 1623 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB9",
+        "to": "KET 1624 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB9",
+        "to": "KET 1625 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB10",
+        "to": "KET 1626 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB10",
+        "to": "KET 1627 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB10",
+        "to": "KET 1628 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB13",
+        "to": "KET 1629 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB13",
+        "to": "KET 1630 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB14",
+        "to": "KET 1631 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_29_AB14",
+        "to": "KET 1632 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC2",
+        "to": "KET 354 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC2",
+        "to": "KET 355 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC3",
+        "to": "KET 356 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC4",
+        "to": "KET 357 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC5",
+        "to": "KET 358 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DC5",
+        "to": "KET 359 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC1",
+        "to": "KET 305 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC1",
+        "to": "KET 306 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC1",
+        "to": "KET 307 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC3",
+        "to": "KET 321 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC4",
+        "to": "KET 322 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC4",
+        "to": "KET 323 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC6",
+        "to": "KET 325 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_AC5",
+        "to": "KET 324 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DB3",
+        "to": "KET 360 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DB2",
+        "to": "KET 361 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DB3",
+        "to": "KET 362 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_DB4",
+        "to": "KET 368 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB6",
+        "to": "KET 407 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB4",
+        "to": "KET 408 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB4",
+        "to": "KET 409 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB3",
+        "to": "KET 410 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB3",
+        "to": "KET 412 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB2",
+        "to": "KET 411 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB2",
+        "to": "KET 413 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_16_BB1",
+        "to": "KET 415 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC68",
+        "to": "KET 2221 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC68",
+        "to": "KET 2226 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC67",
+        "to": "KET 2242 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC67",
+        "to": "KET 2243 SME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC64",
+        "to": "KET 2244 HHSME",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_17_IC64",
+        "to": "KET 2245 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EC1",
+        "to": "KET 377 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EC1",
+        "to": "KET 378 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_EC1",
+        "to": "KET 379 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB3",
+        "to": "KET 1669 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB2",
+        "to": "KET 1662 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB2",
+        "to": "KET 1663 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB2",
+        "to": "KET 1664 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB1",
+        "to": "KET 1665 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB1",
+        "to": "KET 1666 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB1",
+        "to": "KET 1667 N/A",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_31_AB1",
+        "to": "KET 1668 HH2",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AB2",
+        "to": "KET 1062HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_12_AB2",
+        "to": "KET 1063HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CB1",
+        "to": "KET 395 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CB1",
+        "to": "KET 396 HH1",
+        "from_valid": true,
+        "to_valid": false
+      },
+      {
+        "from": "KET_05_CB1",
+        "to": "KET 397 HH1",
+        "from_valid": true,
+        "to_valid": false
+      }
+    ],
+    "connection_fixes": [],
+    "suggested_fixes": {
+      "KET_17_GA120 ->KET_17_GA100": {
+        "original_from": "KET_17_GA120 ",
+        "original_to": "KET_17_GA100",
+        "fixed_from": "KET_17_GA120",
+        "fixed_to": "KET_17_GA100"
+      },
+      "KET_17_GA120 ->KET_17_GA121": {
+        "original_from": "KET_17_GA120 ",
+        "original_to": "KET_17_GA121",
+        "fixed_from": "KET_17_GA120",
+        "fixed_to": "KET_17_GA121"
+      }
+    }
+  },
+  "summary": {
+    "total_pole_matches": 1574,
+    "total_pole_mismatches": 1,
+    "total_conductor_matches": 1575,
+    "total_conductor_invalid": 1235,
+    "total_connection_fixes": 0,
+    "total_suggested_fixes": 2
+  }
+}
