@@ -4,7 +4,7 @@ Data Cleaner
 Main data cleaning coordinator for imported network data.
 """
 
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 import logging
 import re
 
@@ -121,19 +121,34 @@ class DataCleaner:
         
         return fixed_conductors
     
-    def _find_closest_match(self, reference: str, valid_refs: Dict[str, str]) -> str:
+    def _find_closest_match(self, reference: str, valid_refs: Dict[str, str]) -> Optional[str]:
         """Find closest matching pole reference"""
         if reference in valid_refs:
             return valid_refs[reference]
         
+        # Extract the pole ID by removing common suffixes (HH1, HH2, SME, HHSME, N/A, etc.)
+        # These suffixes represent connection types or household identifiers
+        cleaned_ref = reference.strip()
+        
+        # Remove common connection type suffixes
+        suffixes_to_remove = ['HH1', 'HH2', 'HH3', 'HH4', 'HH5', 'SME', 'HHSME', 'N/A', 'NA']
+        for suffix in suffixes_to_remove:
+            if cleaned_ref.endswith(' ' + suffix):
+                cleaned_ref = cleaned_ref[:-len(' ' + suffix)].strip()
+            elif cleaned_ref.endswith(suffix):
+                cleaned_ref = cleaned_ref[:-len(suffix)].strip()
+        
+        # Check if cleaned reference exists
+        if cleaned_ref in valid_refs:
+            return valid_refs[cleaned_ref]
+        
         # Try variations
         variations = [
-            reference.replace(' ', ''),
-            reference.replace('_', ' '),
-            reference.upper(),
-            reference.replace('HH1', ''),  # Common suffix in data
-            reference.replace('HHSME', ''),
-            reference.replace('KET ', 'KET_'),  # Site prefix variations
+            cleaned_ref.replace(' ', ''),
+            cleaned_ref.replace('_', ' '),
+            cleaned_ref.upper(),
+            cleaned_ref.replace('KET ', 'KET_'),  # Site prefix variations
+            cleaned_ref.replace('KET_', 'KET '),
         ]
         
         for variant in variations:
@@ -141,7 +156,7 @@ class DataCleaner:
                 return valid_refs[variant]
         
         # Try fuzzy matching for close matches
-        reference_clean = re.sub(r'[^A-Z0-9]', '', reference.upper())
+        reference_clean = re.sub(r'[^A-Z0-9]', '', cleaned_ref.upper())
         for valid_ref in valid_refs:
             valid_clean = re.sub(r'[^A-Z0-9]', '', valid_ref.upper())
             if reference_clean == valid_clean:

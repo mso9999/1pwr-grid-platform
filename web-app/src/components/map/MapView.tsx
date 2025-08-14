@@ -66,12 +66,16 @@ interface NetworkData {
   transformers: Array<{ id: string; lat: number; lng: number; capacity: number }>
 }
 
-export function MapView({ site }: MapViewProps) {
+export function MapView({ site, networkData: propNetworkData, loading: propLoading }: MapViewProps) {
+  const [showFullscreen, setShowFullscreen] = useState(false)
   const [networkData, setNetworkData] = useState<NetworkData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showLabels, setShowLabels] = useState(true)
+  const [showGrid, setShowGrid] = useState(false)
+  const [showConnections, setShowConnections] = useState(true)
+  const [showVoltage, setShowVoltage] = useState(false)
   const [selectedLayer, setSelectedLayer] = useState<'all' | 'poles' | 'conductors' | 'transformers'>('all')
   const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
-  const mapRef = useRef<any>(null)
 
   // Status color mapping (consistent with uGridPLAN)
   const statusColors: { [key: string]: string } = {
@@ -83,12 +87,23 @@ export function MapView({ site }: MapViewProps) {
     'default': '#9E9E9E'        // Grey
   }
 
-  // Site center coordinates (example for KET)
-  const siteCoordinates: Record<string, [number, number]> = {
-    KET: [-29.8587, 28.7912],
-    MAK: [-29.7521, 28.6234],
-    LEB: [-29.9123, 28.8567],
-    // Add more sites as needed
+  // Calculate map center from actual data
+  const calculateCenter = (data: NetworkData): [number, number] => {
+    if (!data || !data.poles || data.poles.length === 0) {
+      // Default fallback for empty data
+      return [-30.07, 27.85] // KET actual coordinates
+    }
+    
+    // Calculate center from pole coordinates
+    const validPoles = data.poles.filter(p => p.lat && p.lng)
+    if (validPoles.length === 0) {
+      return [-30.07, 27.85]
+    }
+    
+    const avgLat = validPoles.reduce((sum, p) => sum + p.lat, 0) / validPoles.length
+    const avgLng = validPoles.reduce((sum, p) => sum + p.lng, 0) / validPoles.length
+    
+    return [avgLat, avgLng]
   }
 
   useEffect(() => {
@@ -97,53 +112,51 @@ export function MapView({ site }: MapViewProps) {
       import('@/lib/leaflet-config')
     }
     
-    // Simulate loading network data (will be replaced with API call)
-    setLoading(true)
-    setTimeout(() => {
-      // Generate sample data based on site
-      const center = siteCoordinates[site] || [-29.8587, 28.7912]
+    // Use network data from props if available
+    if (propNetworkData && propNetworkData.data) {
+      const data = propNetworkData.data
+      console.log('MapView received data:', {
+        poles: data.poles?.length || 0,
+        connections: data.connections?.length || 0,
+        conductors: data.conductors?.length || 0,
+        samplePole: data.poles?.[0]
+      })
       
-      // Generate sample poles
-      const poles = Array.from({ length: 50 }, (_, i) => ({
-        id: `${site}_POLE_${i + 1}`,
-        lat: center[0] + (Math.random() - 0.5) * 0.02,
-        lng: center[1] + (Math.random() - 0.5) * 0.02,
-        type: i % 10 === 0 ? 'MV' as const : 'LV' as const,
-        validated: Math.random() > 0.1,
-        status: ['as_designed', 'as_built', 'planned', 'pending'][Math.floor(Math.random() * 4)]
-      }))
-
-      // Generate connections (customer connection points)
-      const connections = Array.from({ length: 30 }, (_, i) => ({
-        id: `${site}_CON_${i + 1}`,
-        lat: center[0] + (Math.random() - 0.5) * 0.018,
-        lng: center[1] + (Math.random() - 0.5) * 0.018,
-        status: ['as_designed', 'as_built', 'planned', 'pending'][Math.floor(Math.random() * 4)]
-      }))
-
-      // Generate conductors connecting poles
-      const conductors = poles.slice(0, -1).map((pole, i) => ({
-        id: `${site}_COND_${i + 1}`,
-        from: pole.id,
-        to: poles[i + 1].id,
-        type: pole.type === 'MV' ? 'backbone' as const : 'distribution' as const
-      }))
-
-      // Generate transformers at key locations
-      const transformers = poles
-        .filter(p => p.type === 'MV')
-        .slice(0, 3)
-        .map((pole, i) => ({
-          id: `${site}_TX_${i + 1}`,
-          lat: pole.lat,
-          lng: pole.lng,
-          capacity: 500
-        }))
-
-      setNetworkData({ poles, connections, conductors, transformers })
+      // Transform backend data to match frontend format
+      // Backend returns pole_id but frontend expects id
+      const transformedData: NetworkData = {
+        poles: (data.poles || []).map((pole: any) => ({
+          ...pole,
+          id: pole.pole_id || pole.id,  // Map pole_id to id
+          lat: pole.latitude || pole.lat,
+          lng: pole.longitude || pole.lng,
+          type: pole.pole_type || pole.type || 'LV',
+          status: pole.status || 'as_built',
+          validated: pole.validated || false
+        })),
+        connections: (data.connections || []).map((conn: any) => ({
+          ...conn,
+          id: conn.survey_id || conn.id,
+          lat: conn.latitude || conn.lat,
+          lng: conn.longitude || conn.lng,
+          status: conn.status || 'as_built'
+        })),
+        conductors: (data.conductors || []).map((cond: any) => ({
+          ...cond,
+          id: cond.conductor_id || cond.id,
+          from: cond.from_pole || cond.from,
+          to: cond.to_pole || cond.to,
+          type: cond.conductor_type || cond.type || 'distribution'
+        })),
+        transformers: data.transformers || []
+      }
+      
+      setNetworkData(transformedData)
       setLoading(false)
-    }, 500)
-  }, [site])
+    } else if (propLoading !== undefined) {
+      setLoading(propLoading)
+    }
+  }, [propNetworkData, propLoading])
 
   if (loading) {
     return (
@@ -156,7 +169,7 @@ export function MapView({ site }: MapViewProps) {
     )
   }
 
-  const center = siteCoordinates[site] || [-29.8587, 28.7912]
+  const center: [number, number] = networkData ? calculateCenter(networkData) : [-30.07, 27.85]
 
   return (
     <div className="h-full w-full relative">
@@ -241,7 +254,6 @@ export function MapView({ site }: MapViewProps) {
 
       {/* Map */}
       <MapContainer
-        ref={mapRef}
         center={center}
         zoom={14}
         style={{ height: '100%', width: '100%' }}

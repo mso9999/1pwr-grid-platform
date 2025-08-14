@@ -7,11 +7,12 @@ import { DataStats } from '@/components/stats/DataStats'
 import { ValidationPanel } from '@/components/validation/ValidationPanel'
 import { Navigation } from '@/components/layout/Navigation'
 import FileUpload from '@/components/FileUpload'
+import ExportControls from '@/components/ExportControls'
 import { api } from '@/lib/api'
 
 export default function Dashboard() {
-  const [selectedSite, setSelectedSite] = useState<string>('KET')
-  const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation' | 'upload'>('upload')
+  const [selectedSite, setSelectedSite] = useState<string>('UGRIDPLAN')
+  const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation' | 'upload'>('map')
   const [networkData, setNetworkData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,10 +56,22 @@ export default function Dashboard() {
               <h1 className="text-xl font-bold text-gray-900">1PWR Grid Platform</h1>
               <p className="text-xs text-gray-600">Network Validation & Management</p>
             </div>
-            <SiteSelector 
-              selectedSite={selectedSite}
-              onSiteChange={setSelectedSite}
-            />
+            <div className="flex items-center gap-4">
+              {/* Export Controls - show when network data is loaded */}
+              {networkData && currentView !== 'upload' && (
+                <div className="min-w-[200px]">
+                  <ExportControls 
+                    site={selectedSite}
+                    onExportStart={() => console.log('Export started')}
+                    onExportComplete={() => console.log('Export complete')}
+                  />
+                </div>
+              )}
+              <SiteSelector 
+                selectedSite={selectedSite}
+                onSiteChange={setSelectedSite}
+              />
+            </div>
           </div>
         </header>
 

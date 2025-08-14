@@ -5,27 +5,29 @@ Provides REST API for network data operations and calculations
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import sys
-import os
+from typing import Dict, List, Any, Optional
 import json
-import io
+import pickle
 import tempfile
+import shutil
+import os
+import sys
 from pathlib import Path
+from datetime import datetime
 
 # Add parent directory to path for module imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import existing modules
 from modules.import_pipeline.excel_importer import ExcelImporter
-from modules.import_pipeline.pickle_importer import PickleImporter
+from modules.data_cleaning.data_cleaner import DataCleaner
 from modules.network_engine.voltage_calculator import VoltageCalculator
 from modules.network_engine.network_validator import NetworkValidator
-from modules.data_cleaning.data_cleaner import DataCleaner
 from modules.data_model.enhanced_model import EnhancedNetworkModel
 from modules.data_model.data_converter import DataConverter
+from modules.export_pipeline.excel_exporter import ExcelExporter
 
 app = FastAPI(title="1PWR Grid Platform API", version="0.1.0")
 
@@ -70,6 +72,7 @@ async def upload_excel(file: UploadFile = File(...)):
     Upload and process Excel file from uGridPLAN
     Returns processed network data
     """
+    print(f"\n=== Starting Excel upload for file: {file.filename} ===")
     try:
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file:
@@ -78,12 +81,61 @@ async def upload_excel(file: UploadFile = File(...)):
             tmp_path = tmp_file.name
         
         # Import using existing ExcelImporter
+        print(f"Creating ExcelImporter with temp file: {tmp_path}")
         importer = ExcelImporter(tmp_path)
-        network_data = importer.import_network()
+        print("Importing network data...")
+        import_result = importer.import_all()
+        
+        # Check if import was successful
+        if not import_result.get('success', False):
+            errors = import_result.get('errors', ['Unknown import error'])
+            raise ValueError(f"Import failed: {errors}")
+        
+        # Extract the actual data lists from the nested structure
+        network_data = {
+            'poles': import_result.get('poles', {}).get('poles', []),
+            'conductors': import_result.get('conductors', {}).get('conductors', []),
+            'connections': import_result.get('connections', {}).get('connections', []),
+            'transformers': import_result.get('transformers', {}).get('transformers', [])
+        }
+        
+        print(f"Extracted data: {len(network_data['poles'])} poles, {len(network_data['conductors'])} conductors")
+        
+        # Debug: Print sample pole IDs to understand format
+        if network_data['poles']:
+            sample_poles = network_data['poles'][:5]
+            print(f"Sample pole IDs: {[p.get('pole_id', 'NO_ID') for p in sample_poles]}")
+        
+        # Debug: Print sample conductor references to understand format
+        if network_data['conductors']:
+            sample_conductors = network_data['conductors'][:5]
+            print(f"Sample conductor refs: {[(c.get('from_pole'), c.get('to_pole')) for c in sample_conductors]}")
+        
+        # Merge connections as valid nodes for conductor reference matching
+        # The Connections sheet contains customer connection points that are referenced by DropLines
+        print(f"Processing {len(network_data['connections'])} customer connections...")
+        
+        # Add each connection as a node that can be referenced by conductors
+        for connection in network_data['connections']:
+            survey_id = connection.get('survey_id', '')
+            if survey_id:
+                # Add connection as a special node type for reference matching
+                network_data['poles'].append({
+                    'pole_id': survey_id,
+                    'pole_name': survey_id,
+                    'pole_type': 'CUSTOMER_CONNECTION',
+                    'gps_lat': connection.get('gps_lat'),
+                    'gps_lng': connection.get('gps_lng'),
+                    'utm_x': connection.get('utm_x'),
+                    'utm_y': connection.get('utm_y'),
+                    'from_connections_sheet': True  # Mark source for debugging
+                })
+        
+        print(f"After merging connections: {len(network_data['poles'])} total nodes (poles + customer connections)")
         
         # Clean the data
         cleaner = DataCleaner()
-        cleaned_data = cleaner.clean_network_data(network_data)
+        cleaned_data, cleaning_report = cleaner.clean_data(network_data)
         
         # Extract site name from filename
         site_name = file.filename.split('.')[0].upper()
@@ -106,7 +158,14 @@ async def upload_excel(file: UploadFile = File(...)):
         })
         
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        import traceback
+        error_msg = str(e)
+        error_trace = traceback.format_exc()
+        print(f"\n=== ERROR in upload_excel ===")
+        print(f"Error: {error_msg}")
+        print(f"Traceback:\n{error_trace}")
+        print(f"=== END ERROR ===")
+        raise HTTPException(status_code=400, detail=error_msg)
 
 @app.post("/api/upload/pickle")
 async def upload_pickle(file: UploadFile = File(...)):
@@ -267,30 +326,102 @@ async def calculate_voltage(request: VoltageRequest):
         )
 
 @app.post("/api/validate/network")
-async def validate_network(request: NetworkRequest):
-    """
-    Validate network topology and constraints
-    Returns validation results and identified issues
-    """
+async def validate_network(site: str = "default"):
+    """Validate network topology and data integrity"""
     try:
-        # Initialize validator
+        # Get network data from storage
+        network_data = network_storage.get(site)
+        if not network_data:
+            raise HTTPException(status_code=404, detail=f"No network data found for site: {site}")
+        
+        # Create validator
         validator = NetworkValidator()
         
-        # Run validation
-        is_valid, issues = validator.validate_network(request.data)
-        
-        return CalculationResponse(
-            success=is_valid,
-            message="Validation complete" if is_valid else "Validation found issues",
-            results={"issues": issues}
+        # Validate network
+        validation_results = validator.validate_network(
+            poles=network_data.get('poles', []),
+            conductors=network_data.get('conductors', [])
         )
         
+        return {
+            "success": True,
+            "site": site,
+            "results": validation_results
+        }
     except Exception as e:
-        return CalculationResponse(
-            success=False,
-            message=str(e),
-            errors=[str(e)]
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/export/network-report")
+async def export_network_report(
+    site: str = "default",
+    include_voltage: bool = True,
+    include_validation: bool = True
+):
+    """Generate comprehensive network report in Excel format"""
+    try:
+        # Get network data from storage
+        network_data = network_storage.get(site)
+        if not network_data:
+            raise HTTPException(status_code=404, detail=f"No network data found for site: {site}")
+        
+        # Get voltage results if requested
+        voltage_results = None
+        if include_voltage:
+            voltage_results = voltage_storage.get(site)
+        
+        # Get validation results if requested
+        validation_results = None
+        if include_validation:
+            validator = NetworkValidator()
+            validation_results = validator.validate_network(
+                poles=network_data.get('poles', []),
+                conductors=network_data.get('conductors', [])
+            )
+        
+        # Create exporter and generate report
+        exporter = ExcelExporter()
+        output_path = exporter.export_network_report(
+            network_data=network_data,
+            voltage_results=voltage_results,
+            validation_results=validation_results,
+            site_name=site
         )
+        
+        # Return file for download
+        return FileResponse(
+            path=output_path,
+            media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            filename=os.path.basename(output_path)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/export/field-report")
+async def export_field_report(request: dict):
+    """Generate field team report in Excel format"""
+    try:
+        site_name = request.get("site", "Unknown")
+        work_completed = request.get("work_completed", [])
+        pending_work = request.get("pending_work", [])
+        issues = request.get("issues", [])
+        
+        # Create exporter and generate report
+        exporter = ExcelExporter()
+        output_path = exporter.export_field_report(
+            site_name=site_name,
+            work_completed=work_completed,
+            pending_work=pending_work,
+            issues=issues
+        )
+        
+        # Return file for download
+        return FileResponse(
+            path=output_path,
+            media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            filename=os.path.basename(output_path)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sites")
 async def list_sites():
