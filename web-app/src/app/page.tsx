@@ -1,15 +1,45 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MapView } from '@/components/map/MapView'
 import { SiteSelector } from '@/components/site/SiteSelector'
 import { DataStats } from '@/components/stats/DataStats'
 import { ValidationPanel } from '@/components/validation/ValidationPanel'
 import { Navigation } from '@/components/layout/Navigation'
+import FileUpload from '@/components/FileUpload'
+import { api } from '@/lib/api'
 
 export default function Dashboard() {
   const [selectedSite, setSelectedSite] = useState<string>('KET')
-  const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation'>('map')
+  const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation' | 'upload'>('upload')
+  const [networkData, setNetworkData] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch network data when site changes
+  useEffect(() => {
+    if (selectedSite && currentView !== 'upload') {
+      fetchNetworkData(selectedSite)
+    }
+  }, [selectedSite, currentView])
+
+  const fetchNetworkData = async (site: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.getNetwork(site)
+      setNetworkData(response.data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load network data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUploadSuccess = (site: string) => {
+    setSelectedSite(site)
+    setCurrentView('map')
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -35,9 +65,22 @@ export default function Dashboard() {
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
           <div className="h-full">
-            {currentView === 'map' && <MapView site={selectedSite} />}
-            {currentView === 'stats' && <DataStats site={selectedSite} />}
-            {currentView === 'validation' && <ValidationPanel site={selectedSite} />}
+            {currentView === 'upload' && (
+              <div className="h-full flex items-center justify-center">
+                <FileUpload 
+                  onUploadSuccess={handleUploadSuccess}
+                  onUploadError={setError}
+                />
+              </div>
+            )}
+            {currentView === 'map' && <MapView site={selectedSite} networkData={networkData} loading={loading} />}
+            {currentView === 'stats' && <DataStats site={selectedSite} networkData={networkData} />}
+            {currentView === 'validation' && <ValidationPanel site={selectedSite} networkData={networkData} />}
+            {error && (
+              <div className="absolute bottom-4 right-4 bg-red-50 text-red-800 p-4 rounded-md">
+                {error}
+              </div>
+            )}
           </div>
         </main>
       </div>

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { AlertTriangle, CheckCircle, XCircle, Info, Search, Filter } from 'lucide-react'
 
 interface ValidationPanelProps {
-  site: string
+  site: string;
+  networkData?: any;
 }
 
 interface ValidationIssue {

@@ -1,14 +1,15 @@
-import { Map, Database, CheckCircle, Settings, FileText } from 'lucide-react'
+import { Map, BarChart, CheckCircle, Upload, FileText, Settings } from 'lucide-react'
 
 interface NavigationProps {
-  currentView: string
-  onViewChange: (view: 'map' | 'stats' | 'validation') => void
+  currentView: 'map' | 'stats' | 'validation' | 'upload';
+  onViewChange: (view: 'map' | 'stats' | 'validation' | 'upload') => void;
 }
 
 export function Navigation({ currentView, onViewChange }: NavigationProps) {
   const navItems = [
+    { id: 'upload', label: 'Upload Data', icon: Upload },
     { id: 'map', label: 'Network Map', icon: Map },
-    { id: 'stats', label: 'Data Stats', icon: Database },
+    { id: 'stats', label: 'Data Stats', icon: BarChart },
     { id: 'validation', label: 'Validation', icon: CheckCircle },
   ]
 

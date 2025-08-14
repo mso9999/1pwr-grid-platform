@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Activity, Users, Zap, AlertCircle } from 'lucide-react'
 
 interface DataStatsProps {
-  site: string
+  site: string;
+  networkData?: any;
 }
 
 interface SiteStats {

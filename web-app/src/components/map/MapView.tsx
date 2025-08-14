@@ -39,7 +39,9 @@ const ZoomControl = dynamic(
 )
 
 interface MapViewProps {
-  site: string
+  site: string;
+  networkData?: any;
+  loading?: boolean;
 }
 
 interface NetworkData {
