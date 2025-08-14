@@ -252,15 +252,16 @@ export function MapView({ site, networkData: propNetworkData, loading: propLoadi
         </div>
       </div>
 
-      {/* Map */}
-      <MapContainer
-        center={center}
-        zoom={14}
-        style={{ height: '100%', width: '100%' }}
-        minZoom={10}
-        maxZoom={20}
-        zoomControl={false}
-      >
+      {/* Map Container with explicit height */}
+      <div className="absolute inset-0 z-0">
+        <MapContainer
+          center={center}
+          zoom={14}
+          style={{ height: '100%', width: '100%' }}
+          minZoom={10}
+          maxZoom={20}
+          zoomControl={false}
+        >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -369,7 +370,8 @@ export function MapView({ site, networkData: propNetworkData, loading: propLoadi
               </Popup>
             </Marker>
           ))}
-      </MapContainer>
+        </MapContainer>
+      </div>
     </div>
   )
 }

@@ -107,6 +107,22 @@ class ExcelImporter:
         
         poles = []
         for _, row in df.iterrows():
+            # Get status codes from Excel as per MGD045V03 SOP
+            st_code_1 = row.get('St_code_1', 0)  # Pole Construction Progress (0-9)
+            st_code_2 = row.get('St_code_2', 'NA')  # Further Pole Progress
+            
+            # Derive installation status from St_code_1 (construction progress)
+            # Based on MGD045V03 SOP Table 2: Status codes 1 (Pole Progress)
+            if st_code_1 >= 7:
+                # 7=Pole planted, 8=Poletop dressed, 9=Conductor attached
+                status = 'installed'
+            elif st_code_1 >= 1:
+                # 1-6 = Various planning/preparation stages
+                status = 'planned'
+            else:
+                # 0 = uGridNET output (default)
+                status = 'as_designed'
+            
             pole = {
                 'pole_id': str(row['ID']),
                 'pole_type': row.get('Type', 'standard'),
@@ -117,7 +133,9 @@ class ExcelImporter:
                 'gps_lat': row.get('GPS_Y'),  # Note: Y is latitude
                 'gps_lng': row.get('GPS_X'),  # Note: X is longitude
                 'subnetwork': row.get('SubNetwork', 'main'),
-                'status': 'as_designed'  # Default status
+                'status': status,
+                'st_code_1': st_code_1,  # Keep original codes for reference
+                'st_code_2': st_code_2
             }
             poles.append(pole)
         

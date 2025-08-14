@@ -137,11 +137,40 @@ async def upload_excel(file: UploadFile = File(...)):
         cleaner = DataCleaner()
         cleaned_data, cleaning_report = cleaner.clean_data(network_data)
         
-        # Extract site name from filename
-        site_name = file.filename.split('.')[0].upper()
+        # Extract site name from the actual data
+        # Look at pole IDs to determine the site name (e.g., "KET_17_GA124" -> "KET")
+        site_name = "UNKNOWN"
+        if cleaned_data.get('poles') and len(cleaned_data['poles']) > 0:
+            # Get the first pole ID and extract the site prefix
+            first_pole_id = cleaned_data['poles'][0].get('pole_id', '')
+            if first_pole_id and '_' in first_pole_id:
+                # Extract the prefix before the first underscore
+                site_name = first_pole_id.split('_')[0].upper()
+            elif first_pole_id:
+                # If no underscore, try to extract the alphabetic prefix
+                import re
+                match = re.match(r'^([A-Za-z]+)', first_pole_id)
+                if match:
+                    site_name = match.group(1).upper()
+        
+        # If we couldn't extract from pole IDs, fall back to filename
+        if site_name == "UNKNOWN":
+            site_name = file.filename.split('.')[0].upper()
+            
+        print(f"Extracted site name: {site_name}")
         
         # Store in memory
         network_storage[site_name] = cleaned_data
+        
+        # Debug: Log what's actually stored
+        print(f"\n=== Data stored in network_storage[{site_name}] ===")
+        print(f"Poles: {len(cleaned_data.get('poles', []))}")
+        print(f"Conductors: {len(cleaned_data.get('conductors', []))}")
+        print(f"Connections: {len(cleaned_data.get('connections', []))}")
+        print(f"Transformers: {len(cleaned_data.get('transformers', []))}")
+        if cleaned_data.get('conductors'):
+            print(f"Sample conductor: {cleaned_data['conductors'][0]}")
+        print(f"=== End storage debug ===\n")
         
         # Clean up temp file
         os.unlink(tmp_path)
@@ -237,7 +266,9 @@ async def get_network(site: str):
             "lat": pole.get('gps_lat'),
             "lng": pole.get('gps_lng'),
             "type": pole.get('pole_type', 'standard'),
+            "pole_class": pole.get('angle_class', pole.get('pole_class', 'Unknown')),  # Check both field names
             "status": pole.get('status', 'as_designed'),
+            "is_connection": pole.get('from_connections_sheet', False),
             "utm_x": pole.get('utm_x'),
             "utm_y": pole.get('utm_y')
         })
@@ -249,6 +280,7 @@ async def get_network(site: str):
             "from": conductor.get('from_pole'),
             "to": conductor.get('to_pole'),
             "type": conductor.get('conductor_type', 'distribution'),
+            "status": conductor.get('status', 'as_designed'),
             "length": conductor.get('length_m')
         })
     

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MapView } from '@/components/map/MapView'
+import dynamic from 'next/dynamic'
 import { SiteSelector } from '@/components/site/SiteSelector'
 import { DataStats } from '@/components/stats/DataStats'
 import { ValidationPanel } from '@/components/validation/ValidationPanel'
@@ -9,6 +9,15 @@ import { Navigation } from '@/components/layout/Navigation'
 import FileUpload from '@/components/FileUpload'
 import ExportControls from '@/components/ExportControls'
 import { api } from '@/lib/api'
+
+// Import MapView dynamically with SSR disabled (Leaflet requires browser APIs)
+const MapView = dynamic(
+  () => import('@/components/map/ClientMap').then((mod) => mod.ClientMap),
+  { 
+    ssr: false,
+    loading: () => <div className="h-full flex items-center justify-center">Loading map...</div>
+  }
+)
 
 export default function Dashboard() {
   const [selectedSite, setSelectedSite] = useState<string>('UGRIDPLAN')
@@ -25,12 +34,19 @@ export default function Dashboard() {
   }, [selectedSite, currentView])
 
   const fetchNetworkData = async (site: string) => {
+    console.log('Fetching network data for site:', site)
     setLoading(true)
     setError(null)
     try {
       const response = await api.getNetwork(site)
+      console.log('Network data fetched:', {
+        poles: response.data?.poles?.length || 0,
+        conductors: response.data?.conductors?.length || 0,
+        connections: response.data?.connections?.length || 0
+      })
       setNetworkData(response.data)
     } catch (err) {
+      console.error('Failed to fetch network data:', err)
       setError(err instanceof Error ? err.message : 'Failed to load network data')
     } finally {
       setLoading(false)
