@@ -1,8 +1,23 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Layers, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { 
+  ZoomIn, 
+  ZoomOut, 
+  Maximize2, 
+  Minimize2, 
+  Layers,
+  Navigation,
+  RefreshCw,
+  Zap 
+} from 'lucide-react'
+
+// Import VoltageOverlay component
+const VoltageOverlay = dynamic(
+  () => import('./VoltageOverlay'),
+  { ssr: false }
+)
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(
@@ -55,6 +70,7 @@ export function MapView({ site }: MapViewProps) {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedLayer, setSelectedLayer] = useState<'all' | 'poles' | 'conductors' | 'transformers'>('all')
+  const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
   const mapRef = useRef<any>(null)
 
   // Status color mapping (consistent with uGridPLAN)
@@ -146,6 +162,20 @@ export function MapView({ site }: MapViewProps) {
     <div className="h-full w-full relative">
       {/* Map Controls */}
       <div className="absolute top-4 right-4 z-[1000] space-y-2">
+        {/* Voltage Overlay Toggle */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+          <button
+            onClick={() => setVoltageOverlayEnabled(!voltageOverlayEnabled)}
+            className={`flex items-center gap-2 px-3 py-2 rounded text-sm font-medium transition-colors w-full ${
+              voltageOverlayEnabled ? 'bg-yellow-100 text-yellow-700' : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            {voltageOverlayEnabled ? 'Voltage ON' : 'Voltage OFF'}
+          </button>
+        </div>
+        
+        {/* Layer Controls */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1">
           <button
             onClick={() => setSelectedLayer('all')}
@@ -226,8 +256,20 @@ export function MapView({ site }: MapViewProps) {
         
         <ZoomControl position="bottomright" />
 
-        {/* Render conductors with accurate positioning */}
-        {networkData?.conductors?.map((conductor: any, idx: number) => {
+        {/* Render voltage overlay if enabled */}
+        {voltageOverlayEnabled && networkData && (
+          <VoltageOverlay
+            site={site}
+            conductors={networkData.conductors}
+            poles={networkData.poles}
+            enabled={voltageOverlayEnabled}
+            sourceVoltage={11000}
+            voltageThreshold={7.0}
+          />
+        )}
+
+        {/* Render conductors with accurate positioning (only if voltage overlay is off) */}
+        {!voltageOverlayEnabled && networkData?.conductors?.map((conductor: any, idx: number) => {
           const fromPole = networkData.poles.find((p: any) => p.id === conductor.from)
           const toPole = networkData.poles.find((p: any) => p.id === conductor.to)
           

@@ -21,7 +21,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import existing modules
 from modules.import_pipeline.excel_importer import ExcelImporter
 from modules.import_pipeline.pickle_importer import PickleImporter
-from modules.network_engine.network_engine import NetworkEngine
 from modules.network_engine.voltage_calculator import VoltageCalculator
 from modules.network_engine.network_validator import NetworkValidator
 from modules.data_cleaning.data_cleaner import DataCleaner
