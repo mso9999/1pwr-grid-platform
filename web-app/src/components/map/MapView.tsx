@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Layers, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import type { Icon } from 'leaflet'
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(
@@ -52,6 +51,11 @@ export function MapView({ site }: MapViewProps) {
   }
 
   useEffect(() => {
+    // Initialize Leaflet icon configuration
+    if (typeof window !== 'undefined') {
+      import('@/lib/leaflet-config')
+    }
+    
     // Simulate loading network data (will be replaced with API call)
     setLoading(true)
     setTimeout(() => {
@@ -102,7 +106,7 @@ export function MapView({ site }: MapViewProps) {
   const center = siteCoordinates[site] || [-29.8587, 28.7912]
 
   return (
-    <div className="relative w-full h-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="h-full w-full relative" style={{ minHeight: '600px' }}>
       {/* Map Controls */}
       <div className="absolute top-4 right-4 z-[1000] space-y-2">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1">
@@ -170,10 +174,10 @@ export function MapView({ site }: MapViewProps) {
 
       {/* Map */}
       <MapContainer
-        center={center}
-        zoom={15}
-        style={{ height: '100%', width: '100%' }}
         ref={mapRef}
+        center={center}
+        zoom={14}
+        style={{ height: '100%', width: '100%', minHeight: '600px' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

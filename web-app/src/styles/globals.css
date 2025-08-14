@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet map fixes */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  min-height: 600px;
+}
+
+.leaflet-tile-container img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-marker-icon {
+  background: none !important;
+  border: none !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
