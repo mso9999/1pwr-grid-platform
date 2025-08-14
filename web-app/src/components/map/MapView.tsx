@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Layers, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import type { Icon } from 'leaflet'
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(
@@ -194,75 +195,42 @@ export function MapView({ site }: MapViewProps) {
 
         {/* Render poles */}
         {networkData && (selectedLayer === 'all' || selectedLayer === 'poles') && 
-          networkData.poles.map((pole) => {
-            const icon = new (window as any).L.DivIcon({
-              className: 'custom-marker',
-              html: `<div style="
-                width: 12px;
-                height: 12px;
-                background-color: ${pole.type === 'MV' ? '#ef4444' : '#3b82f6'};
-                border: 2px solid white;
-                border-radius: 50%;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-              "></div>`,
-              iconSize: [12, 12],
-              iconAnchor: [6, 6]
-            })
-
-            return (
-              <Marker
-                key={pole.id}
-                position={[pole.lat, pole.lng]}
-                icon={icon}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <p className="font-medium">{pole.id}</p>
-                    <p className="text-gray-600">Type: {pole.type}</p>
-                    <p className="text-gray-600">
-                      Status: {pole.validated ? 
-                        <span className="text-green-600">Validated</span> : 
-                        <span className="text-orange-600">Pending</span>
-                      }
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            )
-          })}
-
+          networkData.poles.map((pole) => (
+            <Marker
+              key={pole.id}
+              position={[pole.lat, pole.lng]}
+            >
+              <Popup>
+                <div className="text-sm">
+                  <p className="font-medium">{pole.id}</p>
+                  <p className="text-gray-600">Type: {pole.type}</p>
+                  <p className="text-gray-600">
+                    Status: {pole.validated ? 
+                      <span className="text-green-600">Validated</span> : 
+                      <span className="text-orange-600">Pending</span>
+                    }
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          ))
+        }
+        
         {/* Render transformers */}
         {networkData && (selectedLayer === 'all' || selectedLayer === 'transformers') && 
-          networkData.transformers.map((transformer) => {
-            const icon = new (window as any).L.DivIcon({
-              className: 'custom-marker',
-              html: `<div style="
-                width: 16px;
-                height: 16px;
-                background-color: #8b5cf6;
-                border: 2px solid white;
-                border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-              "></div>`,
-              iconSize: [16, 16],
-              iconAnchor: [8, 8]
-            })
-
-            return (
-              <Marker
-                key={transformer.id}
-                position={[transformer.lat, transformer.lng]}
-                icon={icon}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <p className="font-medium">{transformer.id}</p>
-                    <p className="text-gray-600">Capacity: {transformer.capacity} kVA</p>
-                  </div>
-                </Popup>
-              </Marker>
-            )
-          })}
+          networkData.transformers.map((transformer) => (
+            <Marker
+              key={transformer.id}
+              position={[transformer.lat, transformer.lng]}
+            >
+              <Popup>
+                <div className="text-sm">
+                  <p className="font-medium">{transformer.id}</p>
+                  <p className="text-gray-600">Capacity: {transformer.capacity} kVA</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
       </MapContainer>
     </div>
   )
