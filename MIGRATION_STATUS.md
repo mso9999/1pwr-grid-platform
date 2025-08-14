@@ -3,6 +3,8 @@
 ## Overview
 This document tracks the migration progress from desktop uGridPLAN to the web platform.
 
+**Cross-references**: See [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md) for detailed architecture and implementation notes.
+
 ## Current Status (2025-08-14)
 
 ### ✅ Completed Features
@@ -27,6 +29,17 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - Conductor/line rendering with MV/LV differentiation
 - Installation status visualization (solid vs dashed lines)
 - Popup information for all network elements
+- **Voltage Drop Visualization** (per DEVELOPER_HANDOVER.md)
+  - VoltageOverlay.tsx component implemented
+  - Color gradient: Green (0-2%) → Yellow (4-6%) → Red (>8%)
+  - Real-time calculations via backend API
+  - Violation detection and highlighting
+
+#### Data Export
+- **Excel Export** functionality (per DEVELOPER_HANDOVER.md)
+  - ExcelExporter module in backend
+  - API endpoint: `/api/export/excel/{site}`
+  - Frontend API client support
 
 #### Visual Specifications (per MGD045V03 SOP)
 - **Poles**: Circles with St_code_1 color mapping
@@ -51,10 +64,10 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 ### 🚧 In Progress / Known Issues
 
 1. **Map Functionality**
-   - Add/edit/delete network elements not yet implemented
+   - Add/edit/delete network elements not yet implemented (0% per DEVELOPER_HANDOVER.md)
    - Search functionality not implemented
-   - Voltage drop visualization not implemented
-   - Export functionality not implemented
+   - ~~Voltage drop visualization~~ ✅ IMPLEMENTED (VoltageOverlay.tsx)
+   - ~~Export functionality~~ ✅ IMPLEMENTED (ExcelExporter module)
 
 2. **User Management**
    - Login/authentication system not implemented
@@ -112,6 +125,26 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - Site: KET (Ketane)
 - Elements: 2854 nodes, 2810 conductors, 48 transformers
 
+## Cross-Reference with DEVELOPER_HANDOVER.md
+
+### Alignment Status
+- **Backend Modules**: ~80% complete (matches handover assessment)
+- **Frontend**: ~30% complete (was 20% in handover, now includes conductor fixes)
+- **API Integration**: 80% complete (per handover)
+- **Voltage Drop**: ✅ Complete (per handover, component exists)
+- **Excel Export**: ✅ Complete (per handover, module exists)
+- **Network Editing**: 0% (matches handover)
+- **As-Built Tracking**: 0% (matches handover)
+
+### Discrepancies Resolved
+- Added voltage drop visualization to completed features
+- Added Excel export functionality to completed features
+- Clarified that some features marked complete in handover need integration testing
+- Updated percentages to reflect latest conductor rendering fixes
+
 ## References
+- Handover Doc: [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md)
+- Field Feedback: [FIELD_TEAM_FEEDBACK.md](./FIELD_TEAM_FEEDBACK.md)
+- Specifications: [specifications.md](./specifications.md)
 - SOP: MGD045V03 uGridPlan SOP.pdf
 - Desktop Code: `/Users/mattmso/Projects/uGridPREDICT/`
