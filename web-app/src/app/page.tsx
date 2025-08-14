@@ -9,21 +9,21 @@ import { Navigation } from '@/components/layout/Navigation'
 
 export default function Dashboard() {
   const [selectedSite, setSelectedSite] = useState<string>('KET')
-  const [activeView, setActiveView] = useState<'map' | 'data' | 'validation'>('map')
+  const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation'>('map')
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar Navigation */}
-      <Navigation activeView={activeView} onViewChange={setActiveView} />
+      <Navigation currentView={currentView} onViewChange={setCurrentView} />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">1PWR Grid Platform</h1>
-              <p className="text-sm text-gray-500 mt-1">Network Validation & Management</p>
+              <h1 className="text-xl font-bold text-gray-900">1PWR Grid Platform</h1>
+              <p className="text-xs text-gray-600">Network Validation & Management</p>
             </div>
             <SiteSelector 
               selectedSite={selectedSite}
@@ -32,25 +32,13 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 p-6 overflow-auto">
-          {activeView === 'map' && (
-            <div className="h-full">
-              <MapView site={selectedSite} />
-            </div>
-          )}
-          
-          {activeView === 'data' && (
-            <div className="space-y-6">
-              <DataStats site={selectedSite} />
-            </div>
-          )}
-          
-          {activeView === 'validation' && (
-            <div className="h-full">
-              <ValidationPanel site={selectedSite} />
-            </div>
-          )}
+        {/* Main Content */}
+        <main className="flex-1 overflow-hidden">
+          <div className="h-full">
+            {currentView === 'map' && <MapView site={selectedSite} />}
+            {currentView === 'stats' && <DataStats site={selectedSite} />}
+            {currentView === 'validation' && <ValidationPanel site={selectedSite} />}
+          </div>
         </main>
       </div>
     </div>

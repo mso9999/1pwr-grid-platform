@@ -1,14 +1,14 @@
 import { Map, Database, CheckCircle, Settings, FileText } from 'lucide-react'
 
 interface NavigationProps {
-  activeView: string
-  onViewChange: (view: 'map' | 'data' | 'validation') => void
+  currentView: string
+  onViewChange: (view: 'map' | 'stats' | 'validation') => void
 }
 
-export function Navigation({ activeView, onViewChange }: NavigationProps) {
+export function Navigation({ currentView, onViewChange }: NavigationProps) {
   const navItems = [
     { id: 'map', label: 'Network Map', icon: Map },
-    { id: 'data', label: 'Data Stats', icon: Database },
+    { id: 'stats', label: 'Data Stats', icon: Database },
     { id: 'validation', label: 'Validation', icon: CheckCircle },
   ]
 
@@ -25,7 +25,7 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
         <div className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeView === item.id
+            const isActive = currentView === item.id
             
             return (
               <button
