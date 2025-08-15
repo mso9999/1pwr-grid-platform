@@ -210,8 +210,8 @@ class ExcelImporter:
                 'elevation': row.get('elevation'),
                 'utm_x': row.get('UTM_X'),
                 'utm_y': row.get('UTM_Y'),
-                'gps_lat': row.get('GPS_Y'),
-                'gps_lng': row.get('GPS_X'),
+                'latitude': row.get('GPS_Y'),  # Changed from gps_lat
+                'longitude': row.get('GPS_X'),  # Changed from gps_lng
                 'subnetwork': row.get('SubNetwork', 'main'),
                 'status_code': row.get('St_code_3'),
                 'meter_serial': row.get('Meter_Serial'),

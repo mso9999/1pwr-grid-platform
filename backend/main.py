@@ -16,6 +16,8 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
+import math
+import numpy as np
 
 # Add parent directory to path for module imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -115,23 +117,23 @@ async def upload_excel(file: UploadFile = File(...)):
         # The Connections sheet contains customer connection points that are referenced by DropLines
         print(f"Processing {len(network_data['connections'])} customer connections...")
         
-        # Add each connection as a node that can be referenced by conductors
+        # Update connections with proper st_code values
         for connection in network_data['connections']:
-            survey_id = connection.get('survey_id', '')
-            if survey_id:
-                # Add connection as a special node type for reference matching
-                network_data['poles'].append({
-                    'pole_id': survey_id,
-                    'pole_name': survey_id,
-                    'pole_type': 'CUSTOMER_CONNECTION',
-                    'gps_lat': connection.get('gps_lat'),
-                    'gps_lng': connection.get('gps_lng'),
-                    'utm_x': connection.get('utm_x'),
-                    'utm_y': connection.get('utm_y'),
-                    'from_connections_sheet': True  # Mark source for debugging
-                })
+            # Ensure st_code_3 is properly set from status_code field
+            connection['st_code_3'] = connection.get('status_code', 0)
+            connection['st_code_1'] = connection.get('st_code_1', 0)
+            connection['st_code_2'] = connection.get('st_code_2', 'NA')
         
-        print(f"After merging connections: {len(network_data['poles'])} total nodes (poles + customer connections)")
+        # Create a set of valid node IDs for conductor validation
+        valid_node_ids = set()
+        for pole in network_data['poles']:
+            valid_node_ids.add(pole.get('pole_id'))
+        for connection in network_data['connections']:
+            survey_id = connection.get('survey_id')
+            if survey_id:
+                valid_node_ids.add(survey_id)
+        
+        print(f"Total nodes: {len(network_data['poles'])} poles, {len(network_data['connections'])} connections")
         
         # Clean the data
         cleaner = DataCleaner()
@@ -230,26 +232,56 @@ async def upload_pickle(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+def sanitize_value(value):
+    """
+    Recursively sanitize values for JSON serialization
+    Replaces NaN/Infinity with None (null in JSON)
+    """
+    if value is None:
+        return None
+    
+    # Handle numpy types
+    if hasattr(value, 'item'):  # numpy scalar
+        value = value.item()
+    
+    # Handle dictionaries recursively
+    if isinstance(value, dict):
+        return {k: sanitize_value(v) for k, v in value.items()}
+    
+    # Handle lists recursively
+    if isinstance(value, (list, tuple)):
+        return [sanitize_value(item) for item in value]
+    
+    if isinstance(value, (int, str, bool)):
+        return value
+    
+    if isinstance(value, (float, np.floating)):
+        if math.isnan(value) or math.isinf(value):
+            return None
+        return float(value)  # Convert numpy float to Python float
+    
+    if isinstance(value, (np.integer)):
+        return int(value)  # Convert numpy int to Python int
+    
+    return value
+
 @app.get("/api/network/{site}")
-async def get_network(site: str):
+def get_network(site: str):
     """
     Get network data for a specific site
-    Returns data formatted for map visualization
+    Returns poles, connections, conductors, etc.
     """
+    print(f"\n=== GET /api/network/{site} ===")
+    print(f"Available sites in storage: {list(network_storage.keys())}")
+    
     if site not in network_storage:
-        # Return sample data if no real data loaded
-        return JSONResponse(content={
-            "site": site,
-            "data": {
-                "poles": [],
-                "connections": [],
-                "conductors": [],
-                "transformers": []
-            },
-            "message": "No data loaded. Please upload Excel or Pickle file."
-        })
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"No network data for site {site}"}
+        )
     
     network_data = network_storage[site]
+    print(f"Retrieved data for {site}: {len(network_data.get('poles', []))} poles, {len(network_data.get('connections', []))} connections")
     
     # Format for frontend consumption
     formatted_data = {
@@ -260,41 +292,69 @@ async def get_network(site: str):
     }
     
     # Process poles
-    for pole in network_data.get('poles', []):
+    poles_list = network_data.get('poles', [])
+    print(f"Processing {len(poles_list)} poles...")
+    for pole in poles_list:
         formatted_data['poles'].append({
-            "id": pole.get('pole_id'),
-            "lat": pole.get('gps_lat'),
-            "lng": pole.get('gps_lng'),
-            "type": pole.get('pole_type', 'standard'),
-            "pole_class": pole.get('angle_class', pole.get('pole_class', 'Unknown')),  # Check both field names
-            "status": pole.get('status', 'as_designed'),
-            "is_connection": pole.get('from_connections_sheet', False),
-            "utm_x": pole.get('utm_x'),
-            "utm_y": pole.get('utm_y')
+                "id": pole.get('pole_id'),
+                "lat": sanitize_value(pole.get('latitude', pole.get('gps_lat'))),
+                "lng": sanitize_value(pole.get('longitude', pole.get('gps_lng'))),
+                "type": pole.get('pole_type', 'standard'),
+                "pole_class": pole.get('angle_class', pole.get('pole_class', 'Unknown')),  # Check both field names
+                "status": pole.get('status', 'as_designed'),
+                "st_code_1": pole.get('st_code_1', 0),  # Pass through status code 1
+                "st_code_2": pole.get('st_code_2', 'NA'),  # Pass through status code 2
+                "st_code_3": pole.get('st_code_3', 0),  # Pass through status code 3
+                "utm_x": sanitize_value(pole.get('utm_x')),
+                "utm_y": sanitize_value(pole.get('utm_y'))
+            })
+    
+    # Process connections separately
+    connections_list = network_data.get('connections', [])
+    print(f"Processing {len(connections_list)} connections...")
+    for connection in connections_list:
+        formatted_data['connections'].append({
+            "id": connection.get('survey_id'),
+            "lat": sanitize_value(connection.get('latitude', connection.get('gps_lat'))),
+            "lng": sanitize_value(connection.get('longitude', connection.get('gps_lng'))),
+            "type": 'customer_connection',
+            "status": connection.get('status', 'planned'),
+            "st_code_1": connection.get('st_code_1', 0),
+            "st_code_2": connection.get('st_code_2', 'NA'),
+            "st_code_3": connection.get('st_code_3', 0),  # Now properly populated from status_code
+            "meter_serial": connection.get('meter_serial'),
+            "subnetwork": connection.get('subnetwork', 'main'),
+            "utm_x": sanitize_value(connection.get('utm_x')),
+            "utm_y": sanitize_value(connection.get('utm_y'))
         })
     
     # Process conductors
-    for conductor in network_data.get('conductors', []):
+    conductors_list = network_data.get('conductors', [])
+    print(f"Processing {len(conductors_list)} conductors...")
+    for conductor in conductors_list:
         formatted_data['conductors'].append({
             "id": conductor.get('conductor_id'),
             "from": conductor.get('from_pole'),
             "to": conductor.get('to_pole'),
             "type": conductor.get('conductor_type', 'distribution'),
             "status": conductor.get('status', 'as_designed'),
-            "length": conductor.get('length_m')
+            "length": sanitize_value(conductor.get('length_m'))
         })
     
     # Process transformers
-    for transformer in network_data.get('transformers', []):
+    transformers_list = network_data.get('transformers', [])
+    print(f"Processing {len(transformers_list)} transformers...")
+    for transformer in transformers_list:
         formatted_data['transformers'].append({
             "id": transformer.get('transformer_id'),
-            "lat": transformer.get('gps_lat'),
-            "lng": transformer.get('gps_lng'),
-            "rating": transformer.get('rating_kva'),
+            "lat": sanitize_value(transformer.get('gps_lat')),
+            "lng": sanitize_value(transformer.get('gps_lng')),
+            "rating": sanitize_value(transformer.get('rating_kva')),
             "pole_id": transformer.get('pole_id')
         })
     
-    return JSONResponse(content={
+    # Create response without sanitization first to debug
+    response_data = {
         "site": site,
         "data": formatted_data,
         "stats": {
@@ -302,7 +362,14 @@ async def get_network(site: str):
             "total_conductors": len(formatted_data['conductors']),
             "total_transformers": len(formatted_data['transformers'])
         }
-    })
+    }
+    
+    print(f"Returning formatted data: {len(formatted_data['poles'])} poles, {len(formatted_data['connections'])} connections, {len(formatted_data['conductors'])} conductors, {len(formatted_data['transformers'])} transformers")
+    
+    # Sanitize the entire response to handle NaN/Infinity values
+    sanitized_response = sanitize_value(response_data)
+    print(f"Returning sanitized response...")
+    return JSONResponse(content=sanitized_response)
 
 @app.post("/api/calculate/voltage")
 async def calculate_voltage(request: VoltageRequest):

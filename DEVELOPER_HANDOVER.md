@@ -1,4 +1,14 @@
-# 1PWR Grid Platform - Developer Handover Documentation
+# 1PWR Grid Platform - Developer Handover Notes - 1PWR Grid Platform
+
+> **Note**: This document is archived. Please refer to the consolidated documentation in `/docs/` folder:
+> - [Architecture Guide](./docs/ARCHITECTURE.md)
+> - [Development Guide](./docs/DEVELOPMENT.md)
+> - [API Reference](./docs/API.md)
+> - [Migration Status](./docs/MIGRATION_STATUS.md)
+
+---
+
+# Original Developer Handover Notes
 
 **Last Updated**: August 13, 2025  
 **Current Status**: ~40% Complete  

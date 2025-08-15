@@ -1,6 +1,13 @@
-# uGridPLAN to Web Platform Migration Status
+# Migration Status - 1PWR Grid Platform
 
-## Overview
+> **Note**: This document is archived. Please refer to the consolidated documentation in `/docs/` folder:
+> - [Migration Status](./docs/MIGRATION_STATUS.md)
+> - [Architecture Guide](./docs/ARCHITECTURE.md)
+> - [API Reference](./docs/API.md)
+
+---
+
+# Original Migration Status Overview
 This document tracks the migration progress from desktop uGridPLAN to the web platform.
 
 **Cross-references**: See [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md) for detailed architecture and implementation notes.

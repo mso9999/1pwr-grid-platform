@@ -12,7 +12,7 @@ import { api } from '@/lib/api'
 
 // Import MapView dynamically with SSR disabled (Leaflet requires browser APIs)
 const MapView = dynamic(
-  () => import('@/components/map/ClientMap').then((mod) => mod.ClientMap),
+  () => import('@/components/map/MapView').then((mod) => mod.MapView),
   { 
     ssr: false,
     loading: () => <div className="h-full flex items-center justify-center">Loading map...</div>
@@ -20,7 +20,7 @@ const MapView = dynamic(
 )
 
 export default function Dashboard() {
-  const [selectedSite, setSelectedSite] = useState<string>('UGRIDPLAN')
+  const [selectedSite, setSelectedSite] = useState<string>('KET')
   const [currentView, setCurrentView] = useState<'map' | 'stats' | 'validation' | 'upload'>('map')
   const [networkData, setNetworkData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -39,11 +39,13 @@ export default function Dashboard() {
     setError(null)
     try {
       const response = await api.getNetwork(site)
+      console.log('API response:', response)
       console.log('Network data fetched:', {
         poles: response.data?.poles?.length || 0,
         conductors: response.data?.conductors?.length || 0,
         connections: response.data?.connections?.length || 0
       })
+      console.log('Setting networkData to:', response.data)
       setNetworkData(response.data)
     } catch (err) {
       console.error('Failed to fetch network data:', err)
@@ -93,7 +95,7 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
-          <div className="h-full">
+          <div className="h-full relative">
             {currentView === 'upload' && (
               <div className="h-full flex items-center justify-center">
                 <FileUpload 
@@ -102,7 +104,11 @@ export default function Dashboard() {
                 />
               </div>
             )}
-            {currentView === 'map' && <MapView site={selectedSite} networkData={networkData} loading={loading} />}
+            {currentView === 'map' && (
+              <div className="h-full relative">
+                <MapView site={selectedSite} networkData={networkData} loading={loading} />
+              </div>
+            )}
             {currentView === 'stats' && <DataStats site={selectedSite} networkData={networkData} />}
             {currentView === 'validation' && <ValidationPanel site={selectedSite} networkData={networkData} />}
             {error && (

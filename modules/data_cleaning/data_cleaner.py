@@ -44,12 +44,12 @@ class DataCleaner:
             'transformers': data.get('transformers', []).copy()
         }
         
-        # Step 1: Build pole reference index
-        pole_refs = self._build_pole_index(cleaned['poles'])
+        # Step 1: Build node reference index (includes both poles and connections)
+        node_refs = self._build_node_index(cleaned['poles'], cleaned['connections'])
         
-        # Step 2: Fix invalid pole references in conductors
+        # Step 2: Fix invalid node references in conductors
         cleaned['conductors'] = self._fix_conductor_references(
-            cleaned['conductors'], pole_refs
+            cleaned['conductors'], node_refs
         )
         
         # Step 3: Fill missing cable sizes
@@ -60,7 +60,7 @@ class DataCleaner:
         
         # Step 5: Clean orphaned connections
         cleaned['connections'] = self._clean_orphaned_connections(
-            cleaned['connections'], pole_refs
+            cleaned['connections'], node_refs
         )
         
         # Step 6: Fix coordinate issues
@@ -79,24 +79,35 @@ class DataCleaner:
         logger.info(f"Data cleaning complete: {self.cleaning_stats}")
         return cleaned, report
     
-    def _build_pole_index(self, poles: List[Dict]) -> Dict[str, str]:
-        """Build index of valid pole references"""
-        pole_refs = {}
+    def _build_node_index(self, poles: List[Dict], connections: List[Dict]) -> Dict[str, str]:
+        """Build index of valid node references (poles and connections)"""
+        node_refs = {}
+        
+        # Add poles as valid nodes
         for pole in poles:
             # Store both ID and name as valid references
             if 'pole_id' in pole:
-                pole_refs[pole['pole_id']] = pole['pole_id']
+                node_refs[pole['pole_id']] = pole['pole_id']
             if 'pole_name' in pole:
-                pole_refs[pole['pole_name']] = pole['pole_id']
+                node_refs[pole['pole_name']] = pole['pole_id']
                 # Also handle variations (with/without spaces)
-                pole_refs[pole['pole_name'].replace(' ', '')] = pole['pole_id']
-                pole_refs[pole['pole_name'].replace('_', ' ')] = pole['pole_id']
-        return pole_refs
+                node_refs[pole['pole_name'].replace(' ', '')] = pole['pole_id']
+                node_refs[pole['pole_name'].replace('_', ' ')] = pole['pole_id']
+        
+        # Add connections as valid nodes
+        for connection in connections:
+            if 'survey_id' in connection:
+                survey_id = connection['survey_id']
+                node_refs[survey_id] = survey_id
+                # Also handle variations
+                node_refs[survey_id.replace(' ', '')] = survey_id
+        
+        return node_refs
     
     def _fix_conductor_references(
-        self, conductors: List[Dict], pole_refs: Dict[str, str]
+        self, conductors: List[Dict], node_refs: Dict[str, str]
     ) -> List[Dict]:
-        """Fix invalid pole references in conductors"""
+        """Fix invalid node references in conductors"""
         fixed_conductors = []
         
         for conductor in conductors:
@@ -104,8 +115,8 @@ class DataCleaner:
             to_pole = conductor.get('to_pole', '')
             
             # Try to fix references
-            fixed_from = self._find_closest_match(from_pole, pole_refs)
-            fixed_to = self._find_closest_match(to_pole, pole_refs)
+            fixed_from = self._find_closest_match(from_pole, node_refs)
+            fixed_to = self._find_closest_match(to_pole, node_refs)
             
             if fixed_from and fixed_to:
                 conductor['from_pole'] = fixed_from
@@ -218,23 +229,26 @@ class DataCleaner:
         return unique_poles
     
     def _clean_orphaned_connections(
-        self, connections: List[Dict], pole_refs: Dict[str, str]
+        self, connections: List[Dict], node_refs: Dict[str, str]
     ) -> List[Dict]:
-        """Remove connections to non-existent poles"""
+        """Clean connections - they are customer connection points, not pole references"""
         valid_connections = []
         
         for connection in connections:
-            pole_id = connection.get('pole_id')
+            # Connections are customer connection points with their own survey_id
+            # They don't need to reference poles - they ARE nodes that conductors can reference
+            survey_id = connection.get('survey_id')
             
-            # Try to fix reference
-            fixed_pole = self._find_closest_match(pole_id, pole_refs) if pole_id else None
-            
-            if fixed_pole:
-                connection['pole_id'] = fixed_pole
-                valid_connections.append(connection)
+            if survey_id:
+                # Ensure required fields are present
+                if 'latitude' in connection and 'longitude' in connection:
+                    valid_connections.append(connection)
+                else:
+                    self.cleaning_stats['orphaned_connections_removed'] += 1
+                    logger.debug(f"Removing connection without coordinates: {survey_id}")
             else:
                 self.cleaning_stats['orphaned_connections_removed'] += 1
-                logger.debug(f"Removing orphaned connection: {connection.get('connection_id')}")
+                logger.debug(f"Removing connection without survey_id")
         
         return valid_connections
     

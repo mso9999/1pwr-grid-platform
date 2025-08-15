@@ -1,9 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Zap } from 'lucide-react'
+import { LayerControls, LayerVisibility } from './LayerControls'
+import { ElementDetailPanel, ElementDetail } from './ElementDetailPanel'
+import { SC1_COLORS, SC3_COLORS, SC4_COLORS, getLineType } from '@/utils/statusCodes'
 
 // Fix Leaflet default icon issue
 if (typeof window !== 'undefined') {
@@ -15,427 +18,514 @@ if (typeof window !== 'undefined') {
   })
 }
 
-interface MapViewProps {
-  site: string
+export interface ClientMapProps {
   networkData?: any
+  onElementUpdate?: (element: any) => void
   loading?: boolean
 }
 
-export function ClientMap({ site, networkData: propNetworkData, loading: propLoading }: MapViewProps) {
+export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapProps) {
+  console.log('ClientMap received props:', { 
+    hasNetworkData: !!networkData,
+    dataType: typeof networkData,
+    keys: networkData ? Object.keys(networkData) : 'none',
+    loading 
+  })
   const [map, setMap] = useState<L.Map | null>(null)
-  const [selectedLayer, setSelectedLayer] = useState<'all' | 'poles' | 'conductors' | 'transformers'>('all')
-  const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
+  const mapRef = useRef<L.Map | null>(null)
+  const resizeObserverRef = useRef<ResizeObserver | null>(null)
+  const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
+    poles: true,
+    connections: true,
+    mvLines: true,
+    lvLines: true,
+    dropLines: true,
+    transformers: true,
+    generation: true
+  })
+  const [selectedElement, setSelectedElement] = useState<any>(null)
+  const [elementNames, setElementNames] = useState<Map<string, string>>(new Map())
 
-  // Desktop uGridPLAN color specifications from MGD045V03 SOP and desktop code
-  const statusCode1Colors: { [key: number]: string } = {
-    0: '#FFFFFF', // uGridNET output (white)
-    1: '#FFFF00', // Updated planned location (yellow)
-    2: '#ccffd2', // Marked with label onsite (light green)
-    3: '#FF0000', // Consent withheld (red)
-    4: '#95F985', // Consented (green)
-    5: '#000000', // Hard Rock (black)
-    6: '#38fb14', // Excavated (bright green)
-    7: '#26d102', // Pole planted (green)
-    8: '#018501', // Poletop dressed (dark green)
-    9: '#014803', // Conductor attached (very dark green)
-  };
+  const layerGroupsRef = useRef<{
+    poles?: L.LayerGroup
+    connections?: L.LayerGroup
+    mvLines?: L.LayerGroup
+    lvLines?: L.LayerGroup
+    dropLines?: L.LayerGroup
+    transformers?: L.LayerGroup
+    generation?: L.LayerGroup
+  }>({})
 
-  const statusCode3Colors: { [key: number]: string } = {
-    0: '#adadff', // uGridNET Survey (light blue)
-    1: '#FFD700', // Updated Location (gold)
-    2: '#DAA520', // Connection fee paid (goldenrod)
-    3: '#D8BFD8', // Ready board paid (thistle)
-    4: '#DDA0DD', // Contract Signed (plum)
-    5: '#BA55D3', // DB Tested (medium orchid)
-    6: '#9370DB', // Ready Board Installed (medium purple)
-    7: '#696969', // Airdac Terminated (dim gray)
-    8: '#191970', // Customer training (midnight blue)
-    9: '#303030', // Connection commissioned (gray)
-  };
+  const [elementCounts, setElementCounts] = useState({
+    poles: 0,
+    connections: 0,
+    mvLines: 0,
+    lvLines: 0,
+    dropLines: 0,
+    transformers: 0,
+    generation: 0
+  })
 
+  // Initialize Leaflet map
   useEffect(() => {
-    // Only run on client side
     if (typeof window === 'undefined') return
 
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      console.log('Initializing Leaflet map')
-      
-      // Ensure container exists and has size
-      const container = document.getElementById('map-container')
+    let retryCount = 0
+    const maxRetries = 10
+    
+    const initMap = () => {
+      const container = document.getElementById('map')
       if (!container) {
-        console.error('Map container not found')
+        console.log('Map container not found')
+        if (retryCount < maxRetries) {
+          retryCount++
+          setTimeout(initMap, 200)
+        }
         return
       }
       
+      // Check if map already exists
+      if (container.hasAttribute('data-map-initialized')) {
+        console.log('Map already initialized')
+        return
+      }
+      
+      // Log current styles
+      const computedStyle = window.getComputedStyle(container)
+      console.log('Container computed styles:', {
+        position: computedStyle.position,
+        top: computedStyle.top,
+        left: computedStyle.left,
+        right: computedStyle.right,
+        bottom: computedStyle.bottom,
+        width: computedStyle.width,
+        height: computedStyle.height,
+        display: computedStyle.display,
+        zIndex: computedStyle.zIndex
+      })
+      console.log('Container inline styles:', container.style.cssText)
+      console.log('Container parent:', container.parentElement)
+      
+      // Ensure container has dimensions (fixed positioning should provide them)
+      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+        console.log(`Container dimensions: ${container.offsetWidth}x${container.offsetHeight}, retry ${retryCount}/${maxRetries}`)
+        
+        if (retryCount < maxRetries) {
+          retryCount++
+          setTimeout(initMap, 300)
+        }
+        return
+      }
+      
+      container.setAttribute('data-map-initialized', 'true')
+
+      console.log('Initializing Leaflet map')
+      console.log('Map container:', container)
       console.log('Container dimensions:', container.offsetWidth, 'x', container.offsetHeight)
       
-      // If container has no size, set it explicitly
-      if (container.offsetHeight === 0) {
-        console.warn('Container has no height, setting to 100vh')
-        container.style.height = '100vh'
+      // Start with a default view, will be updated when data loads
+      const newMap = L.map('map', {
+        center: [-30.078, 27.859],
+        zoom: 13,
+        zoomControl: true
+      })
+      
+      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      })
+      
+      tileLayer.on('load', () => {
+        console.log('Map tiles loaded successfully')
+      })
+      
+      tileLayer.on('tileerror', (error) => {
+        console.error('Tile load error:', error)
+      })
+      
+      tileLayer.addTo(newMap)
+      console.log('Tile layer added to map')
+      
+      // Force map to recalculate its size
+      setTimeout(() => {
+        console.log('Invalidating map size')
+        newMap.invalidateSize()
+        const size = newMap.getSize()
+        console.log('Map size after invalidate:', size.x, 'x', size.y)
+      }, 100)
+
+      // Initialize layer groups
+      layerGroupsRef.current = {
+        poles: L.layerGroup().addTo(newMap),
+        connections: L.layerGroup().addTo(newMap),
+        mvLines: L.layerGroup().addTo(newMap),
+        lvLines: L.layerGroup().addTo(newMap),
+        dropLines: L.layerGroup().addTo(newMap),
+        transformers: L.layerGroup().addTo(newMap),
+        generation: L.layerGroup().addTo(newMap)
       }
 
-      try {
-        // Create map
-        const mapInstance = L.map('map-container').setView([-30.07, 27.85], 14)
-        
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(mapInstance)
+      // Add resize observer with proper cleanup
+      const resizeObserver = new ResizeObserver(() => {
+        if (newMap && newMap.getContainer()) {
+          console.log('Container resized, invalidating map size')
+          try {
+            newMap.invalidateSize()
+          } catch (e) {
+            console.warn('Error invalidating map size:', e)
+          }
+        }
+      })
+      resizeObserver.observe(container)
+      
+      // Mark container as having resize observer
+      container.setAttribute('data-resize-observer', 'true')
+      
+      // Store reference for cleanup
+      mapRef.current = newMap
+      resizeObserverRef.current = resizeObserver
+      
+      setMap(newMap)
+    }
+    
+    // Start initialization
+    const timer = setTimeout(initMap, 100)
 
-        setMap(mapInstance)
-        console.log('Map created successfully');
-        
-        // Store map instance globally for debugging
-        (window as any).debugMap = mapInstance
-      } catch (error) {
-        console.error('Error creating map:', error)
-      }
-    }, 100)
-
-    // Cleanup
     return () => {
       clearTimeout(timer)
-      if (map) {
-        map.remove()
+    }
+  }, [])  // Empty dependency array - only run once
+
+  // Clean up map on unmount
+  useEffect(() => {
+    return () => {
+      console.log('Cleaning up map on unmount')
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect()
+        resizeObserverRef.current = null
       }
+      if (mapRef.current) {
+        mapRef.current.remove()
+        mapRef.current = null
+      }
+      setMap(null)
     }
   }, [])
 
+  // Update layer visibility
   useEffect(() => {
-    console.log('Network data effect - map:', !!map, 'data:', !!propNetworkData)
-    
-    if (!map || !propNetworkData) {
-      console.log('Skipping network data - map or data not ready')
+    if (!map || !layerGroupsRef.current) return
+
+    Object.entries(layerVisibility).forEach(([key, visible]) => {
+      const layerGroup = layerGroupsRef.current[key as keyof typeof layerGroupsRef.current]
+      if (layerGroup) {
+        if (visible) {
+          map.addLayer(layerGroup)
+        } else {
+          map.removeLayer(layerGroup)
+        }
+      }
+    })
+  }, [layerVisibility, map])
+
+  // Render network data
+  useEffect(() => {
+    console.log('Network data effect - map:', !!map, 'networkData:', networkData)
+    if (!map || !networkData) {
+      console.log('Cannot render: map=', !!map, 'networkData=', !!networkData, 'data keys:', networkData ? Object.keys(networkData) : 'none')
       return
     }
 
-    console.log('Adding network data to map', {
-      poles: propNetworkData.poles?.length || 0,
-      conductors: propNetworkData.conductors?.length || 0,
-      connections: propNetworkData.connections?.length || 0
+    const data = networkData
+    console.log('Rendering network data on map:', {
+      poles: data.poles?.length || 0,
+      connections: data.connections?.length || 0,
+      conductors: data.conductors?.length || 0,
+      transformers: data.transformers?.length || 0
     })
+    
+    // Calculate bounds from data
+    const bounds = L.latLngBounds([])
+    let hasValidCoords = false
 
     // Clear existing layers
-    map.eachLayer((layer) => {
-      if (!(layer instanceof L.TileLayer)) {
-        map.removeLayer(layer)
-      }
+    Object.values(layerGroupsRef.current).forEach(group => {
+      if (group) group.clearLayers()
     })
 
-    // Add poles and connections with visual differentiation
-    if (propNetworkData.poles && (selectedLayer === 'all' || selectedLayer === 'poles')) {
-      propNetworkData.poles.forEach((pole: any) => {
-        const lat = pole.latitude || pole.gps_lat || pole.lat
-        const lng = pole.longitude || pole.gps_lng || pole.lng
-        
-        if (!lat || !lng) return
-        
-        // Check if this is a customer connection
-        if (pole.pole_type === 'CUSTOMER_CONNECTION' || pole.is_connection) {
-          // Customer connections show as squares (per desktop spec)
-          const stCode3 = pole.st_code_3 || 0
-          const connectionColor = statusCode3Colors[stCode3] || '#adadff'
-          
-          // Create square marker for customer connections per desktop spec
-          // Increased size for better visibility to match desktop
-          const squareIcon = L.divIcon({
-            html: `<div style="width: 16px; height: 16px; background: ${connectionColor}; border: 1px solid #000;"></div>`,
-            className: 'square-marker',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+    const names = new Set<string>()
+    const counts = {
+      poles: 0,
+      connections: 0,
+      mvLines: 0,
+      lvLines: 0,
+      dropLines: 0,
+      transformers: 0,
+      generation: 0
+    }
+
+    // Add connections
+    if (data.connections && layerGroupsRef.current.connections) {
+      data.connections.forEach((connection: any) => {
+        if (connection.lat && connection.lng) {
+          bounds.extend([connection.lat, connection.lng])
+          hasValidCoords = true
+          const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
+          const marker = L.circleMarker([connection.lat, connection.lng], {
+            radius: 6,
+            fillColor: color,
+            color: '#333',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
           })
           
-          const marker = L.marker([lat, lng], { icon: squareIcon })
-            .bindPopup(`
-              <b>Customer Connection</b><br/>
-              ID: ${pole.pole_id || pole.id}<br/>
-              Type: ${pole.pole_type}<br/>
-              Status Code 3: ${stCode3}
-            `)
+          marker.on('click', () => {
+            setSelectedElement({
+              type: 'connection',
+              id: connection.id,
+              name: connection.name,
+              data: connection
+            })
+          })
           
-          map.addLayer(marker)
-        } else {
-          // Regular poles - use status code 1 colors per desktop spec
-          const stCode1 = pole.st_code_1 || 0
-          let color = statusCode1Colors[stCode1] || '#FFFFFF'
-          
-          // Desktop spec: white poles need black outline, others use same color
-          let strokeColor = stCode1 === 0 ? '#000000' : color
-          let fillOpacity = 1 // Desktop uses full opacity
-          let weight = 1 // Desktop uses thin border
-          
-          // Desktop spec: MV poles are larger than LV poles
-          // Increased sizes for better visibility to match desktop
-          let radius = 6 // Default LV size (was 2, now 3x larger)
-          if (pole.pole_type === 'MV' || pole.subnetwork?.includes('MV')) {
-            radius = 10 // MV poles are larger (was 4, now 2.5x larger)
+          marker.bindPopup(`Connection: ${connection.name || connection.id}`)
+          if (layerGroupsRef.current.connections) {
+            marker.addTo(layerGroupsRef.current.connections)
           }
           
-          const markerOptions: any = {
-            radius: radius,
+          names.add(connection.name || connection.id)
+          counts.connections++
+        }
+      })
+    }
+
+    // Add poles
+    if (data.poles && layerGroupsRef.current.poles) {
+      data.poles.forEach((pole: any) => {
+        if (pole.lat && pole.lng) {
+          bounds.extend([pole.lat, pole.lng])
+          hasValidCoords = true
+          const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
+          const marker = L.circleMarker([pole.lat, pole.lng], {
+            radius: 8,
             fillColor: color,
-            color: strokeColor,
-            weight: weight,
+            color: '#000',
+            weight: 2,
             opacity: 1,
-            fillOpacity: fillOpacity
+            fillOpacity: 0.9
+          })
+          
+          marker.on('click', () => {
+            setSelectedElement({
+              type: 'pole',
+              id: pole.id,
+              name: pole.name,
+              data: pole
+            })
+          })
+          
+          marker.bindPopup(`Pole: ${pole.name || pole.id}`)
+          if (layerGroupsRef.current.poles) {
+            marker.addTo(layerGroupsRef.current.poles)
           }
           
-          const marker = L.circleMarker([lat, lng], markerOptions)
-            .bindPopup(`
-              <b>Pole</b><br/>
-              ID: ${pole.pole_id || pole.id}<br/>
-              Type: ${pole.pole_type || 'LV'}<br/>
-              Class: ${pole.pole_class || pole.angle_class || 'N/A'}<br/>
-              Status Code 1: ${stCode1}<br/>
-              Status: ${pole.status || 'as_designed'}<br/>
-              Coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}
-            `)
-          
-          map.addLayer(marker)
+          names.add(pole.name || pole.id)
+          counts.poles++
         }
       })
     }
 
     // Add conductors
-    if (propNetworkData.conductors && (selectedLayer === 'all' || selectedLayer === 'conductors')) {
-      console.log(`Processing ${propNetworkData.conductors.length} conductors`)
-      let conductorsRendered = 0
-      let conductorsSkipped = 0
+    if (data.conductors) {
+      // Create node lookup maps
+      const nodeMap = new Map<string, [number, number]>()
       
-      propNetworkData.conductors.forEach((conductor: any, idx: number) => {
-        // Try multiple field names for compatibility
-        const fromRef = conductor.from_pole || conductor.from
-        const toRef = conductor.to_pole || conductor.to
-        
-        if (idx < 3) {
-          console.log(`Conductor ${idx}: from="${fromRef}" to="${toRef}"`)
+      data.poles?.forEach((pole: any) => {
+        if (pole.lat && pole.lng) {
+          nodeMap.set(pole.id, [pole.lat, pole.lng])
         }
+      })
+      
+      data.connections?.forEach((conn: any) => {
+        if (conn.lat && conn.lng) {
+          nodeMap.set(conn.id, [conn.lat, conn.lng])
+        }
+      })
+
+      data.conductors.forEach((conductor: any) => {
+        const fromCoords = nodeMap.get(conductor.from)
+        const toCoords = nodeMap.get(conductor.to)
         
-        const fromPole = propNetworkData.poles?.find((p: any) => 
-          p.pole_id === fromRef || p.id === fromRef
-        )
-        const toPole = propNetworkData.poles?.find((p: any) => 
-          p.pole_id === toRef || p.id === toRef
-        )
-        
-        if (fromPole && toPole) {
-          const fromLat = fromPole.latitude || fromPole.gps_lat || fromPole.lat
-          const fromLng = fromPole.longitude || fromPole.gps_lng || fromPole.lng
-          const toLat = toPole.latitude || toPole.gps_lat || toPole.lat
-          const toLng = toPole.longitude || toPole.gps_lng || toPole.lng
+        if (fromCoords && toCoords) {
+          const lineType = getLineType(
+            conductor,
+            data.poles || [],
+            data.connections || []
+          )
           
-          if (fromLat && fromLng && toLat && toLng) {
-            // Desktop spec: MV lines are thicker and red, LV lines are thinner and black
-            let color = '#000000' // Black for LV (desktop default)
-            let weight = 1.5 // Thin for LV
-            let dashArray = ''
-            let opacity = 1
-            
-            // Check if MV or LV based on conductor type or connected poles
-            const isMV = conductor.conductor_type?.includes('MV') || 
-                        fromPole.pole_type?.includes('MV') || 
-                        toPole.pole_type?.includes('MV') ||
-                        fromPole.subnetwork?.includes('MV') ||
-                        toPole.subnetwork?.includes('MV')
-            
-            if (isMV) {
-              color = '#FF0000' // Red for MV lines (desktop spec)
-              weight = 2.5 // Thicker for MV
-            }
-            
-            // Desktop spec: Use status code 4 for conductor status
-            // 0 = uGridNET output (dashed), 3+ = installed (solid)
-            const stCode4 = conductor.st_code_4 || 0
-            if (stCode4 === 0) {
-              dashArray = '5, 5' // Dashed for uninstalled
-              opacity = 0.7
-            } else if (stCode4 >= 3) {
-              dashArray = '' // Solid for installed
-              opacity = 1
-            } else {
-              dashArray = '3, 3' // Light dash for in-progress
-              opacity = 0.8
-            }
-            
-            const polyline = L.polyline(
-              [[fromLat, fromLng], [toLat, toLng]], 
-              { 
-                color: color,
-                weight: weight,
-                opacity: opacity,
-                dashArray: dashArray
-              }
-            )
-            
-            const conductorId = conductor.conductor_id || conductor.id || 'Unknown'
-            const conductorType = conductor.conductor_type || (isMV ? 'MV' : 'LV')
-            const length = conductor.length || 'N/A'
-            const status = conductor.status || 'as_designed'
-            
-            polyline.bindPopup(`
-              <div style="min-width: 200px;">
-                <strong>Conductor: ${conductorId}</strong><br/>
-                <hr style="margin: 5px 0;"/>
-                <b>Type:</b> ${conductorType}<br/>
-                <b>Status:</b> ${status}<br/>
-                <b>From:</b> ${fromRef}<br/>
-                <b>To:</b> ${toRef}<br/>
-                <b>Length:</b> ${length}m
-              </div>
-            `)
-            
-            // Add the conductor to the map!
-            map.addLayer(polyline)
-            
-            conductorsRendered++
-          } else {
-            conductorsSkipped++
-            if (idx < 3) {
-              console.log(`Skipped conductor ${idx}: missing coordinates`)
-            }
+          let layerGroup: L.LayerGroup | undefined
+          let color = '#808080'
+          
+          switch (lineType) {
+            case 'mv':
+              layerGroup = layerGroupsRef.current.mvLines
+              color = '#FF0000'
+              counts.mvLines++
+              break
+            case 'lv':
+              layerGroup = layerGroupsRef.current.lvLines
+              color = '#0000FF'
+              counts.lvLines++
+              break
+            case 'drop':
+              layerGroup = layerGroupsRef.current.dropLines
+              color = '#00FF00'
+              counts.dropLines++
+              break
           }
-        } else {
-          conductorsSkipped++
-          if (idx < 3) {
-            console.log(`Skipped conductor ${idx}: fromPole=${!!fromPole}, toPole=${!!toPole}`)
+          
+          if (layerGroup) {
+            const polyline = L.polyline([fromCoords, toCoords], {
+              color: SC4_COLORS[conductor.st_code_4 || 0] || color,
+              weight: 2,
+              opacity: 0.8
+            })
+            
+            polyline.on('click', () => {
+              setSelectedElement({
+                type: 'conductor',
+                id: conductor.id,
+                name: conductor.name,
+                data: { ...conductor, line_type: lineType }
+              })
+            })
+            
+            polyline.bindPopup(`${lineType.toUpperCase()} Line: ${conductor.id}`)
+            polyline.addTo(layerGroup)
+            
+            names.add(conductor.name || conductor.id)
           }
         }
       })
-      console.log(`Conductors rendered: ${conductorsRendered}, skipped: ${conductorsSkipped}`)
     }
 
-    // Add connections
-    if (propNetworkData.connections) {
-      propNetworkData.connections.forEach((connection: any) => {
-        const lat = connection.gps_lat || connection.latitude || connection.lat
-        const lng = connection.gps_lng || connection.longitude || connection.lng
-        if (lat && lng) {
-          L.circleMarker([lat, lng], {
-            radius: 3,
-            fillColor: '#4CAF50',
-            fillOpacity: 0.8,
-            color: '#fff',
-            weight: 1
+    // Add transformers
+    if (data.transformers && layerGroupsRef.current.transformers) {
+      data.transformers.forEach((transformer: any) => {
+        if (transformer.lat && transformer.lng) {
+          const marker = L.marker([transformer.lat, transformer.lng])
+          
+          marker.on('click', () => {
+            setSelectedElement({
+              type: 'transformer',
+              id: transformer.id,
+              name: transformer.name,
+              data: transformer
+            })
           })
-          .bindPopup(`<b>${connection.survey_id}</b><br>Status: ${connection.status || 'active'}`)
-          .addTo(map)
+          
+          marker.bindPopup(`Transformer: ${transformer.name || transformer.id}`)
+          if (layerGroupsRef.current.transformers) {
+            marker.addTo(layerGroupsRef.current.transformers)
+          }
+          
+          names.add(transformer.name || transformer.id)
+          counts.transformers++
         }
       })
     }
 
-    // Fit map to bounds if we have data
-    if (propNetworkData.poles?.length || propNetworkData.conductors?.length) {
-      const bounds: [number, number][] = []
-      propNetworkData.poles?.forEach((pole: any) => {
-        const lat = pole.latitude || pole.gps_lat || pole.lat
-        const lng = pole.longitude || pole.gps_lng || pole.lng
-        if (lat && lng) {
-          bounds.push([lat, lng])
+    setElementNames(names)
+    setElementCounts(counts)
+
+    // Fit map to data bounds
+    if (hasValidCoords && bounds.isValid()) {
+      console.log('Fitting map to bounds:', bounds)
+      map.fitBounds(bounds, { padding: [50, 50] })
+      // Force map to refresh
+      setTimeout(() => {
+        map.invalidateSize()
+        console.log('Map size invalidated after data load')
+      }, 200)
+    }
+  }, [networkData, map])
+
+  const handleElementUpdate = async (id: string, updates: any) => {
+    if (onElementUpdate) {
+      return await onElementUpdate(id, updates)
+    }
+    
+    // Local update only
+    if (networkData) {
+      // Update poles
+      if (networkData.poles) {
+        const pole = networkData.poles.find((p: any) => p.id === id)
+        if (pole) {
+          pole.name = updates.name
         }
-      })
-      if (bounds.length > 0) {
-        map.fitBounds(bounds)
+      }
+      
+      // Update connections
+      if (networkData.connections) {
+        const connection = networkData.connections.find((c: any) => c.id === id)
+        if (connection) {
+          connection.name = updates.name
+        }
+      }
+      
+      // Update conductors
+      if (networkData.conductors) {
+        const conductor = networkData.conductors.find((c: any) => c.id === id)
+        if (conductor) {
+          conductor.name = updates.name
+        }
       }
     }
-  }, [map, propNetworkData, selectedLayer])
+    
+    return true
+  }
 
-  if (propLoading) {
+  if (loading) {
     return (
-      <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading network data...</p>
+          <Zap className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-lg font-medium">Loading network data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="h-full w-full relative">
-      {/* Map Controls */}
-      <div className="absolute top-4 right-4 z-[1000] space-y-2">
-        {/* Voltage Overlay Toggle */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
-          <button
-            onClick={() => setVoltageOverlayEnabled(!voltageOverlayEnabled)}
-            className={`flex items-center gap-2 px-3 py-2 rounded text-sm font-medium transition-colors w-full ${
-              voltageOverlayEnabled ? 'bg-yellow-100 text-yellow-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Zap className="w-4 h-4" />
-            {voltageOverlayEnabled ? 'Voltage ON' : 'Voltage OFF'}
-          </button>
-        </div>
-        
-        {/* Layer Controls */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1">
-          <button
-            onClick={() => setSelectedLayer('all')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setSelectedLayer('poles')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'poles' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Poles
-          </button>
-          <button
-            onClick={() => setSelectedLayer('conductors')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'conductors' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Lines
-          </button>
-          <button
-            onClick={() => setSelectedLayer('transformers')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'transformers' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Transformers
-          </button>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 p-3">
-        <h4 className="font-medium text-sm text-gray-900 mb-2">Legend</h4>
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">MV Pole</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">LV Pole</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">Transformer</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-0.5 bg-red-500"></div>
-            <span className="text-xs text-gray-600">Backbone</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-0.5 bg-blue-500"></div>
-            <span className="text-xs text-gray-600">Distribution</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Map Container */}
-      <div id="map-container" className="absolute inset-0 z-0" />
-    </div>
+    <>
+      <div 
+        id="map" 
+        style={{ 
+          position: 'fixed', 
+          top: '64px',
+          left: '256px', 
+          right: '0', 
+          bottom: '0', 
+          width: 'calc(100vw - 256px)',
+          height: 'calc(100vh - 64px)',
+          zIndex: 10,
+          backgroundColor: '#f3f4f6'
+        }} 
+      />
+      
+      <LayerControls
+        visibility={layerVisibility}
+        onVisibilityChange={setLayerVisibility}
+        counts={elementCounts}
+      />
+      
+      <ElementDetailPanel
+        element={selectedElement}
+        onClose={() => setSelectedElement(null)}
+        onUpdate={handleElementUpdate}
+        existingNames={elementNames}
+      />
+    </>
   )
 }

@@ -1,56 +1,23 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  Maximize2, 
-  Minimize2, 
-  Layers,
-  Navigation,
-  RefreshCw,
-  Zap 
-} from 'lucide-react'
+import { ClientMapProps } from './ClientMap'
 
-// Import VoltageOverlay component
-const VoltageOverlay = dynamic(
-  () => import('./VoltageOverlay'),
-  { ssr: false }
-)
-
-// Dynamically import Leaflet components to avoid SSR issues
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-)
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-)
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-)
-const CircleMarker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.CircleMarker),
-  { ssr: false }
-)
-const Rectangle = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Rectangle),
-  { ssr: false }
-)
-const Popup = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Popup),
-  { ssr: false }
-)
-const Polyline = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Polyline),
-  { ssr: false }
-)
-const ZoomControl = dynamic(
-  () => import('react-leaflet').then((mod) => mod.ZoomControl),
-  { ssr: false }
+// Dynamically import ClientMap to avoid SSR issues
+const ClientMap = dynamic<ClientMapProps>(
+  () => import('./ClientMap').then(mod => mod.ClientMap),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading map...</p>
+        </div>
+      </div>
+    )
+  }
 )
 
 interface MapViewProps {
@@ -59,319 +26,35 @@ interface MapViewProps {
   loading?: boolean;
 }
 
-interface NetworkData {
-  poles: Array<{ id: string; lat: number; lng: number; type: 'MV' | 'LV'; validated: boolean; status: string }>
-  connections: Array<{ id: string; lat: number; lng: number; status: string }>
-  conductors: Array<{ id: string; from: string; to: string; type: 'backbone' | 'distribution' }>
-  transformers: Array<{ id: string; lat: number; lng: number; capacity: number }>
-}
-
-export function MapView({ site, networkData: propNetworkData, loading: propLoading }: MapViewProps) {
-  const [showFullscreen, setShowFullscreen] = useState(false)
-  const [networkData, setNetworkData] = useState<NetworkData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [showLabels, setShowLabels] = useState(true)
-  const [showGrid, setShowGrid] = useState(false)
-  const [showConnections, setShowConnections] = useState(true)
-  const [showVoltage, setShowVoltage] = useState(false)
-  const [selectedLayer, setSelectedLayer] = useState<'all' | 'poles' | 'conductors' | 'transformers'>('all')
-  const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
-
-  // Status color mapping (consistent with uGridPLAN)
-  const statusColors: { [key: string]: string } = {
-    'as_designed': '#4CAF50',  // Green
-    'as_built': '#2196F3',      // Blue
-    'planned': '#FFC107',       // Amber
-    'pending': '#FF9800',       // Orange
-    'error': '#F44336',         // Red
-    'default': '#9E9E9E'        // Grey
-  }
-
-  // Calculate map center from actual data
-  const calculateCenter = (data: NetworkData): [number, number] => {
-    if (!data || !data.poles || data.poles.length === 0) {
-      // Default fallback for empty data
-      return [-30.07, 27.85] // KET actual coordinates
-    }
-    
-    // Calculate center from pole coordinates
-    const validPoles = data.poles.filter(p => p.lat && p.lng)
-    if (validPoles.length === 0) {
-      return [-30.07, 27.85]
-    }
-    
-    const avgLat = validPoles.reduce((sum, p) => sum + p.lat, 0) / validPoles.length
-    const avgLng = validPoles.reduce((sum, p) => sum + p.lng, 0) / validPoles.length
-    
-    return [avgLat, avgLng]
-  }
-
+export function MapView({ site, networkData, loading }: MapViewProps) {
+  const [mounted, setMounted] = useState(false)
+  
   useEffect(() => {
-    // Initialize Leaflet icon configuration
-    if (typeof window !== 'undefined') {
-      import('@/lib/leaflet-config')
-    }
-    
-    // Use network data from props if available
-    if (propNetworkData && propNetworkData.data) {
-      const data = propNetworkData.data
-      console.log('MapView received data:', {
-        poles: data.poles?.length || 0,
-        connections: data.connections?.length || 0,
-        conductors: data.conductors?.length || 0,
-        samplePole: data.poles?.[0]
-      })
-      
-      // Transform backend data to match frontend format
-      // Backend returns pole_id but frontend expects id
-      const transformedData: NetworkData = {
-        poles: (data.poles || []).map((pole: any) => ({
-          ...pole,
-          id: pole.pole_id || pole.id,  // Map pole_id to id
-          lat: pole.latitude || pole.lat,
-          lng: pole.longitude || pole.lng,
-          type: pole.pole_type || pole.type || 'LV',
-          status: pole.status || 'as_built',
-          validated: pole.validated || false
-        })),
-        connections: (data.connections || []).map((conn: any) => ({
-          ...conn,
-          id: conn.survey_id || conn.id,
-          lat: conn.latitude || conn.lat,
-          lng: conn.longitude || conn.lng,
-          status: conn.status || 'as_built'
-        })),
-        conductors: (data.conductors || []).map((cond: any) => ({
-          ...cond,
-          id: cond.conductor_id || cond.id,
-          from: cond.from_pole || cond.from,
-          to: cond.to_pole || cond.to,
-          type: cond.conductor_type || cond.type || 'distribution'
-        })),
-        transformers: data.transformers || []
-      }
-      
-      setNetworkData(transformedData)
-      setLoading(false)
-    } else if (propLoading !== undefined) {
-      setLoading(propLoading)
-    }
-  }, [propNetworkData, propLoading])
-
-  if (loading) {
+    setMounted(true)
+  }, [])
+  
+  console.log('MapView props:', { 
+    site, 
+    hasNetworkData: !!networkData, 
+    dataKeys: networkData ? Object.keys(networkData) : 'none',
+    loading 
+  })
+  
+  if (!mounted) {
     return (
       <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading network data...</p>
+          <p className="mt-4 text-gray-600">Loading map...</p>
         </div>
       </div>
     )
   }
-
-  const center: [number, number] = networkData ? calculateCenter(networkData) : [-30.07, 27.85]
-
+  
   return (
-    <div className="h-full w-full relative">
-      {/* Map Controls */}
-      <div className="absolute top-4 right-4 z-[1000] space-y-2">
-        {/* Voltage Overlay Toggle */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
-          <button
-            onClick={() => setVoltageOverlayEnabled(!voltageOverlayEnabled)}
-            className={`flex items-center gap-2 px-3 py-2 rounded text-sm font-medium transition-colors w-full ${
-              voltageOverlayEnabled ? 'bg-yellow-100 text-yellow-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Zap className="w-4 h-4" />
-            {voltageOverlayEnabled ? 'Voltage ON' : 'Voltage OFF'}
-          </button>
-        </div>
-        
-        {/* Layer Controls */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1">
-          <button
-            onClick={() => setSelectedLayer('all')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setSelectedLayer('poles')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'poles' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Poles
-          </button>
-          <button
-            onClick={() => setSelectedLayer('conductors')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'conductors' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Lines
-          </button>
-          <button
-            onClick={() => setSelectedLayer('transformers')}
-            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-              selectedLayer === 'transformers' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Transformers
-          </button>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 p-3">
-        <h4 className="font-medium text-sm text-gray-900 mb-2">Legend</h4>
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">MV Pole</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">LV Pole</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-xs text-gray-600">Transformer</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-0.5 bg-red-500"></div>
-            <span className="text-xs text-gray-600">Backbone</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-0.5 bg-blue-500"></div>
-            <span className="text-xs text-gray-600">Distribution</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Map Container with explicit height */}
-      <div className="absolute inset-0 z-0">
-        <MapContainer
-          center={center}
-          zoom={14}
-          style={{ height: '100%', width: '100%' }}
-          minZoom={10}
-          maxZoom={20}
-          zoomControl={false}
-        >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        
-        <ZoomControl position="bottomright" />
-
-        {/* Render voltage overlay if enabled */}
-        {voltageOverlayEnabled && networkData && (
-          <VoltageOverlay
-            site={site}
-            conductors={networkData.conductors}
-            poles={networkData.poles}
-            enabled={voltageOverlayEnabled}
-            sourceVoltage={11000}
-            voltageThreshold={7.0}
-          />
-        )}
-
-        {/* Render conductors with accurate positioning (only if voltage overlay is off) */}
-        {!voltageOverlayEnabled && networkData?.conductors?.map((conductor: any, idx: number) => {
-          const fromPole = networkData.poles.find((p: any) => p.id === conductor.from)
-          const toPole = networkData.poles.find((p: any) => p.id === conductor.to)
-          
-          if (!fromPole || !toPole) return null
-          
-          return (
-            <Polyline
-              key={`conductor-${idx}`}
-              positions={[
-                [fromPole.lat, fromPole.lng],
-                [toPole.lat, toPole.lng]
-              ]}
-              color={conductor.type === 'backbone' ? '#FF5722' : '#2196F3'}
-              weight={conductor.type === 'backbone' ? 3 : 2}
-              opacity={0.8}
-              smoothFactor={1}
-            />
-          )
-        })}
-
-        {/* Render poles as circles */}
-        {networkData && (selectedLayer === 'all' || selectedLayer === 'poles') && 
-          networkData.poles.map((pole) => (
-            <CircleMarker
-              key={pole.id}
-              center={[pole.lat, pole.lng]}
-              radius={8}
-              fillColor={statusColors[pole.status] || statusColors.default}
-              fillOpacity={0.8}
-              color="#333"
-              weight={1}
-            >
-              <Popup>
-                <div className="p-2 text-sm">
-                  <p className="font-medium">{pole.id}</p>
-                  <p className="text-gray-600">Type: {pole.type}</p>
-                  <p className="text-gray-600">
-                    Status: <span style={{ color: statusColors[pole.status] }}>{pole.status}</span>
-                  </p>
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))
-        }
-        
-        {/* Render connections as squares */}
-        {networkData && (selectedLayer === 'all') && 
-          networkData.connections.map((conn) => (
-            <Rectangle
-              key={conn.id}
-              bounds={[
-                [conn.lat - 0.0001, conn.lng - 0.0001],
-                [conn.lat + 0.0001, conn.lng + 0.0001]
-              ]}
-              fillColor={statusColors[conn.status] || statusColors.default}
-              fillOpacity={0.8}
-              color="#333"
-              weight={1}
-            >
-              <Popup>
-                <div className="p-2 text-sm">
-                  <p className="font-medium">{conn.id}</p>
-                  <p className="text-gray-600">Type: Connection</p>
-                  <p className="text-gray-600">
-                    Status: <span style={{ color: statusColors[conn.status] }}>{conn.status}</span>
-                  </p>
-                </div>
-              </Popup>
-            </Rectangle>
-          ))
-        }
-        
-        {/* Render transformers */}
-        {networkData && (selectedLayer === 'all' || selectedLayer === 'transformers') && 
-          networkData.transformers.map((transformer) => (
-            <Marker
-              key={transformer.id}
-              position={[transformer.lat, transformer.lng]}
-            >
-              <Popup>
-                <div className="text-sm">
-                  <p className="font-medium">{transformer.id}</p>
-                  <p className="text-gray-600">Capacity: {transformer.capacity} kVA</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
-    </div>
+    <ClientMap
+      networkData={networkData}
+      loading={loading}
+    />
   )
 }
