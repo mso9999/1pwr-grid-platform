@@ -195,3 +195,164 @@ class NetworkValidator:
                 })
         
         return issues
+    
+    def validate_conductor_lengths(self, conductors: List[Dict]) -> List[Dict]:
+        """
+        Validate conductor lengths are within reasonable ranges
+        
+        Args:
+            conductors: List of conductor dictionaries
+            
+        Returns:
+            List of conductor length issues
+        """
+        issues = []
+        
+        # Define reasonable length ranges by conductor type
+        length_ranges = {
+            'MV': (10, 5000),  # 10m to 5km for MV lines
+            'LV': (5, 1000),   # 5m to 1km for LV lines
+            'DROP': (3, 200),  # 3m to 200m for drop lines
+            'SERVICE': (3, 100) # 3m to 100m for service lines
+        }
+        
+        for conductor in conductors:
+            conductor_id = conductor.get('conductor_id') or conductor.get('id')
+            conductor_type = conductor.get('conductor_type', 'LV').upper()
+            length = conductor.get('length', 0)
+            
+            # Check if length is positive
+            if length <= 0:
+                issues.append({
+                    'type': 'error',
+                    'conductor_id': conductor_id,
+                    'length': length,
+                    'message': f'Invalid conductor length: {length}m (must be positive)'
+                })
+                continue
+            
+            # Check if within reasonable range for type
+            min_length, max_length = length_ranges.get(conductor_type, (1, 10000))
+            if length < min_length or length > max_length:
+                issues.append({
+                    'type': 'warning',
+                    'conductor_id': conductor_id,
+                    'conductor_type': conductor_type,
+                    'length': length,
+                    'message': f'Unusual {conductor_type} conductor length: {length}m (expected {min_length}-{max_length}m)'
+                })
+        
+        return issues
+    
+    def validate_pole_coordinates(self, poles: List[Dict]) -> List[Dict]:
+        """
+        Validate pole coordinates are within reasonable bounds
+        
+        Args:
+            poles: List of pole dictionaries
+            
+        Returns:
+            List of coordinate issues
+        """
+        issues = []
+        
+        # South Africa approximate bounds
+        lat_bounds = (-35.0, -22.0)
+        lng_bounds = (16.0, 33.0)
+        
+        for pole in poles:
+            pole_id = pole.get('pole_id') or pole.get('id')
+            lat = pole.get('latitude', 0)
+            lng = pole.get('longitude', 0)
+            
+            # Check if coordinates are valid
+            if lat == 0 and lng == 0:
+                issues.append({
+                    'type': 'error',
+                    'pole_id': pole_id,
+                    'message': 'Pole has no coordinates (0,0)'
+                })
+                continue
+            
+            # Check if within South Africa bounds
+            if not (lat_bounds[0] <= lat <= lat_bounds[1]):
+                issues.append({
+                    'type': 'warning',
+                    'pole_id': pole_id,
+                    'latitude': lat,
+                    'message': f'Pole latitude {lat} outside expected range {lat_bounds}'
+                })
+            
+            if not (lng_bounds[0] <= lng <= lng_bounds[1]):
+                issues.append({
+                    'type': 'warning',
+                    'pole_id': pole_id,
+                    'longitude': lng,
+                    'message': f'Pole longitude {lng} outside expected range {lng_bounds}'
+                })
+        
+        return issues
+    
+    def validate_pole_spacing(self, poles: List[Dict], conductors: List[Dict]) -> List[Dict]:
+        """
+        Validate spacing between connected poles
+        
+        Args:
+            poles: List of pole dictionaries
+            conductors: List of conductor dictionaries
+            
+        Returns:
+            List of spacing issues
+        """
+        issues = []
+        
+        # Create pole lookup by ID
+        pole_lookup = {
+            (pole.get('pole_id') or pole.get('id')): pole 
+            for pole in poles
+        }
+        
+        # Check spacing for each conductor
+        for conductor in conductors:
+            conductor_id = conductor.get('conductor_id') or conductor.get('id')
+            from_pole_id = conductor.get('from_pole') or conductor.get('from')
+            to_pole_id = conductor.get('to_pole') or conductor.get('to')
+            
+            from_pole = pole_lookup.get(from_pole_id)
+            to_pole = pole_lookup.get(to_pole_id)
+            
+            if from_pole and to_pole:
+                # Calculate distance between poles
+                lat1, lng1 = from_pole.get('latitude', 0), from_pole.get('longitude', 0)
+                lat2, lng2 = to_pole.get('latitude', 0), to_pole.get('longitude', 0)
+                
+                if lat1 and lng1 and lat2 and lng2:
+                    # Haversine formula for distance
+                    import math
+                    R = 6371000  # Earth radius in meters
+                    lat1_rad, lat2_rad = math.radians(lat1), math.radians(lat2)
+                    dlat = math.radians(lat2 - lat1)
+                    dlng = math.radians(lng2 - lng1)
+                    
+                    a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlng/2)**2
+                    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+                    distance = R * c
+                    
+                    conductor_length = conductor.get('length', 0)
+                    
+                    # Check if conductor length matches pole spacing
+                    if conductor_length > 0:
+                        length_diff = abs(distance - conductor_length)
+                        if length_diff > conductor_length * 0.2:  # More than 20% difference
+                            issues.append({
+                                'type': 'warning',
+                                'conductor_id': conductor_id,
+                                'from_pole': from_pole_id,
+                                'to_pole': to_pole_id,
+                                'calculated_distance': round(distance, 2),
+                                'conductor_length': conductor_length,
+                                'difference': round(length_diff, 2),
+                                'message': f'Conductor length {conductor_length}m differs from pole spacing {distance:.1f}m'
+                            })
+        
+        return issues

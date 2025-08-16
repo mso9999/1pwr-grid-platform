@@ -332,11 +332,39 @@ output_path = exporter.export_network_report(
 |-----------|------------|--------|-------|
 | Excel Import | uGridPLAN | ✅ 100% | Working |
 | Voltage Calc | uGridPLAN | ✅ 100% | Tested |
-| Map Display | uGridPLAN | 🟡 60% | Missing editing |
+| Map Display | uGridPLAN | 🟡 80% | Generation site editing working, map overlay fixed |
 | Excel Export | uGridPLAN | ❌ 0% | Not started |
 | As-Built Tracking | uGridPLAN | ❌ 0% | Critical |
 | Network Design | uGridNET | ❌ 0% | Phase 2 |
 | Resource Planning | uGridPREDICT | ❌ 0% | Phase 2 |
+
+## 📝 Recent Fixes (August 16, 2025)
+
+### Map Overlay Issue After Generation Site Update
+**Problem**: Map container was expanding and overlaying the sidebar after generation site updates, making sidebar navigation inaccessible.
+
+**Root Cause**: Leaflet map container styles were being reset during network data updates, overriding the fixed positioning CSS.
+
+**Solution**: 
+1. **CSS Enhancement** (`/web-app/src/styles/globals.css`):
+   - Applied fixed positioning to `#map`, `.map-container`, and combined selectors
+   - Set explicit dimensions: `top: 64px`, `left: 256px` (respecting header and sidebar)
+   - Added `max-width` and `max-height` constraints with viewport calculations
+   - Used `!important` flags to ensure styles persist
+
+2. **JavaScript Enforcement** (`/web-app/src/components/map/ClientMap.tsx`):
+   - Added style enforcement in network data update `useEffect`
+   - Programmatically applies fixed positioning after each data refresh
+   - Ensures map container stays within layout boundaries
+
+### Generation Site Manual Editing
+**Feature**: Added ability to manually override generation site location via dialog.
+
+**Implementation**:
+- Created `GenerationSiteEditor` component with dialog UI
+- Backend endpoint: `POST /api/network/{site}/generation` to update pole ID
+- Proper callback chain from `page.tsx` → `MapView` → `ClientMap` → `GenerationSiteEditor`
+- Removed problematic `window.location.reload()` calls, using React state updates instead
 
 ---
 

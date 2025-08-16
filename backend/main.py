@@ -3,7 +3,7 @@
 Provides REST API for network data operations and calculations
 """
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
@@ -26,10 +26,15 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 try:
     from utils.excel_importer import ExcelImporter
     from utils.voltage_calculator import VoltageCalculator
+    from validators.network_validator import NetworkValidator
     from utils.report_exporter import ReportExporter
-except ImportError:
+except ImportError as e:
+    print(f"Import error: {e}")
     # Create stub classes if modules don't exist
     class ExcelImporter:
+        def __init__(self, file_path):
+            self.file_path = file_path
+            
         def import_excel(self, *args, **kwargs):
             return {}
     
@@ -69,8 +74,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory storage for now (will move to PostgreSQL)
-network_storage: Dict[str, Any] = {}
+# In-memory storage for network data (will be replaced with database)
+network_storage = {}
+voltage_storage: Dict[str, Any] = {}
 
 class NetworkRequest(BaseModel):
     """Request model for network operations"""
@@ -392,8 +398,72 @@ def get_network(site: str):
     print(f"Returning sanitized response...")
     return JSONResponse(content=sanitized_response)
 
-@app.post("/api/calculate/voltage")
-async def calculate_voltage(request: VoltageRequest):
+@app.get("/api/export/{site}")
+async def export_network_report(site: str):
+    """
+    Export network report to Excel
+    """
+    try:
+        print(f"\n=== Starting Excel export for site: {site} ===")
+        
+        if site not in network_storage:
+            raise HTTPException(status_code=404, detail=f"No network data for site {site}")
+        
+        network_data = network_storage[site]
+        print(f"Network data found: {len(network_data.get('poles', []))} poles, {len(network_data.get('conductors', []))} conductors")
+        
+        validation_results = None
+        voltage_results = None
+        
+        # Get validation results if available
+        try:
+            validator = NetworkValidator()
+            validation_results = validator.validate_network(network_data)
+            print(f"Validation results generated")
+        except Exception as e:
+            print(f"Validation skipped: {e}")
+            pass
+        
+        # Get voltage results if available
+        if site in voltage_storage:
+            voltage_results = voltage_storage[site]
+            print(f"Voltage results found")
+        
+        # Create report
+        print(f"Creating ReportExporter...")
+        exporter = ReportExporter()
+        output_file = exporter.export_network_report(
+            network_data=network_data,
+            validation_results=validation_results,
+            voltage_results=voltage_results,
+            site_name=site
+        )
+        
+        print(f"Report generated: {output_file}")
+        
+        # Check if file exists
+        if not os.path.exists(output_file):
+            raise HTTPException(status_code=500, detail=f"Report file not found: {output_file}")
+        
+        # Return file for download
+        return FileResponse(
+            path=output_file,
+            filename=f"{site}_network_report.xlsx",
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"=== ERROR in export_network_report ===")
+        print(f"Error: {e}")
+        import traceback
+        print(f"Traceback:\n{traceback.format_exc()}")
+        print(f"=== END ERROR ===")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/voltage/{site}")
+async def calculate_voltage_endpoint(site: str, request: VoltageRequest):
     """
     Calculate voltage drop for network
     Returns voltage at each node and identifies violations
@@ -407,34 +477,37 @@ async def calculate_voltage(request: VoltageRequest):
         # Initialize calculator
         calculator = VoltageCalculator()
         
-        # Perform calculations
-        results = calculator.calculate_network_voltage(
-            network_data,
+        # Perform calculations using the correct method
+        results = calculator.calculate_voltage_drop(
+            poles=network_data.get('poles', []),
+            conductors=network_data.get('conductors', []),
             source_voltage=request.source_voltage,
-            voltage_threshold=request.voltage_threshold
+            source_pole_id=getattr(request, 'source_pole_id', None),
+            power_factor=getattr(request, 'power_factor', 0.85)
         )
         
-        # Identify violations
+        # Identify violations from pole voltages
         violations = []
-        for node_id, voltage in results.get('node_voltages', {}).items():
-            voltage_drop_percent = ((request.source_voltage - voltage) / request.source_voltage) * 100
+        for pole_id, pole_data in results.get('pole_voltages', {}).items():
+            voltage_drop_percent = pole_data.get('voltage_drop_percent', 0)
             if voltage_drop_percent > request.voltage_threshold:
                 violations.append({
-                    "node": node_id,
-                    "voltage": voltage,
+                    "node": pole_id,
+                    "voltage": pole_data.get('voltage', 0),
                     "drop_percent": voltage_drop_percent
                 })
+        
+        # Store results for later use
+        voltage_storage[request.site] = results
         
         return CalculationResponse(
             success=True,
             message="Voltage calculation complete",
             results={
-                "voltages": results.get('node_voltages', {}),
+                "voltages": {pole_id: data['voltage'] for pole_id, data in results.get('pole_voltages', {}).items()},
                 "violations": violations,
-                "max_drop": max(
-                    ((request.source_voltage - v) / request.source_voltage) * 100
-                    for v in results.get('node_voltages', {}).values()
-                ) if results.get('node_voltages') else 0
+                "max_drop": results.get('statistics', {}).get('max_voltage_drop_percent', 0),
+                "statistics": results.get('statistics', {})
             }
         )
         
@@ -483,11 +556,59 @@ async def validate_network(site: str = "default"):
         # Create validator
         validator = NetworkValidator()
         
-        # Validate network
+        # Get poles and conductors
+        poles = network_data.get('poles', [])
+        conductors = network_data.get('conductors', [])
+        
+        # Validate network topology
         validation_results = validator.validate_network(
-            poles=network_data.get('poles', []),
-            conductors=network_data.get('conductors', [])
+            poles=poles,
+            conductors=conductors
         )
+        
+        # Add conductor length validation
+        length_issues = validator.validate_conductor_lengths(conductors)
+        if length_issues:
+            validation_results['conductor_length_issues'] = length_issues
+        
+        # Add pole coordinate validation
+        coordinate_issues = validator.validate_pole_coordinates(poles)
+        if coordinate_issues:
+            validation_results['coordinate_issues'] = coordinate_issues
+        
+        # Add pole spacing validation
+        spacing_issues = validator.validate_pole_spacing(poles, conductors)
+        if spacing_issues:
+            validation_results['spacing_issues'] = spacing_issues
+        
+        # Add status code validation
+        pole_status_issues = validator.validate_status_codes(poles, 'pole')
+        conductor_status_issues = validator.validate_status_codes(conductors, 'conductor')
+        if pole_status_issues or conductor_status_issues:
+            validation_results['status_code_issues'] = {
+                'poles': pole_status_issues,
+                'conductors': conductor_status_issues
+            }
+        
+        # Calculate overall validation statistics
+        total_issues = (
+            len(validation_results.get('orphaned_poles', [])) +
+            len(validation_results.get('invalid_conductors', [])) +
+            len(validation_results.get('duplicate_pole_ids', [])) +
+            len(length_issues) +
+            len(coordinate_issues) +
+            len(spacing_issues) +
+            len(pole_status_issues) +
+            len(conductor_status_issues)
+        )
+        
+        validation_results['statistics']['total_issues'] = total_issues
+        validation_results['statistics']['issue_types'] = {
+            'topology': len(validation_results.get('orphaned_poles', [])) + len(validation_results.get('invalid_conductors', [])),
+            'data_quality': len(validation_results.get('duplicate_pole_ids', [])) + len(coordinate_issues),
+            'physical': len(length_issues) + len(spacing_issues),
+            'status': len(pole_status_issues) + len(conductor_status_issues)
+        }
         
         return {
             "success": True,
@@ -520,8 +641,9 @@ async def export_network_report(
         if include_validation:
             validator = NetworkValidator()
             validation_results = validator.validate_network(
-                poles=network_data.get('poles', []),
-                conductors=network_data.get('conductors', [])
+                network_data.get('poles', []),
+                network_data.get('conductors', []),
+                network_data.get('connections', [])
             )
         
         # Create exporter and generate report

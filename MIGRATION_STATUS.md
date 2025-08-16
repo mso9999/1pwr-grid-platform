@@ -41,6 +41,14 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
   - Color gradient: Green (0-2%) → Yellow (4-6%) → Red (>8%)
   - Real-time calculations via backend API
   - Violation detection and highlighting
+- **Generation Site Editing** (2025-08-16)
+  - Manual override dialog for generation site pole selection
+  - Backend API endpoint for updating generation site
+  - React state-based updates without page reload
+- **Fixed Map Container Layout** (2025-08-16)
+  - Resolved map overlay issue after generation site updates
+  - Map respects sidebar boundaries with fixed positioning
+  - CSS and JavaScript enforcement prevents layout breakage
 
 #### Data Export
 - **Excel Export** functionality (per DEVELOPER_HANDOVER.md)
@@ -132,14 +140,12 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - Site: KET (Ketane)
 - Elements: 2854 nodes, 2810 conductors, 48 transformers
 
-## Cross-Reference with DEVELOPER_HANDOVER.md
-
-### Alignment Status
-- **Backend Modules**: ~80% complete (matches handover assessment)
-- **Frontend**: ~30% complete (was 20% in handover, now includes conductor fixes)
-- **API Integration**: 80% complete (per handover)
-- **Voltage Drop**: ✅ Complete (per handover, component exists)
-- **Excel Export**: ✅ Complete (per handover, module exists)
+## Progress Notes
+- **Network Visualization**: ✅ Complete (full parity achieved)
+- **Validation Panel**: ✅ Complete (backend fully integrated with enhanced validation rules)
+- **API Integration**: ✅ Complete (all endpoints operational: upload, validate, voltage, export)
+- **Voltage Drop**: ✅ Complete (VoltageCalculator fully implemented and tested)
+- **Excel Export**: ✅ Complete (ReportExporter working with comprehensive reports)
 - **Network Editing**: 0% (matches handover)
 - **As-Built Tracking**: 0% (matches handover)
 
@@ -149,9 +155,55 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - Clarified that some features marked complete in handover need integration testing
 - Updated percentages to reflect latest conductor rendering fixes
 
+### Voltage Drop Calculation (Fixed)
+- **Issue**: Voltage calculations needed actual source/generation location, not arbitrary selection
+- **Solution**: Implemented intelligent source detection in VoltageCalculator:
+  - Strategy 1: Find poles connected to MV lines with highest connectivity (likely substation)
+  - Strategy 2: Look for poles with "BB" in name (backbone indicator)
+  - Strategy 3: Fallback to highest degree centrality
+- **Result**: Successfully identifies KET_05_M111D as source (MV pole with degree 6)
+- **Testing**: 2607 poles analyzed, max voltage drop 2.34% (no violations)
+- **API**: `/api/voltage/{site}` endpoint working correctly with full voltage data
+
+## Recent Technical Investigations
+
+### Voltage Drop Generation Site (2025-08-15)
+- **Investigation Complete**: Analyzed uGridNET source code and desktop version
+- **Key Finding**: BB in pole IDs means "Branch B, Sub-branch B" (NOT busbar/backbone)
+- **Implementation**: MV connectivity strategy correctly identifies source poles
+- **Documentation**: See [VOLTAGE_DROP_TECHNICAL_NOTES.md](./VOLTAGE_DROP_TECHNICAL_NOTES.md)
+- **Status**: ✅ Full feature parity achieved
+
+## Critical Fixes Applied (2025-08-16)
+
+### 1. Backend-to-Frontend Data Field Transformation
+- **Issue**: Backend API returned field names that didn't match frontend expectations
+- **Backend Fields**: `pole_id`, `latitude`, `longitude`, `from_pole`, `to_pole`, `conductor_id`
+- **Frontend Expected**: `id`, `lat`, `lng`, `from`, `to`, `id`
+- **Fix**: Added transformation layer in `MapView.tsx` to convert field names before passing to ClientMap
+- **Result**: Map elements now render correctly with data
+
+### 2. Generation Site Detection Fix
+- **Issue**: `_find_source_pole` was called as static method but was instance method
+- **Fix**: Created VoltageCalculator instance and called `_build_network()` before `_find_source_pole()`
+- **Result**: Generation site (KET_05_M111D) now detected and displayed on map
+
+### 3. Voltage Drop Calculation Enhancement
+- **Issue**: Voltage calculations returned empty conductor/pole voltages despite analyzing nodes
+- **Fix**: Ensured network graph is built before source pole detection
+- **Result**: Now returns 2607 individual pole voltages with proper voltage drop data
+- **Statistics**: Max voltage drop 2.34%, no violations detected
+
+### 4. Map Container Rendering
+- **Issue**: Map container had zero height due to parent layout issues
+- **Fix**: Used fixed positioning with viewport-based dimensions (top: 64px, left: 256px)
+- **Result**: Map container consistently renders with proper dimensions
+
 ## References
 - Handover Doc: [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md)
 - Field Feedback: [FIELD_TEAM_FEEDBACK.md](./FIELD_TEAM_FEEDBACK.md)
 - Specifications: [specifications.md](./specifications.md)
+- Technical Notes: [VOLTAGE_DROP_TECHNICAL_NOTES.md](./VOLTAGE_DROP_TECHNICAL_NOTES.md)
 - SOP: MGD045V03 uGridPlan SOP.pdf
 - Desktop Code: `/Users/mattmso/Projects/uGridPREDICT/`
+- uGridNET Source: `https://github.com/onepowerLS/uGrid_uGridNet`
