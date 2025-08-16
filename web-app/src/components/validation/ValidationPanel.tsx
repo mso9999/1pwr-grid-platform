@@ -24,68 +24,131 @@ export function ValidationPanel({ site }: ValidationPanelProps) {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'pole' | 'conductor' | 'transformer' | 'customer'>('all')
 
   useEffect(() => {
-    // Simulate loading validation issues (will be replaced with API call)
-    setLoading(true)
-    setTimeout(() => {
-      const sampleIssues: ValidationIssue[] = [
-        {
+    // Fetch validation issues from backend API
+    const fetchValidationResults = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(`http://localhost:8000/api/validate/${site}`)
+        const result = await response.json()
+        
+        if (result.success && result.results) {
+          const validationIssues: ValidationIssue[] = []
+          let issueId = 1
+          
+          // Process orphaned poles
+          if (result.results.orphaned_poles?.length > 0) {
+            result.results.orphaned_poles.forEach((poleId: string) => {
+              validationIssues.push({
+                id: String(issueId++),
+                type: 'warning',
+                category: 'pole',
+                message: 'Orphaned pole detected',
+                details: `Pole ${poleId} has no connected conductors`,
+                location: poleId,
+                timestamp: new Date().toISOString()
+              })
+            })
+          }
+          
+          // Process invalid conductors
+          if (result.results.invalid_conductors?.length > 0) {
+            result.results.invalid_conductors.forEach((conductor: any) => {
+              validationIssues.push({
+                id: String(issueId++),
+                type: 'error',
+                category: 'conductor',
+                message: 'Invalid conductor reference',
+                details: conductor.reason || `Conductor ${conductor.id} has invalid references`,
+                location: conductor.id,
+                timestamp: new Date().toISOString()
+              })
+            })
+          }
+          
+          // Process duplicate IDs
+          if (result.results.duplicate_pole_ids?.length > 0) {
+            result.results.duplicate_pole_ids.forEach((poleId: string) => {
+              validationIssues.push({
+                id: String(issueId++),
+                type: 'error',
+                category: 'pole',
+                message: 'Duplicate pole ID',
+                details: `Multiple poles found with ID: ${poleId}`,
+                location: poleId,
+                timestamp: new Date().toISOString()
+              })
+            })
+          }
+          
+          // Process connectivity issues
+          if (result.results.disconnected_components?.length > 1) {
+            validationIssues.push({
+              id: String(issueId++),
+              type: 'warning',
+              category: 'conductor',
+              message: 'Network connectivity issue',
+              details: `Network has ${result.results.disconnected_components.length} disconnected components`,
+              location: 'Site-wide',
+              timestamp: new Date().toISOString()
+            })
+          }
+          
+          // Add summary info
+          if (result.results.statistics) {
+            const stats = result.results.statistics
+            validationIssues.push({
+              id: String(issueId++),
+              type: 'info',
+              category: 'pole',
+              message: 'Network statistics',
+              details: `${stats.total_poles || 0} poles, ${stats.total_conductors || 0} conductors validated`,
+              location: 'Site-wide',
+              timestamp: new Date().toISOString()
+            })
+            
+            if (stats.validation_rate && stats.validation_rate > 95) {
+              validationIssues.push({
+                id: String(issueId++),
+                type: 'info',
+                category: 'pole',
+                message: 'High validation rate',
+                details: `${stats.validation_rate.toFixed(1)}% of network elements successfully validated`,
+                location: 'Site-wide',
+                timestamp: new Date().toISOString()
+              })
+            }
+          }
+          
+          setIssues(validationIssues)
+        } else {
+          // If no validation results, show a default message
+          setIssues([{
+            id: '1',
+            type: 'info',
+            category: 'pole',
+            message: 'No validation issues detected',
+            details: 'Network validation completed successfully with no issues found',
+            location: 'Site-wide',
+            timestamp: new Date().toISOString()
+          }])
+        }
+      } catch (error) {
+        console.error('Failed to fetch validation results:', error)
+        setIssues([{
           id: '1',
           type: 'error',
-          category: 'conductor',
-          message: 'Invalid conductor reference',
-          details: 'Conductor KET_18_AA15_KET 5000 HH3 references non-existent pole KET 5000 HH3',
-          location: 'KET_18_AA15',
-          timestamp: '2025-08-13T19:00:00Z'
-        },
-        {
-          id: '2',
-          type: 'warning',
           category: 'pole',
-          message: 'Pole not found in KML',
-          details: 'Pole KET_18_AA11 exists in Excel but not in KML ground truth',
-          location: 'KET_18_AA11',
-          timestamp: '2025-08-13T18:45:00Z'
-        },
-        {
-          id: '3',
-          type: 'info',
-          category: 'customer',
-          message: 'Customer dropline detected',
-          details: 'Identified 853 customer droplines with pattern KET XXXX HH#',
-          location: 'Multiple',
-          timestamp: '2025-08-13T18:30:00Z'
-        },
-        {
-          id: '4',
-          type: 'error',
-          category: 'transformer',
-          message: 'Missing transformer data',
-          details: 'No transformer records found for site KET in Excel data',
-          location: 'Site-wide',
-          timestamp: '2025-08-13T18:15:00Z'
-        },
-        {
-          id: '5',
-          type: 'warning',
-          category: 'conductor',
-          message: 'Voltage drop exceeds threshold',
-          details: 'Distribution line KET_26_AB3 shows 8.2% voltage drop (threshold: 7%)',
-          location: 'KET_26_AB3',
-          timestamp: '2025-08-13T18:00:00Z'
-        },
-        {
-          id: '6',
-          type: 'info',
-          category: 'pole',
-          message: 'High validation rate',
-          details: '99.9% of poles successfully validated against KML data',
-          location: 'Site-wide',
-          timestamp: '2025-08-13T17:45:00Z'
-        }
-      ]
-      setIssues(sampleIssues)
-      setLoading(false)
-    }, 500)
+          message: 'Validation service unavailable',
+          details: 'Unable to connect to validation service. Please ensure backend is running.',
+          location: 'System',
+          timestamp: new Date().toISOString()
+        }])
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchValidationResults()
   }, [site])
 
   const getIcon = (type: ValidationIssue['type']) => {

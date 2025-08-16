@@ -14,14 +14,23 @@ The 1PWR Grid Platform is a modern web application that consolidates three legac
 
 ## System Components
 
-### Backend (FastAPI)
-- **Location**: `/backend/`
-- **Port**: 8000
-- **Responsibilities**:
-  - Data import/export (Excel, KML)
-  - Network calculations (voltage drop, validation)
+### Backend Services
+
+- **FastAPI Application** (`backend/main.py`)
   - REST API endpoints
-  - Business logic processing
+  - File upload handling
+  - Network data processing
+  - Voltage calculations
+  - Export generation
+  - Network validation endpoint
+
+- **Validators** (`backend/validators/`)
+  - NetworkValidator: Validates network topology and data integrity
+
+- **Utilities** (`backend/utils/`)
+  - ExcelImporter: Parses uGridPLAN Excel files
+  - VoltageCalculator: Calculates voltage drops
+  - ReportExporter: Generates Excel reports
 
 ### Frontend (Next.js)
 - **Location**: `/web-app/`

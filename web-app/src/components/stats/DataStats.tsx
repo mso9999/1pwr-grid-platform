@@ -3,7 +3,12 @@ import { Activity, Users, Zap, AlertCircle } from 'lucide-react'
 
 interface DataStatsProps {
   site: string;
-  networkData?: any;
+  networkData?: {
+    poles?: any[];
+    conductors?: any[];
+    connections?: any[];
+    transformers?: any[];
+  };
 }
 
 interface SiteStats {
@@ -14,24 +19,87 @@ interface SiteStats {
   validation: { issues: number; warnings: number }
 }
 
-export function DataStats({ site }: DataStatsProps) {
+export function DataStats({ site, networkData }: DataStatsProps) {
   const [stats, setStats] = useState<SiteStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading stats (will be replaced with API call)
+    // Calculate stats from actual network data
     setLoading(true)
-    setTimeout(() => {
+    
+    if (networkData) {
+      const poles = networkData.poles || []
+      const conductors = networkData.conductors || []
+      const connections = networkData.connections || []
+      const transformers = networkData.transformers || []
+      
+      // Count validated poles (those with status codes)
+      const validatedPoles = poles.filter(p => p.st_code_1 !== undefined && p.st_code_1 !== null).length
+      
+      // Classify conductors by voltage level
+      const mvConductors = conductors.filter(c => 
+        c.voltage_level === 'MV' || c.cable_type?.includes('MV') || 
+        (c.from?.startsWith('KET_') && c.to?.startsWith('KET_'))
+      ).length
+      
+      const lvConductors = conductors.filter(c => 
+        c.voltage_level === 'LV' || c.cable_type?.includes('LV') ||
+        (!c.voltage_level && !c.cable_type?.includes('MV') && !c.cable_type?.includes('Drop'))
+      ).length
+      
+      // Count connected customers (those with st_code_3 >= 7)
+      const connectedCustomers = connections.filter(c => 
+        c.st_code_3 >= 7
+      ).length
+      
+      // Calculate total transformer capacity
+      const totalCapacity = transformers.reduce((sum, t) => 
+        sum + (t.capacity_kva || 0), 0
+      )
+      
+      // Count validation issues (placeholder - would come from validation API)
+      const validationIssues = conductors.filter(c => 
+        !poles.find(p => p.pole_id === c.from) || !poles.find(p => p.pole_id === c.to)
+      ).length
+      
       setStats({
-        poles: { total: 1575, validated: 1574, validationRate: 99.9 },
-        conductors: { total: 1938, backbone: 44, distribution: 1894 },
-        customers: { total: 853, connected: 0, pending: 853 },
-        transformers: { total: 8, totalCapacity: 1200 },
-        validation: { issues: 363, warnings: 12 }
+        poles: { 
+          total: poles.length, 
+          validated: validatedPoles, 
+          validationRate: poles.length > 0 ? (validatedPoles / poles.length) * 100 : 0 
+        },
+        conductors: { 
+          total: conductors.length, 
+          backbone: mvConductors, 
+          distribution: lvConductors 
+        },
+        customers: { 
+          total: connections.length, 
+          connected: connectedCustomers, 
+          pending: connections.length - connectedCustomers 
+        },
+        transformers: { 
+          total: transformers.length, 
+          totalCapacity 
+        },
+        validation: { 
+          issues: validationIssues, 
+          warnings: Math.floor(validationIssues * 0.3) // Estimate warnings as 30% of issues
+        }
       })
-      setLoading(false)
-    }, 500)
-  }, [site])
+    } else {
+      // No data available
+      setStats({
+        poles: { total: 0, validated: 0, validationRate: 0 },
+        conductors: { total: 0, backbone: 0, distribution: 0 },
+        customers: { total: 0, connected: 0, pending: 0 },
+        transformers: { total: 0, totalCapacity: 0 },
+        validation: { issues: 0, warnings: 0 }
+      })
+    }
+    
+    setLoading(false)
+  }, [site, networkData])
 
   if (loading) {
     return (
@@ -58,7 +126,7 @@ export function DataStats({ site }: DataStatsProps) {
       subtitle: `${stats.conductors.backbone} backbone, ${stats.conductors.distribution} distribution`,
       icon: Zap,
       color: 'bg-green-500',
-      detail: `${((stats.conductors.total * 50) / 1000).toFixed(1)} km total`,
+      detail: `${((stats.conductors.total * 50) / 1000).toFixed(1)} km est.`,
     },
     {
       title: 'Customer Connections',

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Polyline, Tooltip } from 'react-leaflet';
+import React, { useEffect, useState, useRef } from 'react';
+import L from 'leaflet';
 import { api } from '@/lib/api';
 
 interface VoltageOverlayProps {
+  map: L.Map | null;
   site: string;
   conductors: Array<{
     id: string;
@@ -33,6 +34,7 @@ interface VoltageResult {
 }
 
 export default function VoltageOverlay({
+  map,
   site,
   conductors,
   poles,
@@ -43,13 +45,38 @@ export default function VoltageOverlay({
   const [voltageData, setVoltageData] = useState<VoltageResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const layerGroupRef = useRef<L.LayerGroup | null>(null);
+  const legendRef = useRef<L.Control | null>(null);
+
+  // Initialize layer group when map is available
+  useEffect(() => {
+    if (map && !layerGroupRef.current) {
+      layerGroupRef.current = L.layerGroup().addTo(map);
+    }
+    return () => {
+      if (layerGroupRef.current && map) {
+        map.removeLayer(layerGroupRef.current);
+        layerGroupRef.current = null;
+      }
+      if (legendRef.current && map) {
+        map.removeControl(legendRef.current);
+        legendRef.current = null;
+      }
+    };
+  }, [map]);
 
   // Calculate voltage when enabled
   useEffect(() => {
-    if (enabled && site && conductors.length > 0) {
+    if (enabled && site && conductors.length > 0 && map) {
       calculateVoltage();
+    } else if (!enabled && layerGroupRef.current) {
+      layerGroupRef.current.clearLayers();
+      if (legendRef.current && map) {
+        map.removeControl(legendRef.current);
+        legendRef.current = null;
+      }
     }
-  }, [enabled, site]);
+  }, [enabled, site, map]);
 
   const calculateVoltage = async () => {
     setLoading(true);
@@ -69,23 +96,11 @@ export default function VoltageOverlay({
   };
 
   // Get voltage drop color based on percentage
-  const getVoltageColor = (fromNode: string, toNode: string): string => {
-    if (!voltageData?.voltages) return '#999999'; // Grey if no data
-
-    const fromVoltage = voltageData.voltages[fromNode] || sourceVoltage;
-    const toVoltage = voltageData.voltages[toNode] || sourceVoltage;
-    
-    // Calculate average voltage drop percentage
-    const avgVoltage = (fromVoltage + toVoltage) / 2;
-    const dropPercent = ((sourceVoltage - avgVoltage) / sourceVoltage) * 100;
-
-    // Color gradient based on voltage drop
-    if (dropPercent <= 2) return '#00ff00'; // Green - Excellent
-    if (dropPercent <= 4) return '#90ee90'; // Light Green - Good
-    if (dropPercent <= 6) return '#ffff00'; // Yellow - Acceptable
-    if (dropPercent <= 7) return '#ffa500'; // Orange - Warning
-    if (dropPercent <= 8) return '#ff6600'; // Dark Orange - Critical
-    return '#ff0000'; // Red - Violation
+  const getVoltageColor = (dropPercent: number, threshold: number): string => {
+    if (dropPercent <= 3) return '#10b981'; // Green - Excellent
+    if (dropPercent <= 5) return '#eab308'; // Yellow - Good
+    if (dropPercent <= threshold) return '#f97316'; // Orange - Warning
+    return '#ef4444'; // Red - Violation
   };
 
   // Get line weight based on voltage drop severity
@@ -104,96 +119,115 @@ export default function VoltageOverlay({
   };
 
   // Helper to find pole coordinates
-  const findPoleCoords = (poleId: string) => {
-    const pole = poles.find(p => p.id === poleId);
-    return pole ? [pole.lat, pole.lng] as [number, number] : null;
-  };
+  // Render conductor lines on the map
+  useEffect(() => {
+    if (!map || !voltageData || !enabled || !layerGroupRef.current) return;
 
-  if (!enabled || loading) return null;
+    // Clear existing layers
+    layerGroupRef.current.clearLayers();
+
+    // Remove existing legend if any
+    if (legendRef.current) {
+      map.removeControl(legendRef.current);
+      legendRef.current = null;
+    }
+
+    // Add conductor lines
+    conductors.forEach(conductor => {
+      const fromPole = poles.find(p => p.id === conductor.from);
+      const toPole = poles.find(p => p.id === conductor.to);
+      
+      if (!fromPole || !toPole) return;
+
+      // Get voltage drop for this conductor
+      const fromVoltage = voltageData.voltages[conductor.from] || sourceVoltage;
+      const toVoltage = voltageData.voltages[conductor.to] || sourceVoltage;
+      const voltageDrop = ((sourceVoltage - toVoltage) / sourceVoltage) * 100;
+
+      // Determine color based on voltage drop
+      const color = getVoltageColor(voltageDrop, voltageThreshold);
+
+      // Create polyline
+      const polyline = L.polyline(
+        [[fromPole.lat, fromPole.lng], [toPole.lat, toPole.lng]],
+        {
+          color,
+          weight: 3,
+          opacity: 0.8
+        }
+      );
+
+      // Add popup to polyline
+      const popupContent = `
+        <div style="font-size: 12px;">
+          <div style="font-weight: bold;">${conductor.id}</div>
+          <div>Type: ${conductor.type}</div>
+          <div>From: ${conductor.from} (${fromVoltage.toFixed(0)}V)</div>
+          <div>To: ${conductor.to} (${toVoltage.toFixed(0)}V)</div>
+          <div style="font-weight: bold; color: ${voltageDrop > voltageThreshold ? '#dc2626' : '#16a34a'};">
+            Drop: ${voltageDrop.toFixed(2)}%
+          </div>
+        </div>`;
+      polyline.bindPopup(popupContent);
+
+      layerGroupRef.current?.addLayer(polyline);
+    });
+
+    // Add legend
+    const LegendControl = L.Control.extend({
+      options: { position: 'bottomright' },
+      onAdd: function() {
+        const div = L.DomUtil.create('div', 'bg-white p-3 rounded shadow-lg');
+        div.innerHTML = `
+          <div class="text-sm font-semibold mb-2">Voltage Drop</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-1" style="background: #10b981"></div>
+              <span class="text-xs">0-3%</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-1" style="background: #eab308"></div>
+              <span class="text-xs">3-5%</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-1" style="background: #f97316"></div>
+              <span class="text-xs">5-7%</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-1" style="background: #ef4444"></div>
+              <span class="text-xs">>7%</span>
+            </div>
+          </div>
+          ${voltageData.max_drop > 0 ? `
+            <div class="mt-2 pt-2 border-t text-xs">
+              Max Drop: ${voltageData.max_drop.toFixed(2)}%
+            </div>
+          ` : ''}
+        `;
+        return div;
+      }
+    });
+    const legend = new LegendControl();
+    legend.addTo(map);
+    legendRef.current = legend;
+  }, [map, voltageData, enabled, conductors, poles, sourceVoltage, voltageThreshold]);
+
+  // Render loading/error states
+  if (!map) return null;
 
   return (
     <>
-      {/* Render voltage-colored conductors */}
-      {conductors.map(conductor => {
-        const fromCoords = findPoleCoords(conductor.from);
-        const toCoords = findPoleCoords(conductor.to);
-        
-        if (!fromCoords || !toCoords) return null;
-
-        const color = getVoltageColor(conductor.from, conductor.to);
-        const weight = getLineWeight(conductor.from, conductor.to);
-
-        // Get voltage values for tooltip
-        const fromVoltage = voltageData?.voltages?.[conductor.from] || sourceVoltage;
-        const toVoltage = voltageData?.voltages?.[conductor.to] || sourceVoltage;
-        const avgVoltage = (fromVoltage + toVoltage) / 2;
-        const dropPercent = ((sourceVoltage - avgVoltage) / sourceVoltage) * 100;
-
-        return (
-          <Polyline
-            key={`voltage-${conductor.id}`}
-            positions={[fromCoords, toCoords]}
-            color={color}
-            weight={weight}
-            opacity={0.8}
-          >
-            <Tooltip sticky>
-              <div className="text-xs">
-                <p className="font-semibold">{conductor.id}</p>
-                <p>From: {conductor.from} ({fromVoltage.toFixed(0)}V)</p>
-                <p>To: {conductor.to} ({toVoltage.toFixed(0)}V)</p>
-                <p className={dropPercent > voltageThreshold ? 'text-red-600 font-bold' : ''}>
-                  Drop: {dropPercent.toFixed(2)}%
-                </p>
-              </div>
-            </Tooltip>
-          </Polyline>
-        );
-      })}
-
-      {/* Display error if any */}
-      {error && (
-        <div className="absolute top-4 right-4 bg-red-50 text-red-800 p-3 rounded-md text-sm">
-          Voltage calculation error: {error}
+      {/* Loading indicator */}
+      {loading && (
+        <div className="absolute top-4 right-4 bg-white p-2 rounded shadow z-[1000]">
+          <div className="text-sm">Calculating voltage...</div>
         </div>
       )}
 
-      {/* Voltage legend */}
-      {voltageData && (
-        <div className="absolute bottom-20 right-4 bg-white p-3 rounded-lg shadow-md">
-          <h4 className="text-xs font-semibold mb-2">Voltage Drop</h4>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-green-500"></div>
-              <span className="text-xs">0-2% Excellent</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-green-300"></div>
-              <span className="text-xs">2-4% Good</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-yellow-400"></div>
-              <span className="text-xs">4-6% Acceptable</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-orange-500"></div>
-              <span className="text-xs">6-7% Warning</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-orange-600"></div>
-              <span className="text-xs">7-8% Critical</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-2 bg-red-500"></div>
-              <span className="text-xs">&gt;8% Violation</span>
-            </div>
-          </div>
-          {voltageData.max_drop && (
-            <div className="mt-2 pt-2 border-t text-xs">
-              <p>Max Drop: <span className="font-semibold">{voltageData.max_drop.toFixed(2)}%</span></p>
-              <p>Violations: <span className="font-semibold">{voltageData.violations?.length || 0}</span></p>
-            </div>
-          )}
+      {/* Error display */}
+      {error && (
+        <div className="absolute top-4 right-4 bg-red-50 border border-red-200 p-2 rounded shadow z-[1000]">
+          <div className="text-sm text-red-700">{error}</div>
         </div>
       )}
     </>

@@ -3,10 +3,11 @@
 import { useEffect, useState, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { Zap } from 'lucide-react'
+import { Zap, Activity } from 'lucide-react'
 import { LayerControls, LayerVisibility } from './LayerControls'
 import { ElementDetailPanel, ElementDetail } from './ElementDetailPanel'
 import { SC1_COLORS, SC3_COLORS, SC4_COLORS, getLineType } from '@/utils/statusCodes'
+import VoltageOverlay from './VoltageOverlay'
 
 // Fix Leaflet default icon issue
 if (typeof window !== 'undefined') {
@@ -45,6 +46,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
   })
   const [selectedElement, setSelectedElement] = useState<any>(null)
   const [elementNames, setElementNames] = useState<Map<string, string>>(new Map())
+  const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
 
   const layerGroupsRef = useRef<{
     poles?: L.LayerGroup
@@ -519,6 +521,32 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         onVisibilityChange={setLayerVisibility}
         counts={elementCounts}
       />
+      
+      {/* Voltage Overlay Toggle */}
+      <div className="absolute top-20 left-4 z-[1000]">
+        <button
+          onClick={() => setVoltageOverlayEnabled(!voltageOverlayEnabled)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg text-sm font-medium transition-colors ${
+            voltageOverlayEnabled 
+              ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-300' 
+              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+          }`}
+        >
+          <Activity className="h-4 w-4" />
+          <span>Voltage Drop</span>
+        </button>
+      </div>
+      
+      {/* Voltage Overlay Component */}
+      {map && networkData && voltageOverlayEnabled && (
+        <VoltageOverlay
+          map={map}
+          site={networkData.site || 'default'}
+          conductors={networkData.conductors || []}
+          poles={networkData.poles || []}
+          enabled={voltageOverlayEnabled}
+        />
+      )}
       
       <ElementDetailPanel
         element={selectedElement}
