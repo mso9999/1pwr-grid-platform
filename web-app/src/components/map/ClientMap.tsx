@@ -265,15 +265,16 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         console.log('Map size after invalidate:', size.x, 'x', size.y)
       }, 100)
 
-      // Initialize layer groups
+      // Initialize layer groups in rendering order (bottom to top)
+      // Order: connections (bottom) -> poles -> lines (top)
       layerGroupsRef.current = {
-        poles: L.layerGroup().addTo(newMap),
-        connections: L.layerGroup().addTo(newMap),
-        mvLines: L.layerGroup().addTo(newMap),
+        connections: L.layerGroup().addTo(newMap),    // Bottom layer
+        transformers: L.layerGroup().addTo(newMap),   
+        poles: L.layerGroup().addTo(newMap),          // Middle layer
+        generation: L.layerGroup().addTo(newMap),
+        dropLines: L.layerGroup().addTo(newMap),      // Top layers (lines)
         lvLines: L.layerGroup().addTo(newMap),
-        dropLines: L.layerGroup().addTo(newMap),
-        transformers: L.layerGroup().addTo(newMap),
-        generation: L.layerGroup().addTo(newMap)
+        mvLines: L.layerGroup().addTo(newMap)
       }
 
       // Add resize observer with proper cleanup
@@ -477,7 +478,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           // Create square icon for connections
           const squareSize = Math.round(12 * scale) // Base size 12px, scaled
           const squareIcon = L.divIcon({
-            html: `<div style="background-color: ${color}; border: 1px solid #333; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+            html: `<div style="background-color: ${color}; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
             className: 'connection-square-marker',
             iconSize: [squareSize, squareSize],
             iconAnchor: [squareSize/2, squareSize/2]
@@ -524,11 +525,13 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           bounds.extend([pole.lat, pole.lng])
           hasValidCoords = true
           const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
+          // MV poles have "_M" in their ID and keep borders
+          const isMVPole = pole.id && pole.id.includes('_M')
           const marker = L.circleMarker([pole.lat, pole.lng], {
             radius: 8 * scale,  // Base size 8, scaled by zoom
             fillColor: color,
-            color: '#000',
-            weight: 2,
+            color: isMVPole ? '#000' : color,  // MV poles get black border, LV poles borderless
+            weight: isMVPole ? 2 : 0,
             opacity: 1,
             fillOpacity: 0.9
           })
@@ -758,7 +761,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         const connection = marker.options.alt ? JSON.parse(marker.options.alt) : null
         const color = SC3_COLORS[connection?.st_code_3 || 0] || '#808080'
         const newIcon = L.divIcon({
-          html: `<div style="background-color: ${color}; border: 1px solid #333; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+          html: `<div style="background-color: ${color}; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
           className: 'connection-square-marker',
           iconSize: [squareSize, squareSize],
           iconAnchor: [squareSize/2, squareSize/2]
