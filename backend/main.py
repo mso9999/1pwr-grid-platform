@@ -27,7 +27,7 @@ try:
     from utils.excel_importer import ExcelImporter
     from utils.voltage_calculator import VoltageCalculator
     from validators.network_validator import NetworkValidator
-    from utils.report_exporter import ReportExporter
+    from storage import network_storage  # Import shared storage
 except ImportError as e:
     print(f"Import error: {e}")
     # Create stub classes if modules don't exist
@@ -74,8 +74,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory storage for network data (will be replaced with database)
-network_storage = {}
+# In-memory storage for voltage data (network storage imported from storage.py)
 voltage_storage: Dict[str, Any] = {}
 
 class NetworkRequest(BaseModel):

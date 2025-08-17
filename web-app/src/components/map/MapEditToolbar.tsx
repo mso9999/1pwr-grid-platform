@@ -120,6 +120,11 @@ export function MapEditToolbar({
   // Show appropriate dialog when location is set or element selected
   useEffect(() => {
     if (pendingPoleLocation && editMode === 'add-pole') {
+      setPoleFormData(prev => ({
+        ...prev,
+        latitude: pendingPoleLocation.lat,
+        longitude: pendingPoleLocation.lng
+      }));
       setShowPoleDialog(true);
     } else if (pendingConnectionLocation && editMode === 'add-connection') {
       setConnectionFormData(prev => ({

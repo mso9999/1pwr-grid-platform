@@ -81,11 +81,11 @@ class ConductorSplit(BaseModel):
     split_point: Dict[str, float]  # {lat, lng}
     new_pole_id: Optional[str] = None
 
-# In-memory storage reference (will be replaced with database later)
+# Import shared storage
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from main import network_storage
+from storage import network_storage
 
 @router.post("/poles/{site}")
 async def create_pole(site: str, pole: PoleCreate):
@@ -95,20 +95,21 @@ async def create_pole(site: str, pole: PoleCreate):
             network_storage[site] = {"poles": [], "conductors": [], "connections": [], "transformers": []}
         
         # Generate pole ID if not provided
-        if not pole.pole_id:
+        pole_id = pole.pole_id
+        if not pole_id:
             # Extract site prefix and generate sequential ID
             existing_poles = network_storage[site].get("poles", [])
             pole_number = len(existing_poles) + 1
-            pole.pole_id = f"{site.upper()}_{pole_number:04d}"
+            pole_id = f"{site.upper()}_{pole_number:04d}"
         
         # Check for duplicate pole ID
         existing_poles = network_storage[site].get("poles", [])
-        if any(p["pole_id"] == pole.pole_id for p in existing_poles):
-            raise HTTPException(status_code=400, detail=f"Pole ID {pole.pole_id} already exists")
+        if any(p["pole_id"] == pole_id for p in existing_poles):
+            raise HTTPException(status_code=400, detail=f"Pole ID {pole_id} already exists")
         
         # Create pole data
         new_pole = {
-            "pole_id": pole.pole_id,
+            "pole_id": pole_id,
             "latitude": pole.latitude,
             "longitude": pole.longitude,
             "pole_type": pole.pole_type,
@@ -124,11 +125,12 @@ async def create_pole(site: str, pole: PoleCreate):
         # Add to storage
         network_storage[site]["poles"].append(new_pole)
         
-        return {
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={
             "success": True,
-            "message": f"Pole {pole.pole_id} created successfully",
+            "message": f"Pole {pole_id} created successfully",
             "pole": new_pole
-        }
+        })
         
     except HTTPException:
         raise
@@ -154,11 +156,12 @@ async def update_pole(site: str, pole_id: str, pole: PoleUpdate):
         
         poles[pole_index].update(update_data)
         
-        return {
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={
             "success": True,
             "message": f"Pole {pole_id} updated successfully",
             "pole": poles[pole_index]
-        }
+        })
         
     except HTTPException:
         raise
@@ -202,12 +205,13 @@ async def delete_pole(site: str, pole_id: str, force: bool = False):
                 if c.get("from_pole") != pole_id and c.get("to_pole") != pole_id
             ]
         
-        return {
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={
             "success": True,
             "message": f"Pole {pole_id} deleted successfully",
             "deleted_pole": deleted_pole,
             "deleted_conductors": len(connected_conductors) if force else 0
-        }
+        })
         
     except HTTPException:
         raise
@@ -271,13 +275,18 @@ async def create_conductor(site: str, conductor: ConductorCreate):
         if not conductor.conductor_id:
             conductor.conductor_id = f"COND_{uuid.uuid4().hex[:8].upper()}"
         
-        # Verify both poles exist
+        # Verify both nodes exist (can be poles or connections)
         poles = network_storage[site].get("poles", [])
-        pole_ids = {p["pole_id"] for p in poles}
+        connections = network_storage[site].get("connections", [])
         
-        if conductor.from_pole not in pole_ids:
+        # Create a set of all valid node IDs
+        pole_ids = {p["pole_id"] for p in poles}
+        connection_ids = {c["pole_id"] for c in connections}
+        all_node_ids = pole_ids | connection_ids
+        
+        if conductor.from_pole not in all_node_ids:
             raise HTTPException(status_code=400, detail=f"From pole {conductor.from_pole} not found")
-        if conductor.to_pole not in pole_ids:
+        if conductor.to_pole not in all_node_ids:
             raise HTTPException(status_code=400, detail=f"To pole {conductor.to_pole} not found")
         
         # Calculate length if not provided
@@ -313,6 +322,43 @@ async def create_conductor(site: str, conductor: ConductorCreate):
             "message": f"Conductor {conductor.conductor_id} created successfully",
             "conductor": new_conductor
         }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/conductors/{site}/{conductor_id}")
+async def update_conductor(site: str, conductor_id: str, conductor: ConductorUpdate):
+    """Update an existing conductor"""
+    try:
+        if site not in network_storage:
+            raise HTTPException(status_code=404, detail=f"Site {site} not found")
+        
+        conductors = network_storage[site].get("conductors", [])
+        
+        # Find the conductor
+        conductor_index = None
+        for i, c in enumerate(conductors):
+            if c["conductor_id"] == conductor_id:
+                conductor_index = i
+                break
+        
+        if conductor_index is None:
+            raise HTTPException(status_code=404, detail=f"Conductor {conductor_id} not found")
+        
+        # Update fields
+        update_data = conductor.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            conductors[conductor_index][key] = value
+        conductors[conductor_index]["updated_at"] = datetime.utcnow().isoformat()
+        
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Conductor {conductor_id} updated successfully",
+            "conductor": conductors[conductor_index]
+        })
         
     except HTTPException:
         raise
@@ -417,11 +463,12 @@ async def delete_conductor(site: str, conductor_id: str):
         
         deleted_conductor = conductors.pop(conductor_index)
         
-        return {
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={
             "success": True,
             "message": f"Conductor {conductor_id} deleted successfully",
             "deleted_conductor": deleted_conductor
-        }
+        })
         
     except HTTPException:
         raise
