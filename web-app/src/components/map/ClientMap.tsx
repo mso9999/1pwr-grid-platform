@@ -639,7 +639,8 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
               color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
               weight: 2,
               pane: pane,
-              opacity: 1  // No transparency for lines
+              opacity: 1,  // No transparency for lines
+              dashArray: conductor.st_code_4 === 5 ? undefined : '5, 10'  // Dashed unless energized (SC4=5)
             })
             
             polyline.on('click', () => {
