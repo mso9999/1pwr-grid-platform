@@ -267,12 +267,14 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
       // Create custom panes for proper layer ordering
       newMap.createPane('connectionsPane')
-      newMap.createPane('polesPane')
+      newMap.createPane('lvPolesPane')
+      newMap.createPane('mvPolesPane')
       newMap.createPane('linesPane')
       
       // Set z-index for each pane (higher = on top)
       newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
-      newMap.getPane('polesPane')!.style.zIndex = '500'        // Middle
+      newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
+      newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
       newMap.getPane('linesPane')!.style.zIndex = '600'        // Top
       
       // Initialize layer groups
@@ -544,7 +546,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             weight: isMVPole ? 2 : 0,
             opacity: 1,
             fillOpacity: 0.9,
-            pane: 'polesPane'
+            pane: isMVPole ? 'mvPolesPane' : 'lvPolesPane'  // MV poles render above LV poles
           })
           
           marker.on('click', () => {
