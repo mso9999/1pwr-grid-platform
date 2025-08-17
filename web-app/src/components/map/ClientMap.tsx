@@ -265,14 +265,23 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         console.log('Map size after invalidate:', size.x, 'x', size.y)
       }, 100)
 
-      // Initialize layer groups in rendering order (bottom to top)
-      // Order: connections (bottom) -> poles -> lines (top)
+      // Create custom panes for proper layer ordering
+      newMap.createPane('connectionsPane')
+      newMap.createPane('polesPane')
+      newMap.createPane('linesPane')
+      
+      // Set z-index for each pane (higher = on top)
+      newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
+      newMap.getPane('polesPane')!.style.zIndex = '500'        // Middle
+      newMap.getPane('linesPane')!.style.zIndex = '600'        // Top
+      
+      // Initialize layer groups
       layerGroupsRef.current = {
-        connections: L.layerGroup().addTo(newMap),    // Bottom layer
+        connections: L.layerGroup().addTo(newMap),
         transformers: L.layerGroup().addTo(newMap),   
-        poles: L.layerGroup().addTo(newMap),          // Middle layer
+        poles: L.layerGroup().addTo(newMap),
         generation: L.layerGroup().addTo(newMap),
-        dropLines: L.layerGroup().addTo(newMap),      // Top layers (lines)
+        dropLines: L.layerGroup().addTo(newMap),
         lvLines: L.layerGroup().addTo(newMap),
         mvLines: L.layerGroup().addTo(newMap)
       }
@@ -486,6 +495,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           
           const marker = L.marker([connection.lat, connection.lng], { 
             icon: squareIcon,
+            pane: 'connectionsPane',
             alt: JSON.stringify(connection) // Store connection data for zoom updates
           })
           
@@ -533,7 +543,8 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             color: isMVPole ? '#000' : color,  // MV poles get black border, LV poles borderless
             weight: isMVPole ? 2 : 0,
             opacity: 1,
-            fillOpacity: 0.9
+            fillOpacity: 0.9,
+            pane: 'polesPane'
           })
           
           marker.on('click', () => {
@@ -617,6 +628,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             const polyline = L.polyline([fromCoords, toCoords], {
               color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
               weight: 2,
+              pane: 'linesPane',
               opacity: 0.8
             })
             
