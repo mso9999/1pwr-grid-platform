@@ -180,3 +180,42 @@ export function getLineType(conductor: any, poles: any[], connections: any[]): '
   // Default to LV for pole-to-pole connections
   return 'lv'
 }
+
+// Helper functions to get narrative descriptions
+export function getSC1Narrative(code: number): string {
+  return SC1_DESCRIPTIONS[code] || 'Unknown status'
+}
+
+export function getSC2Narrative(code: string): string {
+  return SC2_DESCRIPTIONS[code] || 'Unknown status'
+}
+
+export function getSC3Narrative(code: number): string {
+  return SC3_DESCRIPTIONS[code] || 'Unknown status'
+}
+
+export function getSC4Narrative(code: number): string {
+  return SC4_DESCRIPTIONS[code] || 'Unknown status'
+}
+
+export function getSC5Narrative(code: number): string {
+  return SC5_DESCRIPTIONS[code] || 'Unknown status'
+}
+
+// Generic function to get status code narrative
+export function getStatusCodeNarrative(code: string, value: number | string): string {
+  switch(code) {
+    case 'SC1':
+      return getSC1Narrative(typeof value === 'number' ? value : parseInt(value as string));
+    case 'SC2':
+      return getSC2Narrative(value as string);
+    case 'SC3':
+      return getSC3Narrative(typeof value === 'number' ? value : parseInt(value as string));
+    case 'SC4':
+      return getSC4Narrative(typeof value === 'number' ? value : parseInt(value as string));
+    case 'SC5':
+      return getSC5Narrative(typeof value === 'number' ? value : parseInt(value as string));
+    default:
+      return 'Unknown status';
+  }
+}

@@ -31,6 +31,7 @@ class ExcelImporter:
                 df_connections = pd.read_excel(xls, 'Connections')
                 for _, row in df_connections.iterrows():
                     # Map the correct column names from the actual Excel file
+                    # Column headers in uGridPlan.xlsx: Survey ID, GPS_X, GPS_Y, St_code_3
                     connection = {
                         'survey_id': str(row.get('pole_id', row.get('Survey ID', ''))),  # Use pole_id or Survey ID
                         'pole_id': str(row.get('pole_id', row.get('Survey ID', ''))),  # Keep both for compatibility
@@ -40,7 +41,8 @@ class ExcelImporter:
                         'connection_type': str(row.get('connection_type', 'CUSTOMER')),
                         'st_code_1': int(row.get('st_code_1', 0)) if pd.notna(row.get('st_code_1')) else 0,
                         'st_code_2': str(row.get('st_code_2', 'NA')) if pd.notna(row.get('st_code_2')) else 'NA',
-                        'st_code_3': int(row.get('st_code_3', row.get('St_code_3', 0))) if pd.notna(row.get('st_code_3', row.get('St_code_3'))) else 0
+                        # St_code_3 with capital S is the actual column name in uGridPlan.xlsx
+                        'st_code_3': int(row.get('St_code_3', row.get('st_code_3', 0))) if pd.notna(row.get('St_code_3', row.get('st_code_3'))) else 0
                     }
                     if connection['survey_id']:
                         network_data['connections'].append(connection)

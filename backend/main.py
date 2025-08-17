@@ -146,8 +146,8 @@ async def upload_excel(file: UploadFile = File(...)):
         
         # Update connections with proper st_code values
         for connection in network_data['connections']:
-            # Ensure st_code_3 is properly set from status_code field
-            connection['st_code_3'] = connection.get('status_code', 0)
+            # Keep st_code_3 as imported, don't overwrite with non-existent status_code
+            connection['st_code_3'] = connection.get('st_code_3', 0)
             connection['st_code_1'] = connection.get('st_code_1', 0)
             connection['st_code_2'] = connection.get('st_code_2', 'NA')
         

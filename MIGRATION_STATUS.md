@@ -12,7 +12,7 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 
 **Cross-references**: See [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md) for detailed architecture and implementation notes.
 
-## Current Status (2025-08-16)
+## Current Status (2025-08-17)
 
 ### ✅ Completed Features
 
@@ -24,6 +24,11 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
   - Connections (1280 customer connections - no longer duplicated)
   - Transformers (48 units)
   - NetworkCalculations
+- **Fixed St_code_3 Import Bug** (2025-08-17)
+  - Fixed Excel importer column name case sensitivity issue
+  - Fixed backend overwriting st_code_3 values with non-existent field
+  - Verified: KET has 51 non-zero st_code_3 values, SHG has 195
+  - Connection meter status (0-10 scale) now displays correctly
 - **Fixed Connection Import Duplication** (2025-08-16)
   - Connections no longer duplicated in poles array
   - Excel importer processes Connections sheet first to track IDs
