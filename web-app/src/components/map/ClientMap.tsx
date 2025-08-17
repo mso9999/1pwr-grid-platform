@@ -762,6 +762,15 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     setElementNames(names)
     setElementCounts(counts)
     
+    // Center map on data bounds if we have valid coordinates
+    if (hasValidCoords && bounds.isValid()) {
+      console.log('Centering map on data bounds:', bounds)
+      map.fitBounds(bounds, {
+        padding: [50, 50],  // Add padding around the bounds
+        maxZoom: 15  // Don't zoom in too far
+      })
+    }
+    
     // Enforce fixed positioning after network data update
     const mapContainer = document.getElementById('map-container')
     if (mapContainer) {
