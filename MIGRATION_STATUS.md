@@ -208,6 +208,20 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - **Fix**: Used fixed positioning with viewport-based dimensions (top: 64px, left: 256px)
 - **Result**: Map container consistently renders with proper dimensions
 
+### 5. Zoom-Based Icon Scaling (2025-08-17)
+- **Issue**: Connection and pole icons remained fixed size at all zoom levels, causing clutter when zoomed out
+- **Solution**: Implemented dynamic scaling based on map zoom level
+- **Implementation**:
+  - Added `getZoomScale()` function returning scale factor 0.5x-2.0x for zoom levels 10-18
+  - Changed connection markers from fixed `L.rectangle` to scalable `L.divIcon` squares
+  - Poles use `L.circleMarker` with dynamic radius scaling
+  - Added `zoomend` event listener to resize all markers when zoom changes
+  - Base sizes: Connections 12px squares, Poles 8px circles
+- **Files Modified**: 
+  - `web-app/src/components/map/ClientMap.tsx` - Added scaling logic and marker updates
+  - `web-app/src/styles/globals.css` - Added CSS for square connection markers
+- **Result**: Icons now scale smoothly with zoom for better visibility and less clutter
+
 ## References
 - Handover Doc: [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md)
 - Field Feedback: [FIELD_TEAM_FEEDBACK.md](./FIELD_TEAM_FEEDBACK.md)
