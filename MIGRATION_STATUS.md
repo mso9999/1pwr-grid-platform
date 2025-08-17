@@ -197,6 +197,24 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - **Fix**: Created VoltageCalculator instance and called `_build_network()` before `_find_source_pole()`
 - **Result**: Generation site (KET_05_M111D) now detected and displayed on map
 
+## Map Rendering Improvements (2025-08-17)
+
+### 1. Layer Ordering with Leaflet Panes
+- **Issue**: Map elements rendered in wrong order (poles over lines, connections over poles)
+- **Solution**: Implemented custom Leaflet panes with explicit z-index control
+- **Layer Stack** (bottom to top):
+  - Connections: z-index 400 (bottom)
+  - LV Poles: z-index 500
+  - MV Poles: z-index 550 (overlays LV poles)
+  - Lines: z-index 600 (top)
+- **Result**: Proper visual hierarchy with lines always visible on top
+
+### 2. Marker Styling Updates
+- **Borderless Elements**: Connections and LV poles now render without borders for cleaner appearance
+- **MV Pole Distinction**: MV poles (identified by "_M" in ID) retain black borders for visual clarity
+- **Transparency**: All marker fills set to 50% opacity for better overlap visibility
+- **Implementation**: Applied to both initial rendering and zoom-based resizing
+
 ### 3. Voltage Drop Calculation Enhancement
 - **Issue**: Voltage calculations returned empty conductor/pole voltages despite analyzing nodes
 - **Fix**: Ensured network graph is built before source pole detection

@@ -88,6 +88,13 @@ Key Files:
    - Status-based coloring
    - Poles (circles) and connections (squares)
    - Zoom controls (10-20 range)
+   - **Layer Ordering (Aug 17, 2025)**:
+     - Custom Leaflet panes with z-index control
+     - Connections (bottom) → LV poles → MV poles → Lines (top)
+   - **Marker Styling (Aug 17, 2025)**:
+     - Borderless connections and LV poles
+     - MV poles retain black borders (identified by "_M" in ID)
+     - All markers use 50% transparency for better overlap visibility
 
 ## ❌ Critical Features NOT Implemented
 
