@@ -46,6 +46,17 @@
   border: none !important;
 }
 
+/* Square connection markers - use SVG path override */
+.connection-marker-square {
+  border-radius: 0 !important;
+}
+
+/* Force square shape for connection markers using SVG */
+svg .connection-marker-square {
+  rx: 0 !important;
+  ry: 0 !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

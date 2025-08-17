@@ -398,6 +398,24 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     })
   }, [layerVisibility, map])
 
+  // Helper function to calculate size based on zoom
+  const getZoomScale = (zoom: number) => {
+    // Scale factor: smaller at low zoom, larger at high zoom
+    const minZoom = 10
+    const maxZoom = 18
+    const minScale = 0.5
+    const maxScale = 2.0
+    
+    if (zoom <= minZoom) return minScale
+    if (zoom >= maxZoom) return maxScale
+    
+    const zoomRange = maxZoom - minZoom
+    const scaleRange = maxScale - minScale
+    const zoomProgress = (zoom - minZoom) / zoomRange
+    
+    return minScale + (scaleRange * zoomProgress)
+  }
+
   // Render network data
   useEffect(() => {
     console.log('Network data effect - map:', !!map, 'networkData:', networkData)
@@ -413,20 +431,31 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       conductors: data.conductors?.length || 0,
       transformers: data.transformers?.length || 0
     })
-    
-    // Calculate bounds from data
-    const bounds = L.latLngBounds([])
-    let hasValidCoords = false
+
+    if (!map || !data || !layerGroupsRef.current) return
+
+    console.log('Updating network data on map', { 
+      map: !!map, 
+      data: !!data,
+      layerGroups: !!layerGroupsRef.current
+    })
 
     // Clear existing layers
     Object.values(layerGroupsRef.current).forEach(group => {
       if (group) group.clearLayers()
     })
 
+    const bounds = L.latLngBounds([])
+    let hasValidCoords = false
     const names = new Set<string>()
+
+    // Store references to markers for zoom updates
+    const connectionMarkers: Array<{marker: L.Marker, baseSize: number}> = []
+    const poleMarkers: L.CircleMarker[] = []
+
     const counts = {
-      poles: data.poles?.length || 0,
-      connections: data.connections?.length || 0,
+      poles: 0,
+      connections: 0,
       conductors: data.conductors?.length || 0,
       mvLines: 0,
       lvLines: 0,
@@ -437,25 +466,27 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
     // Add connections
     if (data.connections && layerGroupsRef.current.connections) {
+      const currentZoom = map.getZoom()
+      const scale = getZoomScale(currentZoom)
+      
       data.connections.forEach((connection: any) => {
         if (connection.lat && connection.lng) {
           bounds.extend([connection.lat, connection.lng])
           hasValidCoords = true
           const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
-          // Use rectangle marker for connections
-          const marker = L.rectangle(
-            [
-              [connection.lat - 0.00005, connection.lng - 0.00005],
-              [connection.lat + 0.00005, connection.lng + 0.00005]
-            ],
-            {
-              fillColor: color,
-              color: '#333',
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            }
-          )
+          // Create square icon for connections
+          const squareSize = Math.round(12 * scale) // Base size 12px, scaled
+          const squareIcon = L.divIcon({
+            html: `<div style="background-color: ${color}; border: 1px solid #333; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+            className: 'connection-square-marker',
+            iconSize: [squareSize, squareSize],
+            iconAnchor: [squareSize/2, squareSize/2]
+          })
+          
+          const marker = L.marker([connection.lat, connection.lng], { 
+            icon: squareIcon,
+            alt: JSON.stringify(connection) // Store connection data for zoom updates
+          })
           
           marker.on('click', () => {
             setSelectedElement({
@@ -474,6 +505,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           `)
           if (layerGroupsRef.current.connections) {
             marker.addTo(layerGroupsRef.current.connections)
+            connectionMarkers.push({marker, baseSize: 12})
           }
           
           names.add(connection.name || connection.id)
@@ -484,13 +516,16 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
     // Add poles
     if (data.poles && layerGroupsRef.current.poles) {
+      const currentZoom = map.getZoom()
+      const scale = getZoomScale(currentZoom)
+      
       data.poles.forEach((pole: any) => {
         if (pole.lat && pole.lng) {
           bounds.extend([pole.lat, pole.lng])
           hasValidCoords = true
           const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
           const marker = L.circleMarker([pole.lat, pole.lng], {
-            radius: 8,
+            radius: 8 * scale,  // Base size 8, scaled by zoom
             fillColor: color,
             color: '#000',
             weight: 2,
@@ -517,6 +552,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           `)
           if (layerGroupsRef.current.poles) {
             marker.addTo(layerGroupsRef.current.poles)
+            poleMarkers.push(marker)
           }
           
           names.add(pole.name || pole.id)
@@ -701,25 +737,48 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     setElementCounts(counts)
     
     // Enforce fixed positioning after network data update
-    const container = document.getElementById('map')
-    if (container) {
-      // Remove any inline styles that might override CSS
-      container.removeAttribute('style')
-      // Force re-apply CSS classes
-      container.className = 'map-container'
-      
-      // As a failsafe, apply critical styles inline
-      container.style.position = 'fixed'
-      container.style.top = '64px'
-      container.style.left = '256px'
-      container.style.right = '0'
-      container.style.bottom = '0'
-      container.style.zIndex = '10'
-      
-      console.log('Enforced fixed positioning after network update')
+    const mapContainer = document.getElementById('map-container')
+    if (mapContainer) {
+      mapContainer.style.position = 'fixed'
+      mapContainer.style.top = '64px'
+      mapContainer.style.left = '256px'
+      mapContainer.style.right = '0'
+      mapContainer.style.bottom = '0'
+      mapContainer.style.zIndex = '1'
     }
 
-  }, [map, networkData, layerVisibility])
+    // Add zoom event listener to update marker sizes
+    const onZoomEnd = () => {
+      const currentZoom = map.getZoom()
+      const scale = getZoomScale(currentZoom)
+      
+      // Update connection marker sizes (recreate icons)
+      connectionMarkers.forEach(({marker, baseSize}) => {
+        const squareSize = Math.round(baseSize * scale)
+        const connection = marker.options.alt ? JSON.parse(marker.options.alt) : null
+        const color = SC3_COLORS[connection?.st_code_3 || 0] || '#808080'
+        const newIcon = L.divIcon({
+          html: `<div style="background-color: ${color}; border: 1px solid #333; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+          className: 'connection-square-marker',
+          iconSize: [squareSize, squareSize],
+          iconAnchor: [squareSize/2, squareSize/2]
+        })
+        marker.setIcon(newIcon)
+      })
+      
+      // Update pole marker sizes
+      poleMarkers.forEach(marker => {
+        marker.setRadius(8 * scale)
+      })
+    }
+
+    map.on('zoomend', onZoomEnd)
+
+    // Cleanup
+    return () => {
+      map.off('zoomend', onZoomEnd)
+    }
+  }, [map, networkData, layerGroupsRef])
 
   if (loading) {
     return (
