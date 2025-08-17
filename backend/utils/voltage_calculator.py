@@ -151,16 +151,42 @@ class VoltageCalculator:
     
     def _find_source_pole(self, poles: List[Dict], conductors: List[Dict]) -> Optional[str]:
         """Auto-detect source pole (typically substation or transformer)"""
-        # Look for poles with high connectivity (likely substation)
+        # Strategy 1: Look for poles connected to MV lines (likely substation)
+        mv_poles = set()
+        for conductor in conductors:
+            if conductor.get('conductor_type') == 'MV':
+                if conductor.get('from_pole'):
+                    mv_poles.add(conductor['from_pole'])
+                if conductor.get('to_pole'):
+                    mv_poles.add(conductor['to_pole'])
+        
+        # Find MV pole with highest connectivity (likely the substation)
+        if mv_poles and self.network:
+            mv_connectivity = {}
+            for pole in mv_poles:
+                if pole in self.network:
+                    mv_connectivity[pole] = self.network.degree(pole)
+            if mv_connectivity:
+                # Return MV pole with highest degree
+                source = max(mv_connectivity, key=mv_connectivity.get)
+                print(f"Found source pole by MV connectivity: {source} (degree: {mv_connectivity[source]})")
+                return source
+        
+        # Strategy 2: Look for transformers or explicitly marked generation sites
+        # (Removed incorrect BB assumption - BB is just Branch B, Sub-branch B in topology)
+        
+        # Strategy 3: Look for poles with high connectivity (likely substation)
         if self.network:
             degree_centrality = nx.degree_centrality(self.network)
             if degree_centrality:
                 # Get pole with highest degree centrality
                 source = max(degree_centrality, key=degree_centrality.get)
+                print(f"Found source pole by degree centrality: {source}")
                 return source
                 
         # Fallback: return first pole
         if poles:
+            print(f"Using fallback source pole: {poles[0]['pole_id']}")
             return poles[0]['pole_id']
         return None
     

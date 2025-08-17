@@ -12,18 +12,22 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 
 **Cross-references**: See [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md) for detailed architecture and implementation notes.
 
-## Current Status (2025-08-14)
+## Current Status (2025-08-16)
 
 ### ✅ Completed Features
 
 #### Backend
 - Excel file upload and parsing (uGridPLAN format)
 - Data import for all required sheets:
-  - PoleClasses (1575 poles)
+  - PoleClasses (1575 poles - correctly filtered)
   - DropLines & NetworkLength (2810 conductors)
-  - Connections (1280 customer connections)
+  - Connections (1280 customer connections - no longer duplicated)
   - Transformers (48 units)
   - NetworkCalculations
+- **Fixed Connection Import Duplication** (2025-08-16)
+  - Connections no longer duplicated in poles array
+  - Excel importer processes Connections sheet first to track IDs
+  - Poles sheet entries with connection IDs are now skipped
 - Site name extraction from pole IDs
 - Data cleaning and reference matching
 - RESTful API endpoints for network data

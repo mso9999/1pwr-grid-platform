@@ -1,13 +1,45 @@
-'use client'
+'use client';
 
-import { useEffect, useState, useRef } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { Zap, Activity } from 'lucide-react'
-import { LayerControls, LayerVisibility } from './LayerControls'
-import { ElementDetailPanel, ElementDetail } from './ElementDetailPanel'
-import { SC1_COLORS, SC3_COLORS, SC4_COLORS, getLineType } from '@/utils/statusCodes'
-import VoltageOverlay from './VoltageOverlay'
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Button } from '@/components/ui/button';
+import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import { LayerControls } from './LayerControls'
+import { ElementDetailPanel } from './ElementDetailPanel'
+import { MapEditToolbar } from './MapEditToolbar'
+import { ElementEditDialog } from './ElementEditDialog'
+import { SearchPanel } from './SearchPanel'
+import { GenerationSiteEditor } from './GenerationSiteEditor'
+import { toast } from 'sonner'
+import { 
+  SC1_COLORS, 
+  SC1_DESCRIPTIONS,
+  SC3_COLORS, 
+  SC3_DESCRIPTIONS,
+  SC4_COLORS, 
+  SC4_DESCRIPTIONS,
+  getLineType 
+} from '@/utils/statusCodes'
+import { Crosshair, Search, Layers, Eye, EyeOff, Zap, Activity } from 'lucide-react';
+
+type EditMode = 'select' | 'add-pole' | 'add-connection' | 'add-conductor' | 'split-conductor' | 'delete';
+
+interface ElementDetail {
+  type: 'pole' | 'connection' | 'conductor' | 'transformer' | 'generation';
+  id: string;
+  data: any;
+}
+
+interface LayerVisibility {
+  poles: boolean;
+  connections: boolean;
+  mvLines: boolean;
+  lvLines: boolean;
+  dropLines: boolean;
+  transformers: boolean;
+  generation: boolean;
+}
 
 // Fix Leaflet default icon issue
 if (typeof window !== 'undefined') {
@@ -21,20 +53,27 @@ if (typeof window !== 'undefined') {
 
 export interface ClientMapProps {
   networkData?: any
-  onElementUpdate?: (element: any) => void
+  onElementUpdate?: () => void
   loading?: boolean
 }
 
 export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapProps) {
   console.log('ClientMap received props:', { 
     hasNetworkData: !!networkData,
-    dataType: typeof networkData,
     keys: networkData ? Object.keys(networkData) : 'none',
     loading 
   })
   const [map, setMap] = useState<L.Map | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
+  const [selectedElement, setSelectedElement] = useState<ElementDetail | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editingElement, setEditingElement] = useState<ElementDetail | null>(null)
+  const [showVoltageOverlay, setShowVoltageOverlay] = useState(false)
+  const [editMode, setEditMode] = useState<EditMode>('select')
+  const [pendingPoleLocation, setPendingPoleLocation] = useState<{lat: number, lng: number} | null>(null)
+  const [pendingConnectionLocation, setPendingConnectionLocation] = useState<{lat: number, lng: number} | null>(null)
+  const [showSearchPanel, setShowSearchPanel] = useState(false)
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     poles: true,
     connections: true,
@@ -44,13 +83,23 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     transformers: true,
     generation: true
   })
-  const [selectedElement, setSelectedElement] = useState<any>(null)
-  const [elementNames, setElementNames] = useState<Map<string, string>>(new Map())
+  const [elementCounts, setElementCounts] = useState({
+    poles: 0,
+    connections: 0,
+    conductors: 0,
+    mvLines: 0,
+    lvLines: 0,
+    dropLines: 0,
+    transformers: 0,
+    generation: 0
+  })
+  const [elementNames, setElementNames] = useState<Set<string>>(new Set())
   const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
 
   const layerGroupsRef = useRef<{
     poles?: L.LayerGroup
     connections?: L.LayerGroup
+    conductors?: L.LayerGroup
     mvLines?: L.LayerGroup
     lvLines?: L.LayerGroup
     dropLines?: L.LayerGroup
@@ -58,15 +107,75 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     generation?: L.LayerGroup
   }>({})
 
-  const [elementCounts, setElementCounts] = useState({
-    poles: 0,
-    connections: 0,
-    mvLines: 0,
-    lvLines: 0,
-    dropLines: 0,
-    transformers: 0,
-    generation: 0
-  })
+  const site = networkData?.site || 'UGRIDPLAN'
+
+  // Handle map clicks for editing
+  const handleMapClick = useCallback((e: L.LeafletMouseEvent) => {
+    if (editMode === 'add-pole') {
+      setPendingPoleLocation({
+        lat: e.latlng.lat,
+        lng: e.latlng.lng
+      });
+    } else if (editMode === 'add-connection') {
+      setPendingConnectionLocation({
+        lat: e.latlng.lat,
+        lng: e.latlng.lng
+      });
+    }
+  }, [editMode]);
+
+  // Handle pole creation completion
+  const handlePoleCreated = useCallback(() => {
+    setPendingPoleLocation(null);
+    setEditMode('select');
+  }, []);
+
+  // Handle connection creation completion
+  const handleConnectionCreated = useCallback(() => {
+    setPendingConnectionLocation(null);
+    setEditMode('select');
+  }, []);
+
+  const handleElementUpdate = useCallback(async (id: string, updates: any): Promise<boolean> => {
+    // Update the local element data
+    if (networkData) {
+      // Update poles
+      if (networkData.poles) {
+        const pole = networkData.poles.find((p: any) => p.id === id)
+        if (pole) {
+          Object.assign(pole, updates)
+        }
+      }
+      
+      // Update connections
+      if (networkData.connections) {
+        const connection = networkData.connections.find((c: any) => c.id === id)
+        if (connection) {
+          Object.assign(connection, updates)
+        }
+      }
+      
+      // Update conductors
+      if (networkData.conductors) {
+        const conductor = networkData.conductors.find((c: any) => c.id === id)
+        if (conductor) {
+          Object.assign(conductor, updates)
+        }
+      }
+    }
+    
+    // Refresh the map
+    if (onElementUpdate) {
+      onElementUpdate()
+    }
+    
+    return true
+  }, [networkData, onElementUpdate])
+
+  const handleEditElement = useCallback((element: any) => {
+    setEditingElement(element)
+    setEditDialogOpen(true)
+  }, [])
 
   // Initialize Leaflet map
   useEffect(() => {
@@ -183,6 +292,9 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       // Mark container as having resize observer
       container.setAttribute('data-resize-observer', 'true')
       
+      // Add click handler for editing
+      newMap.on('click', handleMapClick)
+      
       // Store reference for cleanup
       mapRef.current = newMap
       resizeObserverRef.current = resizeObserver
@@ -198,19 +310,75 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     }
   }, [])  // Empty dependency array - only run once
 
+  // Show pending location markers
+  useEffect(() => {
+    if (!map) return
+
+    // Clear any existing pending markers
+    const pendingMarkersLayer = L.layerGroup().addTo(map)
+    
+    // Add pending pole marker
+    if (pendingPoleLocation) {
+      const pendingIcon = L.divIcon({
+        html: `<div style="
+          width: 20px; 
+          height: 20px; 
+          background: rgba(59, 130, 246, 0.5); 
+          border: 2px solid #3b82f6; 
+          border-radius: 50%;
+          animation: pulse 1.5s infinite;
+        "></div>`,
+        className: 'pending-marker',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      })
+      
+      L.marker([pendingPoleLocation.lat, pendingPoleLocation.lng], { icon: pendingIcon })
+        .addTo(pendingMarkersLayer)
+    }
+    
+    // Add pending connection marker
+    if (pendingConnectionLocation) {
+      const pendingIcon = L.divIcon({
+        html: `<div style="
+          width: 16px; 
+          height: 16px; 
+          background: rgba(168, 85, 247, 0.5); 
+          border: 2px solid #a855f7; 
+          border-radius: 50%;
+          animation: pulse 1.5s infinite;
+        "></div>`,
+        className: 'pending-marker',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      })
+      
+      L.marker([pendingConnectionLocation.lat, pendingConnectionLocation.lng], { icon: pendingIcon })
+        .addTo(pendingMarkersLayer)
+    }
+    
+    return () => {
+      pendingMarkersLayer.clearLayers()
+      pendingMarkersLayer.remove()
+    }
+  }, [map, pendingPoleLocation, pendingConnectionLocation])
+
   // Clean up map on unmount
   useEffect(() => {
     return () => {
       console.log('Cleaning up map on unmount')
-      if (resizeObserverRef.current) {
+      if (mapRef.current) {
+        try {
+          mapRef.current.remove()
+          mapRef.current = null
+        } catch (e) {
+          console.warn('Error removing map:', e)
+        }
+      }
+      if (resizeObserverRef.current && typeof window !== 'undefined') {
         resizeObserverRef.current.disconnect()
         resizeObserverRef.current = null
       }
-      if (mapRef.current) {
-        mapRef.current.remove()
-        mapRef.current = null
-      }
-      setMap(null)
     }
   }, [])
 
@@ -257,13 +425,14 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
     const names = new Set<string>()
     const counts = {
-      poles: 0,
-      connections: 0,
+      poles: data.poles?.length || 0,
+      connections: data.connections?.length || 0,
+      conductors: data.conductors?.length || 0,
       mvLines: 0,
       lvLines: 0,
       dropLines: 0,
-      transformers: 0,
-      generation: 0
+      transformers: data.transformers?.length || 0,
+      generation: data.generation?.length || 0
     }
 
     // Add connections
@@ -273,25 +442,36 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           bounds.extend([connection.lat, connection.lng])
           hasValidCoords = true
           const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
-          const marker = L.circleMarker([connection.lat, connection.lng], {
-            radius: 6,
-            fillColor: color,
-            color: '#333',
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-          })
+          // Use rectangle marker for connections
+          const marker = L.rectangle(
+            [
+              [connection.lat - 0.00005, connection.lng - 0.00005],
+              [connection.lat + 0.00005, connection.lng + 0.00005]
+            ],
+            {
+              fillColor: color,
+              color: '#333',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            }
+          )
           
           marker.on('click', () => {
             setSelectedElement({
               type: 'connection',
               id: connection.id,
-              name: connection.name,
               data: connection
             })
           })
           
-          marker.bindPopup(`Connection: ${connection.name || connection.id}`)
+          marker.bindPopup(`
+            <div>
+              <strong>Connection: ${connection.name || connection.id}</strong><br/>
+              Status: ${connection.st_code_3 || 0} - ${SC3_DESCRIPTIONS[connection.st_code_3 || 0]}<br/>
+              Coords: ${connection.lat.toFixed(6)}, ${connection.lng.toFixed(6)}
+            </div>
+          `)
           if (layerGroupsRef.current.connections) {
             marker.addTo(layerGroupsRef.current.connections)
           }
@@ -322,12 +502,19 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             setSelectedElement({
               type: 'pole',
               id: pole.id,
-              name: pole.name,
               data: pole
             })
           })
           
-          marker.bindPopup(`Pole: ${pole.name || pole.id}`)
+          marker.bindPopup(`
+            <div>
+              <strong>Pole: ${pole.name || pole.id}</strong><br/>
+              Class: ${pole.pole_class || 'Unknown'}<br/>
+              Type: ${pole.pole_type || 'Unknown'}<br/>
+              Status: ${pole.st_code_1 || 0} - ${SC1_DESCRIPTIONS[pole.st_code_1 || 0]}<br/>
+              Coords: ${pole.lat.toFixed(6)}, ${pole.lng.toFixed(6)}
+            </div>
+          `)
           if (layerGroupsRef.current.poles) {
             marker.addTo(layerGroupsRef.current.poles)
           }
@@ -372,38 +559,55 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           switch (lineType) {
             case 'mv':
               layerGroup = layerGroupsRef.current.mvLines
-              color = '#FF0000'
+              color = '#0000FF'  // Blue for MV
               counts.mvLines++
               break
             case 'lv':
               layerGroup = layerGroupsRef.current.lvLines
-              color = '#0000FF'
+              color = '#00FF00'  // Green for LV
               counts.lvLines++
               break
             case 'drop':
               layerGroup = layerGroupsRef.current.dropLines
-              color = '#00FF00'
+              color = '#FFA500'  // Orange for Drop
               counts.dropLines++
               break
           }
           
           if (layerGroup) {
             const polyline = L.polyline([fromCoords, toCoords], {
-              color: SC4_COLORS[conductor.st_code_4 || 0] || color,
+              color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
               weight: 2,
               opacity: 0.8
             })
             
             polyline.on('click', () => {
-              setSelectedElement({
-                type: 'conductor',
-                id: conductor.id,
-                name: conductor.name,
-                data: { ...conductor, line_type: lineType }
-              })
+              if (editMode === 'split-conductor') {
+                // Show split dialog for this conductor
+                setSelectedElement({
+                  type: 'conductor',
+                  id: conductor.id,
+                  data: { ...conductor, line_type: lineType }
+                })
+                // The MapEditToolbar will handle showing the split dialog
+              } else {
+                setSelectedElement({
+                  type: 'conductor',
+                  id: conductor.id,
+                  data: { ...conductor, line_type: lineType }
+                })
+              }
             })
             
-            polyline.bindPopup(`${lineType.toUpperCase()} Line: ${conductor.id}`)
+            polyline.bindPopup(`
+              <div>
+                <strong>${lineType.toUpperCase()} Line: ${conductor.id}</strong><br/>
+                From: ${conductor.from}<br/>
+                To: ${conductor.to}<br/>
+                Length: ${conductor.length ? conductor.length.toFixed(2) + 'm' : 'Unknown'}<br/>
+                Status: ${conductor.st_code_4 || 0} - ${SC4_DESCRIPTIONS[conductor.st_code_4 || 0]}
+              </div>
+            `)
             polyline.addTo(layerGroup)
             
             names.add(conductor.name || conductor.id)
@@ -422,7 +626,6 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             setSelectedElement({
               type: 'transformer',
               id: transformer.id,
-              name: transformer.name,
               data: transformer
             })
           })
@@ -438,55 +641,85 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       })
     }
 
+    // Add generation sites (substations)
+    if (data.generation && layerGroupsRef.current.generation) {
+      console.log('Processing generation sites:', data.generation)
+      data.generation.forEach((gen: any) => {
+        if (gen.lat && gen.lng) {
+          console.log('Adding generation marker at:', gen.lat, gen.lng, gen)
+          // Create a distinctive icon for generation/substation
+          const genIcon = L.divIcon({
+            className: 'generation-icon',
+            html: `<div style="
+              width: 24px;
+              height: 24px;
+              background: linear-gradient(135deg, #f59e0b, #dc2626);
+              border: 3px solid white;
+              border-radius: 50%;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "><svg style="width: 14px; height: 14px; fill: white;" viewBox="0 0 24 24">
+              <path d="M11 2v9.4l-6.4-6.4-1.4 1.4L11 14.2V22h2v-7.8l7.8-7.8L19.4 5 13 11.4V2z"/>
+            </svg></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -12]
+          })
+          
+          const marker = L.marker([gen.lat, gen.lng], { icon: genIcon })
+          
+          marker.on('click', () => {
+            setSelectedElement({
+              type: 'generation',
+              id: gen.id,
+              data: gen
+            })
+          })
+          
+          marker.bindPopup(`
+            <div>
+              <strong>${gen.name || 'Generation Site'}</strong><br/>
+              Type: ${gen.type || 'Substation'}<br/>
+              Pole: ${gen.pole_id}<br/>
+              Capacity: ${gen.capacity || 'Unknown'}
+            </div>
+          `)
+          
+          if (layerGroupsRef.current.generation) {
+            marker.addTo(layerGroupsRef.current.generation)
+          }
+          
+          names.add(gen.name || gen.id)
+          counts.generation++
+        }
+      })
+    }
+
     setElementNames(names)
     setElementCounts(counts)
-
-    // Fit map to data bounds
-    if (hasValidCoords && bounds.isValid()) {
-      console.log('Fitting map to bounds:', bounds)
-      map.fitBounds(bounds, { padding: [50, 50] })
-      // Force map to refresh
-      setTimeout(() => {
-        map.invalidateSize()
-        console.log('Map size invalidated after data load')
-      }, 200)
-    }
-  }, [networkData, map])
-
-  const handleElementUpdate = async (id: string, updates: any) => {
-    if (onElementUpdate) {
-      return await onElementUpdate(id, updates)
-    }
     
-    // Local update only
-    if (networkData) {
-      // Update poles
-      if (networkData.poles) {
-        const pole = networkData.poles.find((p: any) => p.id === id)
-        if (pole) {
-          pole.name = updates.name
-        }
-      }
+    // Enforce fixed positioning after network data update
+    const container = document.getElementById('map')
+    if (container) {
+      // Remove any inline styles that might override CSS
+      container.removeAttribute('style')
+      // Force re-apply CSS classes
+      container.className = 'map-container'
       
-      // Update connections
-      if (networkData.connections) {
-        const connection = networkData.connections.find((c: any) => c.id === id)
-        if (connection) {
-          connection.name = updates.name
-        }
-      }
+      // As a failsafe, apply critical styles inline
+      container.style.position = 'fixed'
+      container.style.top = '64px'
+      container.style.left = '256px'
+      container.style.right = '0'
+      container.style.bottom = '0'
+      container.style.zIndex = '10'
       
-      // Update conductors
-      if (networkData.conductors) {
-        const conductor = networkData.conductors.find((c: any) => c.id === id)
-        if (conductor) {
-          conductor.name = updates.name
-        }
-      }
+      console.log('Enforced fixed positioning after network update')
     }
-    
-    return true
-  }
+
+  }, [map, networkData, layerVisibility])
 
   if (loading) {
     return (
@@ -503,30 +736,48 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     <>
       <div 
         id="map" 
-        style={{ 
-          position: 'fixed', 
-          top: '64px',
-          left: '256px', 
-          right: '0', 
-          bottom: '0', 
-          width: 'calc(100vw - 256px)',
-          height: 'calc(100vh - 64px)',
-          zIndex: 10,
-          backgroundColor: '#f3f4f6'
-        }} 
+        className="map-container"
       />
-      
+      <MapEditToolbar 
+        site={site}
+        editMode={editMode}
+        onEditModeChange={setEditMode}
+        selectedElement={selectedElement}
+        pendingPoleLocation={pendingPoleLocation}
+        pendingConnectionLocation={pendingConnectionLocation}
+        onPoleCreated={handlePoleCreated}
+        onConnectionCreated={handleConnectionCreated}
+        onElementUpdate={() => {
+          // Trigger the network data refresh
+          if (onElementUpdate) {
+            onElementUpdate();
+          }
+        }}
+      />
       <LayerControls
         visibility={layerVisibility}
         onVisibilityChange={setLayerVisibility}
         counts={elementCounts}
       />
-      
-      {/* Voltage Overlay Toggle */}
-      <div className="absolute top-20 left-4 z-[1000]">
+      {/* Map Control Buttons */}
+      <div className="absolute top-20 right-4 z-50 space-y-2">
+        {/* Search Button */}
+        <button
+          onClick={() => setShowSearchPanel(!showSearchPanel)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-all w-full ${
+            showSearchPanel 
+              ? 'bg-blue-100 text-blue-700 border-2 border-blue-300' 
+              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+          }`}
+        >
+          <Search className="h-4 w-4" />
+          <span>Search</span>
+        </button>
+        
+        {/* Voltage Drop Toggle Button */}
         <button
           onClick={() => setVoltageOverlayEnabled(!voltageOverlayEnabled)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg text-sm font-medium transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-all w-full ${
             voltageOverlayEnabled 
               ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-300' 
               : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
@@ -535,16 +786,34 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           <Activity className="h-4 w-4" />
           <span>Voltage Drop</span>
         </button>
+        
+        {/* Generation Site Editor */}
+        {networkData && (
+          <GenerationSiteEditor
+            site={site}
+            currentPoleId={networkData.generation?.[0]?.pole_id}
+            poles={networkData.poles || []}
+            onUpdate={async () => {
+              // Trigger element update callback to refresh data
+              if (onElementUpdate) {
+                onElementUpdate();
+              }
+            }}
+          />
+        )}
       </div>
       
-      {/* Voltage Overlay Component */}
-      {map && networkData && voltageOverlayEnabled && (
-        <VoltageOverlay
-          map={map}
-          site={networkData.site || 'default'}
-          conductors={networkData.conductors || []}
+      {/* Search Panel */}
+      {showSearchPanel && networkData && (
+        <SearchPanel
           poles={networkData.poles || []}
-          enabled={voltageOverlayEnabled}
+          connections={networkData.connections || []}
+          conductors={networkData.conductors || []}
+          onElementSelect={(element) => {
+            setSelectedElement(element);
+            setShowSearchPanel(false);
+          }}
+          onClose={() => setShowSearchPanel(false)}
         />
       )}
       
@@ -552,7 +821,22 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         element={selectedElement}
         onClose={() => setSelectedElement(null)}
         onUpdate={handleElementUpdate}
+        onEdit={handleEditElement}
         existingNames={elementNames}
+      />
+      
+      <ElementEditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        element={editingElement}
+        site={site}
+        onElementUpdated={() => {
+          setEditDialogOpen(false)
+          setEditingElement(null)
+          if (onElementUpdate) {
+            onElementUpdate()
+          }
+        }}
       />
     </>
   )

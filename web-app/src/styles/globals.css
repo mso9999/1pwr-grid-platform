@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Pulse animation for pending markers */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Map container positioning - Force fixed positioning */
+#map, .map-container, div#map.map-container {
+  position: fixed !important;
+  top: 64px !important;
+  left: 256px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: calc(100vw - 256px) !important;
+  max-height: calc(100vh - 64px) !important;
+  overflow: hidden !important;
+}
+
 /* Leaflet map fixes */
 .leaflet-container {
   height: 100%;

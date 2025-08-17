@@ -3,17 +3,17 @@
 Provides REST API for network data operations and calculations
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Query
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
-from typing import Dict, List, Any, Optional
+from typing import Optional, List, Dict, Any
 import json
-import pickle
-import tempfile
-import shutil
 import os
+import traceback
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 from datetime import datetime
 import math
@@ -315,7 +315,8 @@ def get_network(site: str):
         "poles": [],
         "connections": [],
         "conductors": [],
-        "transformers": []
+        "transformers": [],
+        "generation": []
     }
     
     # Process poles
@@ -380,6 +381,54 @@ def get_network(site: str):
             "pole_id": transformer.get('pole_id')
         })
     
+    # Add generation site - find the source pole from voltage calculations
+    # The source pole is the generation/substation location
+    
+    # Check for manual override from API or hardcoded value
+    manual_generation_pole_id = None  # Change this to hardcode, e.g., "KET_02_BB1"
+    
+    # Check for dynamic override set via API
+    if 'generation_overrides' in globals() and site in generation_overrides:
+        manual_generation_pole_id = generation_overrides[site]
+        print(f"Using API-set generation override for {site}: {manual_generation_pole_id}")
+    
+    try:
+        from utils.voltage_calculator import VoltageCalculator
+        
+        if manual_generation_pole_id:
+            # Use manual override
+            source_pole_id = manual_generation_pole_id
+            print(f"Using manual generation site override: {source_pole_id}")
+        else:
+            # Auto-detect using MV connectivity analysis
+            calculator = VoltageCalculator()
+            calculator._build_network(poles=network_data.get('poles', []), conductors=network_data.get('conductors', []))
+            source_pole_id = calculator._find_source_pole(poles=network_data.get('poles', []), conductors=network_data.get('conductors', []))
+        
+        if source_pole_id:
+            # Find the source pole data - check different field name variations
+            source_pole = next((p for p in poles_list if p.get('pole_id') == source_pole_id or p.get('id') == source_pole_id), None)
+            if source_pole:
+                print(f"Found source pole: {source_pole_id}")
+                # Get lat/lng from different possible field names
+                lat = source_pole.get('latitude', source_pole.get('gps_lat', source_pole.get('lat')))
+                lng = source_pole.get('longitude', source_pole.get('gps_lng', source_pole.get('lng')))
+                formatted_data['generation'].append({
+                    'id': f'GEN_{source_pole_id}',
+                    'pole_id': source_pole_id,
+                    'lat': lat,
+                    'lng': lng,
+                    'type': 'substation',
+                    'name': f'Generation Site at {source_pole_id}',
+                    'capacity': 'Unknown'
+                })
+                print(f"Added generation site at pole {source_pole_id}")
+    except Exception as e:
+        print(f"Could not determine generation site: {e}")
+    
+    print(f"Generation sites: {formatted_data.get('generation', [])}")
+    print(f"Generation in formatted_data: {formatted_data.get('generation', 'NOT FOUND')}")
+    
     # Create response without sanitization first to debug
     response_data = {
         "site": site,
@@ -387,7 +436,8 @@ def get_network(site: str):
         "stats": {
             "total_poles": len(formatted_data['poles']),
             "total_conductors": len(formatted_data['conductors']),
-            "total_transformers": len(formatted_data['transformers'])
+            "total_transformers": len(formatted_data['transformers']),
+            "total_generation": len(formatted_data.get('generation', []))
         }
     }
     
@@ -397,6 +447,32 @@ def get_network(site: str):
     sanitized_response = sanitize_value(response_data)
     print(f"Returning sanitized response...")
     return JSONResponse(content=sanitized_response)
+
+@app.post("/api/network/{site}/generation")
+async def update_generation_site(site: str, request: Request):
+    """
+    Update the generation site location for a specific network
+    """
+    if site not in network_storage:
+        raise HTTPException(status_code=404, detail=f"Site {site} not found")
+    
+    body = await request.json()
+    pole_id = body.get('pole_id')
+    if not pole_id:
+        raise HTTPException(status_code=400, detail="pole_id is required")
+    
+    # Store the manual generation site override
+    if 'generation_overrides' not in globals():
+        global generation_overrides
+        generation_overrides = {}
+    
+    generation_overrides[site] = pole_id
+    
+    return JSONResponse(content={
+        "success": True,
+        "message": f"Generation site for {site} updated to {pole_id}",
+        "pole_id": pole_id
+    })
 
 @app.get("/api/export/{site}")
 async def export_network_report(site: str):
@@ -733,6 +809,10 @@ async def delete_network(site: str):
         return JSONResponse(content={"success": True, "message": f"Deleted data for {site}"})
     else:
         raise HTTPException(status_code=404, detail=f"No data for site {site}")
+
+# Register network editing routes
+from routes.network_edit import router as network_edit_router
+app.include_router(network_edit_router, prefix="/api/network", tags=["network-edit"])
 
 if __name__ == "__main__":
     import uvicorn

@@ -106,7 +106,12 @@ export default function Dashboard() {
             )}
             {currentView === 'map' && (
               <div className="h-full relative">
-                <MapView site={selectedSite} networkData={networkData} loading={loading} />
+                <MapView 
+                  site={selectedSite} 
+                  networkData={networkData} 
+                  loading={loading}
+                  onNetworkUpdate={() => fetchNetworkData(selectedSite)}
+                />
               </div>
             )}
             {currentView === 'stats' && <DataStats site={selectedSite} networkData={networkData} />}

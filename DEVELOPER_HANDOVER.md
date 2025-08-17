@@ -10,8 +10,8 @@
 
 # Original Developer Handover Notes
 
-**Last Updated**: August 13, 2025  
-**Current Status**: ~40% Complete  
+**Last Updated**: August 16, 2025  
+**Current Status**: ~45% Complete  
 **Repository**: https://github.com/mso9999/1pwr-grid-platform
 
 ## 🎯 Project Overview
@@ -34,12 +34,13 @@ Migrate and unify three legacy desktop tools (uGridNET, uGridPLAN, uGridPREDICT)
 
 ```
 1pwr-grid-platform/
-├── modules/                    # Python backend modules (80% complete)
-│   ├── import_pipeline/        ✅ Excel/Pickle importers
-│   ├── network_engine/         ✅ Voltage calculations, validation
-│   ├── data_model/             ✅ Enhanced network model
-│   ├── data_cleaning/          ✅ Data cleanup, topology fixing
-│   └── kml_validator/          ✅ KML cross-reference validation
+├── backend/                    # FastAPI backend (85% complete)
+│   ├── utils/                  
+│   │   ├── excel_importer.py   ✅ Fixed connection duplication issue
+│   │   ├── voltage_calculator.py ✅ Voltage drop calculations
+│   │   └── report_exporter.py  ✅ Excel export functionality
+│   ├── validators/             ✅ Network validation
+│   └── main.py                 ✅ API endpoints
 ├── web-app/                    # Next.js frontend (20% complete)
 │   ├── src/
 │   │   ├── app/               ✅ Main dashboard layout
@@ -134,6 +135,36 @@ Key Files:
 - Progress prediction models
 - Gantt chart generation
 - Mode 1 (resource-driven) vs Mode 2 (target-driven)
+
+## 🔧 Critical Fixes Applied
+
+### Connection Import Duplication Fix (Aug 16, 2025)
+**Problem**: Customer connections were being duplicated in both poles and connections arrays, causing:
+- Incorrect node counts (2854 instead of 1575 poles)
+- Duplicate rendering on the map
+- Validation errors for conductor endpoints
+
+**Root Cause**: Excel source files contain connection IDs in BOTH Poles and Connections sheets. The importer was processing both sheets independently.
+
+**Solution** (in `backend/utils/excel_importer.py`):
+```python
+# Process Connections sheet FIRST and track IDs
+connection_ids = set()
+if 'Connections' in xls.sheet_names:
+    # Import connections and track their IDs
+    for connection in connections:
+        connection_ids.add(connection['pole_id'])
+
+# When processing Poles sheet, skip duplicates
+if pole_id in connection_ids:
+    continue  # Skip this pole as it's already a connection
+```
+
+**Result**:
+- Poles: 1575 (actual poles only)
+- Connections: 1280 (no longer duplicated)
+- Conductors: 2810 (all references valid)
+- Full feature parity with desktop version
 
 ## 🚀 Most Efficient Path Forward
 

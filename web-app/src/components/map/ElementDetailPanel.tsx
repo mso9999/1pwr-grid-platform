@@ -20,6 +20,7 @@ interface ElementDetailPanelProps {
   element: ElementDetail | null
   onClose: () => void
   onUpdate?: (id: string, updates: any) => Promise<boolean>
+  onEdit?: (element: any) => void
   existingNames?: Set<string>
 }
 
@@ -27,6 +28,7 @@ export function ElementDetailPanel({
   element, 
   onClose, 
   onUpdate,
+  onEdit,
   existingNames = new Set()
 }: ElementDetailPanelProps) {
   const [isEditing, setIsEditing] = useState(false)
@@ -252,13 +254,25 @@ export function ElementDetailPanel({
             />
             <h3 className="font-semibold capitalize">{element.type}</h3>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-1">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(element.data)}
+                title="Edit Properties"
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Editable Name */}
