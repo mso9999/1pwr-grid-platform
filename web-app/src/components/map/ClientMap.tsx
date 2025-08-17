@@ -489,7 +489,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           // Create square icon for connections
           const squareSize = Math.round(12 * scale) // Base size 12px, scaled
           const squareIcon = L.divIcon({
-            html: `<div style="background-color: ${color}; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+            html: `<div style="background-color: ${color}; opacity: 0.5; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
             className: 'connection-square-marker',
             iconSize: [squareSize, squareSize],
             iconAnchor: [squareSize/2, squareSize/2]
@@ -545,7 +545,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             color: isMVPole ? '#000' : color,  // MV poles get black border, LV poles borderless
             weight: isMVPole ? 2 : 0,
             opacity: 1,
-            fillOpacity: 0.9,
+            fillOpacity: 0.5,  // 50% transparency
             pane: isMVPole ? 'mvPolesPane' : 'lvPolesPane'  // MV poles render above LV poles
           })
           
@@ -775,7 +775,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         const connection = marker.options.alt ? JSON.parse(marker.options.alt) : null
         const color = SC3_COLORS[connection?.st_code_3 || 0] || '#808080'
         const newIcon = L.divIcon({
-          html: `<div style="background-color: ${color}; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
+          html: `<div style="background-color: ${color}; opacity: 0.5; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
           className: 'connection-square-marker',
           iconSize: [squareSize, squareSize],
           iconAnchor: [squareSize/2, squareSize/2]
