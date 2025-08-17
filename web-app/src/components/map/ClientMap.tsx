@@ -640,7 +640,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
               weight: 2,
               pane: pane,
               opacity: 1,  // No transparency for lines
-              dashArray: conductor.st_code_4 === 5 ? undefined : '5, 10'  // Dashed unless energized (SC4=5)
+              dashArray: conductor.st_code_4 >= 3 ? undefined : '5, 10'  // Solid for installed (SC4>=3), dashed for planned/in-progress
             })
             
             polyline.on('click', () => {

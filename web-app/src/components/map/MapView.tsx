@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { ClientMapProps } from './ClientMap'
+import IssuesList from './IssuesList'
 
 // Dynamically import ClientMap to avoid SSR issues
 const ClientMap = dynamic<ClientMapProps>(
@@ -30,6 +31,8 @@ interface MapViewProps {
 export function MapView({ site, networkData, loading, onNetworkUpdate }: MapViewProps) {
   const [mounted, setMounted] = useState(false)
   const [transformedData, setTransformedData] = useState<any>(null)
+  const [showIssues, setShowIssues] = useState(true)
+  const [selectedElementFromIssue, setSelectedElementFromIssue] = useState<{type: string, id: string} | null>(null)
   
   useEffect(() => {
     setMounted(true)
@@ -105,10 +108,22 @@ export function MapView({ site, networkData, loading, onNetworkUpdate }: MapView
   }
   
   return (
-    <ClientMap
-      networkData={transformedData ? {...transformedData, site} : null}
-      loading={loading}
-      onElementUpdate={onNetworkUpdate}
-    />
+    <>
+      <ClientMap
+        networkData={transformedData ? {...transformedData, site} : null}
+        loading={loading}
+        onElementUpdate={onNetworkUpdate}
+      />
+      {showIssues && transformedData && (
+        <IssuesList
+          networkData={transformedData}
+          onClose={() => setShowIssues(false)}
+          onSelectElement={(type, id) => {
+            setSelectedElementFromIssue({ type, id })
+            // TODO: Pass this to ClientMap to highlight the element
+          }}
+        />
+      )}
+    </>
   )
 }
