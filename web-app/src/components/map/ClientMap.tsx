@@ -269,13 +269,17 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       newMap.createPane('connectionsPane')
       newMap.createPane('lvPolesPane')
       newMap.createPane('mvPolesPane')
-      newMap.createPane('linesPane')
+      newMap.createPane('dropLinesPane')
+      newMap.createPane('lvLinesPane')
+      newMap.createPane('mvLinesPane')
       
       // Set z-index for each pane (higher = on top)
       newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
       newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
       newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
-      newMap.getPane('linesPane')!.style.zIndex = '600'        // Top
+      newMap.getPane('dropLinesPane')!.style.zIndex = '600'     // Drop lines
+      newMap.getPane('lvLinesPane')!.style.zIndex = '650'       // LV lines (above drop)
+      newMap.getPane('mvLinesPane')!.style.zIndex = '700'       // MV lines (top)
       
       // Initialize layer groups
       layerGroupsRef.current = {
@@ -607,21 +611,25 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           
           let layerGroup: L.LayerGroup | undefined
           let color = '#808080'
+          let pane = 'dropLinesPane'  // Default to drop lines pane
           
           switch (lineType) {
             case 'mv':
               layerGroup = layerGroupsRef.current.mvLines
               color = '#0000FF'  // Blue for MV
+              pane = 'mvLinesPane'
               counts.mvLines++
               break
             case 'lv':
               layerGroup = layerGroupsRef.current.lvLines
               color = '#00FF00'  // Green for LV
+              pane = 'lvLinesPane'
               counts.lvLines++
               break
             case 'drop':
               layerGroup = layerGroupsRef.current.dropLines
               color = '#FFA500'  // Orange for Drop
+              pane = 'dropLinesPane'
               counts.dropLines++
               break
           }
@@ -630,8 +638,8 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             const polyline = L.polyline([fromCoords, toCoords], {
               color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
               weight: 2,
-              pane: 'linesPane',
-              opacity: 0.8
+              pane: pane,
+              opacity: 1  // No transparency for lines
             })
             
             polyline.on('click', () => {
