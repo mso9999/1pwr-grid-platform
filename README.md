@@ -38,6 +38,22 @@ npm run dev
 
 Access the application at http://localhost:3001
 
+## 🧪 Testing
+
+### Functional Tests
+The project includes comprehensive functional test specifications for validating authentication, network operations, and user workflows. Test cases are documented in CSV format with timestamp prefixes (e.g., `250817_2301_functional_tests.csv`).
+
+Each test case includes:
+- Unique test ID (e.g., AUTH-001, NET-001)
+- Test area, function, and description
+- Preconditions and detailed test steps
+- Expected vs actual results
+- Pass/Fail status with runner identification
+- Git commit SHA for code version tracking
+- Execution timestamp
+
+See the latest functional test file in the root directory for current test coverage.
+
 ## 📊 Current Status
 
 ### ✅ Completed Features
@@ -48,6 +64,7 @@ Access the application at http://localhost:3001
 - Voltage drop calculation and overlay
 - Excel export with comprehensive reports (including validation results)
 - Real-time network data API with validation endpoint
+- User authentication system with JWT tokens, role-based access control, and protected routes
 - Status-based coloring for poles, connections, conductors (MGD045V03 SOP compliant)
 
 ### 🚧 In Progress
