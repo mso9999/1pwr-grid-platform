@@ -197,6 +197,34 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 - **Fix**: Created VoltageCalculator instance and called `_build_network()` before `_find_source_pole()`
 - **Result**: Generation site (KET_05_M111D) now detected and displayed on map
 
+## Network Editing API Completion (2025-08-17)
+
+### 1. Network Storage Sharing Fix
+- **Issue**: Backend `main.py` was redefining `network_storage` locally, breaking data sharing with network_edit routes
+- **Fix**: Removed local redefinition, now properly imports from `storage.py` module
+- **Result**: Network data persists correctly across all API endpoints
+
+### 2. Conductor Creation Enhancement
+- **Issue**: Conductor creation only accepted poles as endpoints, not customer connections
+- **Fix**: Updated validation to check both poles and connections as valid nodes
+- **Result**: Conductors can now connect to both poles and connections (matching Excel data structure)
+
+### 3. Missing Update Conductor Endpoint
+- **Issue**: No API endpoint existed to update conductor attributes
+- **Fix**: Added `PUT /api/network/conductors/{site}/{conductor_id}` endpoint
+- **Result**: Can now update conductor status codes, notes, and other attributes
+
+### 4. Conductor Split Functionality
+- **Testing**: Successfully splits conductors at specified coordinates
+- **Result**: Creates new pole at split point (ID: `SPLIT_[n]`) and two conductor segments
+- **Status**: ✅ Full CRUD operations working for network editing
+
+### 5. Dynamic Map Centering
+- **Implementation**: Map automatically centers on loaded network data using `fitBounds`
+- **Calculation**: Center computed from all pole coordinates (lat=-30.054479, lng=27.880555 for KET site)
+- **Bounds**: lat=[-30.121760, -29.736500], lng=[27.840495, 28.776500]
+- **Status**: ✅ Map properly centers and zooms to show all network elements
+
 ## Map Rendering Improvements (2025-08-17)
 
 ### 1. Layer Ordering with Leaflet Panes

@@ -217,7 +217,7 @@ export async function uploadExcel(file: File) {
 1. ✅ File upload UI with drag-drop (COMPLETE)
 2. ✅ Voltage drop overlay on map (COMPLETE)
 3. ✅ Excel export with calculations (COMPLETE)
-4. Network editing tools (TODO)
+4. ✅ Network editing tools (COMPLETE)
 
 ### Phase 4: uGridPREDICT Integration (2-3 days)
 1. Port resource allocation logic
@@ -278,6 +278,24 @@ Complete Excel export functionality with comprehensive network reports and field
    - Download functionality
    - Progress indicators
 
+### Network Editing API Endpoints (NEW - Implemented)
+
+#### Poles
+- `POST /api/network/poles/{site}` - Create new pole
+- `PUT /api/network/poles/{site}/{pole_id}` - Update pole
+- `DELETE /api/network/poles/{site}/{pole_id}` - Delete pole
+
+#### Conductors  
+- `POST /api/network/conductors/{site}` - Create new conductor
+- `PUT /api/network/conductors/{site}/{conductor_id}` - Update conductor
+- `DELETE /api/network/conductors/{site}/{conductor_id}` - Delete conductor
+- `POST /api/network/conductors/{site}/{conductor_id}/split` - Split conductor at point
+
+#### Connections
+- `POST /api/network/connections/{site}` - Create new connection
+- `PUT /api/network/connections/{site}/{connection_id}` - Update connection
+- `DELETE /api/network/connections/{site}/{connection_id}` - Delete connection
+
 ### Usage
 ```python
 # Backend usage
@@ -321,7 +339,7 @@ output_path = exporter.export_network_report(
 - [x] Import Excel/KML from uGridPLAN
 - [x] Display network on interactive map
 - [x] Calculate and visualize voltage drop
-- [ ] Edit network (add/move/delete elements)
+- [x] Edit network (add/move/delete elements)
 - [x] Export updated Excel with calculations
 - [x] Track as-built vs as-designed status
 - [ ] Generate material takeoff reports
