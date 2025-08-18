@@ -8,6 +8,8 @@ import { ValidationPanel } from '@/components/validation/ValidationPanel'
 import { Navigation } from '@/components/layout/Navigation'
 import FileUpload from '@/components/FileUpload'
 import ExportControls from '@/components/ExportControls'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import UserMenu from '@/components/auth/UserMenu'
 import { api } from '@/lib/api'
 
 // Import MapView dynamically with SSR disabled (Leaflet requires browser APIs)
@@ -61,12 +63,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar Navigation */}
-      <Navigation currentView={currentView} onViewChange={setCurrentView} />
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <ProtectedRoute requiredPermission="network:view">
+      <div className="flex h-screen bg-gray-50">
+        {/* Sidebar Navigation */}
+        <Navigation currentView={currentView} onViewChange={setCurrentView} />
+        
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -89,6 +92,7 @@ export default function Dashboard() {
                 selectedSite={selectedSite}
                 onSiteChange={setSelectedSite}
               />
+              <UserMenu />
             </div>
           </div>
         </header>
@@ -125,5 +129,6 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

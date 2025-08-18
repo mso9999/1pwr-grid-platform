@@ -26,6 +26,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 try:
     from utils.excel_importer import ExcelImporter
     from utils.voltage_calculator import VoltageCalculator
+    from utils.template_generator import TemplateGenerator
     from validators.network_validator import NetworkValidator
     from storage import network_storage  # Import shared storage
 except ImportError as e:
@@ -94,6 +95,15 @@ class CalculationResponse(BaseModel):
     message: str
     results: Optional[Dict[str, Any]] = None
     errors: Optional[List[str]] = None
+
+# Import route modules
+from routes import network_edit, material_takeoff, as_built, auth
+
+# Register route modules
+app.include_router(auth.router, tags=["authentication"])
+app.include_router(network_edit.router, prefix="/api/network", tags=["network"])
+app.include_router(material_takeoff.router, prefix="/api", tags=["reports"])
+app.include_router(as_built.router, prefix="/api", tags=["as-built"])
 
 @app.get("/")
 async def root():
@@ -808,6 +818,69 @@ async def delete_network(site: str):
         return JSONResponse(content={"success": True, "message": f"Deleted data for {site}"})
     else:
         raise HTTPException(status_code=404, detail=f"No data for site {site}")
+
+@app.get("/api/template/download")
+async def download_template(
+    project_name: str = "New_Project",
+    include_sample_data: bool = False
+):
+    """
+    Download an Excel template for creating new grid projects
+    
+    Args:
+        project_name: Name for the new project
+        include_sample_data: Whether to include sample data rows
+    
+    Returns:
+        Excel file as download
+    """
+    try:
+        generator = TemplateGenerator()
+        excel_buffer = generator.generate_template(
+            project_name=project_name,
+            include_sample_data=include_sample_data
+        )
+        
+        # Create temp file
+        temp_file = tempfile.NamedTemporaryFile(
+            suffix='.xlsx',
+            prefix=f'{project_name}_template_',
+            delete=False
+        )
+        temp_file.write(excel_buffer.getvalue())
+        temp_file.close()
+        
+        return FileResponse(
+            path=temp_file.name,
+            media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            filename=f'{project_name}_template.xlsx'
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate template: {str(e)}"
+        )
+
+@app.get("/api/template/status-codes")
+async def get_status_code_reference():
+    """
+    Get a reference guide for all status codes used in the system
+    """
+    try:
+        generator = TemplateGenerator()
+        df = generator.generate_status_code_reference()
+        
+        # Convert to JSON format
+        return JSONResponse(content={
+            "status_codes": df.to_dict(orient="records"),
+            "total_codes": len(df),
+            "categories": df['Category'].unique().tolist()
+        })
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate status code reference: {str(e)}"
+        )
 
 # Register network editing routes
 from routes.network_edit import router as network_edit_router

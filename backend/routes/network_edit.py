@@ -4,6 +4,7 @@ Handles CRUD operations for poles, connections, and conductors
 """
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import uuid
@@ -218,6 +219,33 @@ async def delete_pole(site: str, pole_id: str, force: bool = False):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/connections/{site}/{connection_id}")
+async def delete_connection(site: str, connection_id: str):
+    """Delete a customer connection"""
+    try:
+        if site not in network_storage:
+            raise HTTPException(status_code=404, detail=f"Site {site} not found")
+        
+        connections = network_storage[site].get("connections", [])
+        
+        # Find and remove connection
+        connection_index = next((i for i, c in enumerate(connections) if c.get("connection_id") == connection_id or c.get("pole_id") == connection_id), None)
+        if connection_index is None:
+            raise HTTPException(status_code=404, detail=f"Connection {connection_id} not found")
+        
+        deleted_connection = connections.pop(connection_index)
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Connection {connection_id} deleted successfully",
+            "deleted_connection": deleted_connection
+        })
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/connections/{site}")
 async def create_connection(site: str, connection: ConnectionCreate):
     """Create a new customer connection"""
@@ -409,7 +437,7 @@ async def split_conductor(site: str, conductor_id: str, split_data: ConductorSpl
             "from_pole": original_conductor["from_pole"],
             "to_pole": split_data.new_pole_id,
             "conductor_type": original_conductor["conductor_type"],
-            "conductor_spec": original_conductor["conductor_spec"],
+            "conductor_spec": original_conductor.get("conductor_spec", "50"),
             "length": original_conductor.get("length", 0) / 2,  # Approximate
             "st_code_4": original_conductor.get("st_code_4", 0),
             "notes": f"First segment of split conductor {conductor_id}",
@@ -423,7 +451,7 @@ async def split_conductor(site: str, conductor_id: str, split_data: ConductorSpl
             "from_pole": split_data.new_pole_id,
             "to_pole": original_conductor["to_pole"],
             "conductor_type": original_conductor["conductor_type"],
-            "conductor_spec": original_conductor["conductor_spec"],
+            "conductor_spec": original_conductor.get("conductor_spec", "50"),
             "length": original_conductor.get("length", 0) / 2,  # Approximate
             "st_code_4": original_conductor.get("st_code_4", 0),
             "notes": f"Second segment of split conductor {conductor_id}",
