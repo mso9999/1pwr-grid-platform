@@ -1,0 +1,68 @@
+UID,Area,Function/Feature,Test Description,Preconditions,Test Steps,Expected Result,Actual Result,Status Pass/Fail/Blocked/N/A,Runner Human/LLM,Run Datetime YYMMDD_HHMM,Git Commit (SHA),Context Notes,Linked Issue
+AUTH-001,Authentication,Login Page,Verify login page loads correctly,Frontend running on port 3001,"1. Navigate to http://localhost:3001/login
+2. Observe page layout",Login page displays with username/password fields and sign in button,actual = expected,Pass,Human,250817_2230,1476b2f,,
+AUTH-002,Authentication,Login Success,Test successful login with valid credentials,"Backend running on port 8000, Frontend running","1. Navigate to login page
+2. Enter username: admin
+3. Enter password: admin123
+4. Click Sign In","User redirected to dashboard, user menu shows in header",404,Fail,Human,250817_2240,1476b2f,"GET http://localhost:3001/unauthorized 404 (Not Found) Router @ webpack-internal:///s/app-router.js:330",
+AUTH-003,Authentication,Login Failure,Test failed login with invalid credentials,Services running,"1. Navigate to login page
+2. Enter username: admin
+3. Enter password: wrongpass
+4. Click Sign In",Error message displayed 'Invalid username or password',Incorrect username or password,Pass,Human,250817_2242,1476b2f,"POST http://localhost:8000/api/auth/login 401 (Unauthorized) auth.ts:71",
+AUTH-004,Authentication,Protected Route,Verify dashboard requires authentication,Services running,"1. Clear browser storage
+2. Navigate directly to http://localhost:3001/",Redirected to login page,404,Fail,Human,250817_2244,1476b2f,"GET http://localhost:3001/unauthorized 404 (Not Found)",
+AUTH-005,Authentication,User Profile Menu,Test user profile dropdown functionality,"Services running, User logged in","1. Login as admin
+2. Click user avatar in header
+3. Observe dropdown menu","Dropdown shows user info, role badge, and logout option",,N/A,Human,,,,
+AUTH-006,Authentication,Logout,Test logout functionality,"Services running, User logged in","1. Login as admin
+2. Click user avatar
+3. Click Log out","User logged out, redirected to login page",,N/A,Human,,,,
+AUTH-007,Authentication,Token Persistence,Verify token persists across page refresh,"Services running, User logged in","1. Login as admin
+2. Refresh browser page (F5)
+3. Check authentication status",User remains logged in after refresh,,N/A,Human,,,,
+AUTH-008,Authentication,Role Display,Test role badge display for different users,Services running,"1. Login as admin - check role badge
+2. Logout and login as field_user
+3. Check role badge
+4. Logout and login as viewer","Each user shows correct role badge color:
+- admin: red
+- field_user: green
+- viewer: gray",,N/A,Human,,,,
+AUTH-009,Authentication,Backend Login API,Test backend login endpoint directly,Backend running,"curl -X POST http://localhost:8000/api/auth/login \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'username=admin&password=admin123'",Returns JSON with access_token and refresh_token,,N/A,LLM,,,,
+AUTH-010,Authentication,Backend Current User API,Test getting current user info,Backend running,"1. Get token from login
+2. curl -X GET http://localhost:8000/api/auth/me \
+  -H 'Authorization: Bearer {token}'",Returns user object with username/email/role/permissions,,N/A,LLM,,,,
+AUTH-011,Authentication,Backend Invalid Token,Test API with invalid token,Backend running,"curl -X GET http://localhost:8000/api/auth/me \
+  -H 'Authorization: Bearer invalid_token'",Returns 401 Unauthorized error,,N/A,LLM,,,,
+AUTH-012,Authentication,Backend User List,Test listing users with admin role,Backend running,"1. Login as admin
+2. curl -X GET http://localhost:8000/api/auth/users \
+  -H 'Authorization: Bearer {admin_token}'",Returns list of all users,,N/A,LLM,,,,
+AUTH-013,Authentication,Backend Permission Denied,Test permission enforcement,Backend running,"1. Login as viewer
+2. curl -X GET http://localhost:8000/api/auth/users \
+  -H 'Authorization: Bearer {viewer_token}'",Returns 403 Forbidden error,,N/A,LLM,,,,
+AUTH-014,Authentication,Token Expiry,Test token expiration handling,Services running,"1. Modify token expiry to 1 second in backend
+2. Login and wait 2 seconds
+3. Try to access protected endpoint",Token expired error and redirect to login,,N/A,Human,,,,
+AUTH-015,Authentication,Multiple Sessions,Test concurrent sessions for same user,Services running,"1. Login as admin in Chrome
+2. Login as admin in Firefox
+3. Test both sessions work",Both sessions work independently,,N/A,Human,,,,
+AUTH-002-R2,Authentication,Login Success (Retest),Test successful login with valid credentials after routing fix,"Backend running on port 8000, Frontend running","1. Navigate to login page
+2. Enter username: admin
+3. Enter password: admin123
+4. Click Sign In","User redirected to dashboard, user menu shows in header",,N/A,Human,,,2d08bec,"Fixed routing issues",
+AUTH-004-R2,Authentication,Protected Route (Retest),Verify dashboard requires authentication after routing fix,Services running,"1. Clear browser storage
+2. Navigate directly to http://localhost:3001/",Redirected to login page,,N/A,Human,,,2d08bec,"Added unauthorized page",
+NET-001,Network Display,Map Rendering,Verify network map displays after login,"Services running, KET data loaded","1. Login as any user
+2. Navigate to map view
+3. Observe map display",Map shows poles/connections/conductors for KET site,,N/A,Human,,,,
+NET-002,Network Display,Authentication Headers,Test network API calls include auth token,"Services running, User logged in","1. Login and open DevTools Network tab
+2. Load network data
+3. Check request headers",All API calls include Authorization: Bearer header,,N/A,Human,,,,
+NET-003,Network Export,Excel Export with Auth,Test Excel export requires authentication,"Services running, Network loaded","1. Login as any user
+2. Click Export to Excel
+3. Download file",Excel file downloads successfully,,N/A,Human,,,,
+NET-004,Network Upload,File Upload with Auth,Test file upload requires authentication,"Services running, User logged in","1. Login as admin
+2. Navigate to upload view
+3. Select Excel file
+4. Upload file",File uploads and processes successfully,,N/A,Human,,,,
