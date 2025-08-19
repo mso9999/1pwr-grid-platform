@@ -71,7 +71,7 @@ export default function Dashboard() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
+        <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0 relative z-50">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-gray-900">1PWR Grid Platform</h1>
