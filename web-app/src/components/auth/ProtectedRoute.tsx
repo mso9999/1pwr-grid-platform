@@ -37,16 +37,13 @@ export default function ProtectedRoute({
     }
   }, [user, requiredPermission, requiredRole, router]);
 
-  if (loading) {
+  // Always show loading during auth check or when no user
+  if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   // Check permissions
