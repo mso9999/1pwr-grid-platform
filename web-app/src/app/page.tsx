@@ -63,7 +63,7 @@ export default function Dashboard() {
   }
 
   return (
-    <ProtectedRoute requiredPermission="network:view">
+    <ProtectedRoute requiredPermission="view_network">
       <div className="flex h-screen bg-gray-50">
         {/* Sidebar Navigation */}
         <Navigation currentView={currentView} onViewChange={setCurrentView} />

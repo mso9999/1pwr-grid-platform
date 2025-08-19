@@ -116,6 +116,7 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     """JWT token response"""
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str = "bearer"
     expires_in: int = 3600
 

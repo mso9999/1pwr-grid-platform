@@ -110,6 +110,30 @@ async def root():
     """API health check"""
     return {"status": "healthy", "service": "1PWR Grid Platform API"}
 
+@app.get("/test")
+def test_endpoint():
+    """Simple test endpoint to debug response issues"""
+    import json
+    response = {"test": "success", "number": 123}
+    print(f"Test endpoint returning: {response}")
+    return response
+
+@app.get("/test-raw")
+def test_raw_endpoint():
+    """Test with raw response"""
+    from fastapi.responses import Response
+    content = '{"raw": "test", "value": 42}'
+    print(f"Returning raw content: {content}")
+    return Response(content=content, media_type="application/json")
+
+@app.get("/test-plain")
+def test_plain_endpoint():
+    """Test with plain text response"""
+    from fastapi.responses import PlainTextResponse
+    content = "Hello World"
+    print(f"Returning plain text: {content}")
+    return PlainTextResponse(content=content)
+
 @app.post("/api/upload/excel")
 async def upload_excel(file: UploadFile = File(...)):
     """
@@ -452,10 +476,8 @@ def get_network(site: str):
     
     print(f"Returning formatted data: {len(formatted_data['poles'])} poles, {len(formatted_data['connections'])} connections, {len(formatted_data['conductors'])} conductors, {len(formatted_data['transformers'])} transformers")
     
-    # Sanitize the entire response to handle NaN/Infinity values
-    sanitized_response = sanitize_value(response_data)
-    print(f"Returning sanitized response...")
-    return JSONResponse(content=sanitized_response)
+    # Return the response directly, FastAPI will handle JSON serialization
+    return response_data
 
 @app.post("/api/network/{site}/generation")
 async def update_generation_site(site: str, request: Request):
@@ -777,7 +799,7 @@ async def export_field_report(request: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/sites")
-async def list_sites():
+def get_sites():
     """
     List all sites with loaded data
     """
@@ -789,14 +811,13 @@ async def list_sites():
             "conductors": len(data.get('conductors', [])),
             "transformers": len(data.get('transformers', []))
         })
-    
-    return JSONResponse(content={"sites": sites})
+    print(f"Returning sites: {sites}")
+    return {"sites": sites}
 
 @app.post("/api/export/excel/{site}")
 async def export_excel(site: str):
     """
     Export network data to Excel format
-    Returns Excel file for download
     """
     if site not in network_storage:
         raise HTTPException(status_code=404, detail=f"No data for site {site}")

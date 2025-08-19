@@ -12,9 +12,21 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
 
 **Cross-references**: See [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md) for detailed architecture and implementation notes.
 
-## Current Status (2025-08-17)
+## Current Status (2025-08-18)
 
 ### ✅ Completed Features
+
+#### Authentication & Security (Fixed 2025-08-18)
+- **Fixed Missing Refresh Token Issue**
+  - Added `refresh_token: Optional[str] = None` to Token model in `/backend/models/user.py`
+  - Login endpoint now returns both access_token and refresh_token
+- **Fixed Permission Mismatch**
+  - Updated frontend from "network:view" to "view_network" in `/web-app/src/app/page.tsx`
+  - Permissions now match between frontend and backend
+- **Network Data Loading**
+  - Successfully loads KET site data (1575 poles, 2810 conductors, 1280 connections)
+  - Generation site auto-detection working (KET_05_M111D identified as substation)
+- Test users operational: admin/admin123, field_user/field123, viewer/viewer123
 
 #### Backend
 - Excel file upload and parsing (uGridPLAN format)
