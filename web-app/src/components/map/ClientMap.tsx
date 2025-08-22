@@ -489,13 +489,22 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     }
 
     // Process conductors in batches
-    const conductorBatches: { [key: string]: L.Polyline[] } = {
-      mv: [],
-      lv: [],
-      drop: []
+    const conductorBatches = {
+      mv: [] as L.Polyline[],
+      lv: [] as L.Polyline[],
+      drop: [] as L.Polyline[]
     }
     
-    if (data.conductors) {
+    // Debug: Count droplines before processing
+    const dropLineCount = data.conductors?.filter((c: any) => {
+      const isFromConnection = data.connections?.some((conn: any) => conn.id === c.from)
+      const isToConnection = data.connections?.some((conn: any) => conn.id === c.to)
+      return isFromConnection || isToConnection
+    }).length || 0
+    
+    console.log('Processing conductors:', data.conductors?.length || 0)
+    console.log('Expected droplines:', dropLineCount)
+    if (data.conductors && (layerGroupsRef.current.mvLines || layerGroupsRef.current.lvLines || layerGroupsRef.current.dropLines)) {
       await renderBatch(
         data.conductors,
         (conductor: any) => {
@@ -531,6 +540,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
                 color = '#FFA500'  // Orange for Drop
                 pane = 'dropLinesPane'
                 counts.dropLines++
+                console.log('Found dropline:', conductor.id, 'from:', conductor.from, 'to:', conductor.to)
                 break
             }
             
@@ -585,39 +595,23 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         connectionMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.connections!))
       }
       
-      const addConductorBatch = (type: string, layerGroup: L.LayerGroup | undefined) => {
-        if (!layerGroup) return
-        const batch = conductorBatches[type]
-        if (batch.length === 0) return
-        
-        const batchSize = 50
-        let index = 0
-        
-        const addBatch = () => {
-          const end = Math.min(index + batchSize, batch.length)
-          for (let i = index; i < end; i++) {
-            batch[i].addTo(layerGroup)
-          }
-          index = end
-          
-          if (index < batch.length) {
-            requestAnimationFrame(addBatch)
-          }
-        }
-        
-        requestAnimationFrame(addBatch)
+      // Add conductor batches to their respective layer groups
+      if (conductorBatches.mv.length > 0 && layerGroupsRef.current.mvLines) {
+        console.log('Adding MV lines to layer group:', conductorBatches.mv.length)
+        conductorBatches.mv.forEach(line => line.addTo(layerGroupsRef.current.mvLines!))
       }
       
-      console.log('Conductor batches:', {
-        mv: conductorBatches.mv.length,
-        lv: conductorBatches.lv.length,
-        drop: conductorBatches.drop.length
-      })
-      addConductorBatch('mv', layerGroupsRef.current.mvLines)
-      addConductorBatch('lv', layerGroupsRef.current.lvLines)
-      addConductorBatch('drop', layerGroupsRef.current.dropLines)
-    }, 100)
-
+      if (conductorBatches.lv.length > 0 && layerGroupsRef.current.lvLines) {
+        console.log('Adding LV lines to layer group:', conductorBatches.lv.length)
+        conductorBatches.lv.forEach(line => line.addTo(layerGroupsRef.current.lvLines!))
+      }
+      
+      if (conductorBatches.drop.length > 0 && layerGroupsRef.current.dropLines) {
+        console.log('Adding drop lines to layer group:', conductorBatches.drop.length)
+        conductorBatches.drop.forEach(line => line.addTo(layerGroupsRef.current.dropLines!))
+      }
+    }, 0)
+    
     // Clear progress after rendering
     setTimeout(() => {
       setRenderProgress(null)

@@ -31,12 +31,12 @@ npm install
 cd backend
 python main.py
 
-# Terminal 2 - Frontend (port 3001)
+# Terminal 2 - Frontend (port 3000-3003)
 cd web-app
 npm run dev
 ```
 
-Access the application at http://localhost:3001
+Access the application at http://localhost:3000 (or 3001-3003 if port is in use)
 
 ## 🧪 Testing
 
@@ -111,6 +111,7 @@ See the latest functional test file in the root directory for current test cover
 
 ## 📚 Documentation
 
+- **[Developer Handover](DEVELOPER_HANDOVER.md)** - Comprehensive project context and implementation details
 - **[Architecture Guide](docs/ARCHITECTURE.md)** - System design and technical decisions
 - **[API Reference](docs/API.md)** - Backend API endpoints and usage
 - **[Development Guide](docs/DEVELOPMENT.md)** - Setup and contribution guidelines

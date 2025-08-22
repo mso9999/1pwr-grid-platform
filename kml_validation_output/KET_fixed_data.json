@@ -18905,7 +18905,7 @@
     ]
   },
   "conductors": {
-    "count": 2810,
+    "count": 2870,
     "list": [
       {
         "from_pole": "KET_BB_M5",
@@ -49816,12 +49816,1185 @@
         "status_code": 0,
         "notes": NaN,
         "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA124",
+        "to_pole": "CONN_0_0",
+        "length_m": 43.898332736951346,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA124",
+        "to_pole": "CONN_0_1",
+        "length_m": 12.799560562133031,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA124",
+        "to_pole": "CONN_0_2",
+        "length_m": 48.17145403331676,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA100",
+        "to_pole": "CONN_1_0",
+        "length_m": 13.43639123113796,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA100",
+        "to_pole": "CONN_1_1",
+        "length_m": 37.23772704606717,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_0",
+        "length_m": 43.73013720308227,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_1",
+        "length_m": 16.725268301830564,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_2",
+        "length_m": 46.38113906403856,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_0",
+        "length_m": 40.2326235750525,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_1",
+        "length_m": 36.79137619288973,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_2",
+        "length_m": 27.772958189385868,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA104",
+        "to_pole": "CONN_4_0",
+        "length_m": 31.848327827932792,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA104",
+        "to_pole": "CONN_4_1",
+        "length_m": 31.180040301954257,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA104",
+        "to_pole": "CONN_4_2",
+        "length_m": 13.92782775248341,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_0",
+        "length_m": 34.1531804652674,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_1",
+        "length_m": 49.053831533338894,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_2",
+        "length_m": 18.473041144095966,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_0",
+        "length_m": 43.82456275750686,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_1",
+        "length_m": 43.88438294292739,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_2",
+        "length_m": 21.961283577308386,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_0",
+        "length_m": 36.23723522399937,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_1",
+        "length_m": 35.33276127166568,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_2",
+        "length_m": 42.12205422439064,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA108",
+        "to_pole": "CONN_8_0",
+        "length_m": 21.735813959913624,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA108",
+        "to_pole": "CONN_8_1",
+        "length_m": 14.181749612742252,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_0",
+        "length_m": 45.935518954654725,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_1",
+        "length_m": 48.3092344947252,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_2",
+        "length_m": 23.068255723908287,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA111",
+        "to_pole": "CONN_10_0",
+        "length_m": 26.282707608266975,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA111",
+        "to_pole": "CONN_10_1",
+        "length_m": 25.19557734053047,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA124",
+        "to_pole": "CONN_0_0",
+        "length_m": 45.54155378437324,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA124",
+        "to_pole": "CONN_0_1",
+        "length_m": 24.923829618552134,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA100",
+        "to_pole": "CONN_1_0",
+        "length_m": 48.139863714336535,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA100",
+        "to_pole": "CONN_1_1",
+        "length_m": 26.51727235847656,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_0",
+        "length_m": 35.72224091562792,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_1",
+        "length_m": 49.258902481499284,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA101",
+        "to_pole": "CONN_2_2",
+        "length_m": 32.66753788642659,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_0",
+        "length_m": 47.70546144437719,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_1",
+        "length_m": 25.51532606281137,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA102",
+        "to_pole": "CONN_3_2",
+        "length_m": 46.317232459034734,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA104",
+        "to_pole": "CONN_4_0",
+        "length_m": 39.49666932709853,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA104",
+        "to_pole": "CONN_4_1",
+        "length_m": 48.38516298365928,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_0",
+        "length_m": 21.58320378363586,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_1",
+        "length_m": 41.41275928220867,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA105",
+        "to_pole": "CONN_5_2",
+        "length_m": 42.17333908109956,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_0",
+        "length_m": 22.853172853364367,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_1",
+        "length_m": 22.416732453534436,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA106",
+        "to_pole": "CONN_6_2",
+        "length_m": 18.798850690922862,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_0",
+        "length_m": 34.09099218213349,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_1",
+        "length_m": 36.710815613286925,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA107",
+        "to_pole": "CONN_7_2",
+        "length_m": 44.64721790580559,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA108",
+        "to_pole": "CONN_8_0",
+        "length_m": 48.36426878226918,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA108",
+        "to_pole": "CONN_8_1",
+        "length_m": 30.643434290326823,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_0",
+        "length_m": 40.33157327231613,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_1",
+        "length_m": 27.22283406464381,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA109",
+        "to_pole": "CONN_9_2",
+        "length_m": 49.456289274184925,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA111",
+        "to_pole": "CONN_10_0",
+        "length_m": 35.33100489497654,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 3,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA111",
+        "to_pole": "CONN_10_1",
+        "length_m": 27.867323053803865,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA112",
+        "to_pole": "CONN_11_0",
+        "length_m": 19.320076767848057,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 1,
+        "status": "as_designed"
+      },
+      {
+        "from_pole": "KET_17_GA112",
+        "to_pole": "CONN_11_1",
+        "length_m": 44.32579610734545,
+        "cable_size": 0.0,
+        "conductor_type": "dropline",
+        "subnetwork": "TEST",
+        "status_code": 2,
+        "status": "as_designed"
       }
     ]
   },
   "connections": {
-    "count": 0,
-    "list": []
+    "count": 52,
+    "list": [
+      {
+        "id": "CONN_0_0",
+        "name": "Connection 0-0",
+        "gps_lat": -30.078200033323014,
+        "gps_lng": 27.858706374320036,
+        "latitude": -30.078064489802685,
+        "longitude": 27.858572953254733,
+        "pole_id": "KET_17_GA124",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_0_1",
+        "name": "Connection 0-1",
+        "gps_lat": -30.077945660881007,
+        "gps_lng": 27.858763683288934,
+        "latitude": -30.078241268022673,
+        "longitude": 27.85853914290033,
+        "pole_id": "KET_17_GA124",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_1_0",
+        "name": "Connection 1-0",
+        "gps_lat": -30.076109139102382,
+        "gps_lng": 27.855512435092006,
+        "latitude": -30.076117715082994,
+        "longitude": 27.85552855559819,
+        "pole_id": "KET_17_GA100",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_1_1",
+        "name": "Connection 1-1",
+        "gps_lat": -30.07597040934878,
+        "gps_lng": 27.855312884112475,
+        "latitude": -30.075728384200872,
+        "longitude": 27.85558016225706,
+        "pole_id": "KET_17_GA100",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_2_0",
+        "name": "Connection 2-0",
+        "gps_lat": -30.07614422071495,
+        "gps_lng": 27.855656889314663,
+        "latitude": -30.076196716843697,
+        "longitude": 27.855856713378767,
+        "pole_id": "KET_17_GA101",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_2_1",
+        "name": "Connection 2-1",
+        "gps_lat": -30.075998085804137,
+        "gps_lng": 27.855779606906793,
+        "latitude": -30.0760044949728,
+        "longitude": 27.85588490997071,
+        "pole_id": "KET_17_GA101",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_2_2",
+        "name": "Connection 2-2",
+        "gps_lat": -30.076094913520368,
+        "gps_lng": 27.855849057349822,
+        "latitude": -30.075980170705428,
+        "longitude": 27.855932457435877,
+        "pole_id": "KET_17_GA101",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_3_0",
+        "name": "Connection 3-0",
+        "gps_lat": -30.076360077971778,
+        "gps_lng": 27.855980781586933,
+        "latitude": -30.0763157992205,
+        "longitude": 27.855900236451134,
+        "pole_id": "KET_17_GA102",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_3_1",
+        "name": "Connection 3-1",
+        "gps_lat": -30.076306956873108,
+        "gps_lng": 27.85594542909279,
+        "latitude": -30.076513553420206,
+        "longitude": 27.85585371370311,
+        "pole_id": "KET_17_GA102",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_3_2",
+        "name": "Connection 3-2",
+        "gps_lat": -30.076371924058293,
+        "gps_lng": 27.856091789948575,
+        "latitude": -30.07628966212901,
+        "longitude": 27.85611746290847,
+        "pole_id": "KET_17_GA102",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_4_0",
+        "name": "Connection 4-0",
+        "gps_lat": -30.075741501762515,
+        "gps_lng": 27.856995070086306,
+        "latitude": -30.07596314005313,
+        "longitude": 27.856886746565007,
+        "pole_id": "KET_17_GA104",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_4_1",
+        "name": "Connection 4-1",
+        "gps_lat": -30.075942404276738,
+        "gps_lng": 27.85692129345423,
+        "latitude": -30.07574214007421,
+        "longitude": 27.857195921563047,
+        "pole_id": "KET_17_GA104",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_5_0",
+        "name": "Connection 5-0",
+        "gps_lat": -30.07607126534683,
+        "gps_lng": 27.856416935442393,
+        "latitude": -30.076311315705162,
+        "longitude": 27.85637003561179,
+        "pole_id": "KET_17_GA105",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_5_1",
+        "name": "Connection 5-1",
+        "gps_lat": -30.07618971469892,
+        "gps_lng": 27.85660521751821,
+        "latitude": -30.075998047860917,
+        "longitude": 27.856624627342615,
+        "pole_id": "KET_17_GA105",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_5_2",
+        "name": "Connection 5-2",
+        "gps_lat": -30.076291552401493,
+        "gps_lng": 27.85655093664373,
+        "latitude": -30.07630487353086,
+        "longitude": 27.85670885264423,
+        "pole_id": "KET_17_GA105",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_6_0",
+        "name": "Connection 6-0",
+        "gps_lat": -30.077031695487246,
+        "gps_lng": 27.856607271497147,
+        "latitude": -30.0771222460996,
+        "longitude": 27.856890793981933,
+        "pole_id": "KET_17_GA106",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_6_1",
+        "name": "Connection 6-1",
+        "gps_lat": -30.077086434903833,
+        "gps_lng": 27.85683352770431,
+        "latitude": -30.077174392478227,
+        "longitude": 27.856645587339273,
+        "pole_id": "KET_17_GA106",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_6_2",
+        "name": "Connection 6-2",
+        "gps_lat": -30.077306935050505,
+        "gps_lng": 27.856912899520317,
+        "latitude": -30.077283541158643,
+        "longitude": 27.856625975450484,
+        "pole_id": "KET_17_GA106",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_7_0",
+        "name": "Connection 7-0",
+        "gps_lat": -30.077328839747125,
+        "gps_lng": 27.857231467796776,
+        "latitude": -30.07753129598824,
+        "longitude": 27.857000967771004,
+        "pole_id": "KET_17_GA107",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_7_1",
+        "name": "Connection 7-1",
+        "gps_lat": -30.077467896804485,
+        "gps_lng": 27.857191191996897,
+        "latitude": -30.077454760315174,
+        "longitude": 27.857141320315304,
+        "pole_id": "KET_17_GA107",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_7_2",
+        "name": "Connection 7-2",
+        "gps_lat": -30.077306896321556,
+        "gps_lng": 27.8572371611102,
+        "latitude": -30.07730408670244,
+        "longitude": 27.85729945237456,
+        "pole_id": "KET_17_GA107",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_8_0",
+        "name": "Connection 8-0",
+        "gps_lat": -30.077528843783163,
+        "gps_lng": 27.857543873745808,
+        "latitude": -30.077627769162977,
+        "longitude": 27.857860042551074,
+        "pole_id": "KET_17_GA108",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_8_1",
+        "name": "Connection 8-1",
+        "gps_lat": -30.07768302702964,
+        "gps_lng": 27.857846097780428,
+        "latitude": -30.07738215195074,
+        "longitude": 27.85768272586518,
+        "pole_id": "KET_17_GA108",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_9_0",
+        "name": "Connection 9-0",
+        "gps_lat": -30.07796115217054,
+        "gps_lng": 27.85826913193109,
+        "latitude": -30.07777268789045,
+        "longitude": 27.858252269214184,
+        "pole_id": "KET_17_GA109",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_9_1",
+        "name": "Connection 9-1",
+        "gps_lat": -30.077673755525094,
+        "gps_lng": 27.858257739447218,
+        "latitude": -30.077714696915596,
+        "longitude": 27.85805132537917,
+        "pole_id": "KET_17_GA109",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_9_2",
+        "name": "Connection 9-2",
+        "gps_lat": -30.077791070399524,
+        "gps_lng": 27.858097721088043,
+        "latitude": -30.077962807003484,
+        "longitude": 27.858354925133224,
+        "pole_id": "KET_17_GA109",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_10_0",
+        "name": "Connection 10-0",
+        "gps_lat": -30.077097036481053,
+        "gps_lng": 27.858018103337876,
+        "latitude": -30.076993557675102,
+        "longitude": 27.858139504244136,
+        "pole_id": "KET_17_GA111",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_10_1",
+        "name": "Connection 10-1",
+        "gps_lat": -30.077159671106426,
+        "gps_lng": 27.85811254694221,
+        "latitude": -30.077333566531408,
+        "longitude": 27.858114629471146,
+        "pole_id": "KET_17_GA111",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_11_0",
+        "name": "Connection 11-0",
+        "gps_lat": -30.076755762126314,
+        "gps_lng": 27.858495473987738,
+        "latitude": -30.076661580341774,
+        "longitude": 27.858602460452893,
+        "pole_id": "KET_17_GA112",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_11_1",
+        "name": "Connection 11-1",
+        "gps_lat": -30.076760424419547,
+        "gps_lng": 27.858570646069403,
+        "latitude": -30.076853979853333,
+        "longitude": 27.85876790768698,
+        "pole_id": "KET_17_GA112",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_11_2",
+        "name": "Connection 11-2",
+        "gps_lat": -30.076577821043056,
+        "gps_lng": 27.858507427949018,
+        "latitude": -30.076517549733158,
+        "longitude": 27.858768132625723,
+        "pole_id": "KET_17_GA112",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_12_0",
+        "name": "Connection 12-0",
+        "gps_lat": -30.076292711083063,
+        "gps_lng": 27.855131822020034,
+        "latitude": -30.076045987623605,
+        "longitude": 27.85524350263995,
+        "pole_id": "KET_17_GA120 ",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_12_1",
+        "name": "Connection 12-1",
+        "gps_lat": -30.076159651807643,
+        "gps_lng": 27.8551075476284,
+        "latitude": -30.076355830546596,
+        "longitude": 27.85491847583924,
+        "pole_id": "KET_17_GA120 ",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_13_0",
+        "name": "Connection 13-0",
+        "gps_lat": -30.07641953944463,
+        "gps_lng": 27.85472660732471,
+        "latitude": -30.07654078744546,
+        "longitude": 27.854665598671094,
+        "pole_id": "KET_17_GA121",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_13_1",
+        "name": "Connection 13-1",
+        "gps_lat": -30.07656801071535,
+        "gps_lng": 27.85471960826325,
+        "latitude": -30.07628097012959,
+        "longitude": 27.854731021546538,
+        "pole_id": "KET_17_GA121",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_13_2",
+        "name": "Connection 13-2",
+        "gps_lat": -30.076364148801993,
+        "gps_lng": 27.85482059415274,
+        "latitude": -30.076525499160986,
+        "longitude": 27.854907192715988,
+        "pole_id": "KET_17_GA121",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_14_0",
+        "name": "Connection 14-0",
+        "gps_lat": -30.076569444415775,
+        "gps_lng": 27.854491509111412,
+        "latitude": -30.07673933304819,
+        "longitude": 27.854251889297466,
+        "pole_id": "KET_17_GA122",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_14_1",
+        "name": "Connection 14-1",
+        "gps_lat": -30.076825163732085,
+        "gps_lng": 27.854241195861366,
+        "latitude": -30.076801086818875,
+        "longitude": 27.85444554895401,
+        "pole_id": "KET_17_GA122",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_14_2",
+        "name": "Connection 14-2",
+        "gps_lat": -30.07654719769748,
+        "gps_lng": 27.854277686714177,
+        "latitude": -30.076541736194443,
+        "longitude": 27.854246237732156,
+        "pole_id": "KET_17_GA122",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_15_0",
+        "name": "Connection 15-0",
+        "gps_lat": -30.07664818408727,
+        "gps_lng": 27.85401629396481,
+        "latitude": -30.07659373637096,
+        "longitude": 27.853898178164446,
+        "pole_id": "KET_17_GA123",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_15_1",
+        "name": "Connection 15-1",
+        "gps_lat": -30.076920847997613,
+        "gps_lng": 27.85413571543778,
+        "latitude": -30.07697394259046,
+        "longitude": 27.85412482917941,
+        "pole_id": "KET_17_GA123",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_16_0",
+        "name": "Connection 16-0",
+        "gps_lat": -30.016322883281177,
+        "gps_lng": 27.907114890095304,
+        "latitude": -30.016495710424476,
+        "longitude": 27.906761343068748,
+        "pole_id": "KET_02_AA1",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_16_1",
+        "name": "Connection 16-1",
+        "gps_lat": -30.016623096523624,
+        "gps_lng": 27.906762535018242,
+        "latitude": -30.016495198508515,
+        "longitude": 27.90699672003233,
+        "pole_id": "KET_02_AA1",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_17_0",
+        "name": "Connection 17-0",
+        "gps_lat": -30.01440413790221,
+        "gps_lng": 27.904640584549814,
+        "latitude": -30.01466172815598,
+        "longitude": 27.904415347278395,
+        "pole_id": "KET_02_AA10",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_17_1",
+        "name": "Connection 17-1",
+        "gps_lat": -30.014477149896887,
+        "gps_lng": 27.90462393508477,
+        "latitude": -30.014484294096793,
+        "longitude": 27.90467698797704,
+        "pole_id": "KET_02_AA10",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_17_2",
+        "name": "Connection 17-2",
+        "gps_lat": -30.014683800612968,
+        "gps_lng": 27.904417067466724,
+        "latitude": -30.0145615161458,
+        "longitude": 27.904645299135932,
+        "pole_id": "KET_02_AA10",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_18_0",
+        "name": "Connection 18-0",
+        "gps_lat": -30.016294475499038,
+        "gps_lng": 27.90634505954329,
+        "latitude": -30.016600703650234,
+        "longitude": 27.906430661180114,
+        "pole_id": "KET_02_AA2",
+        "st_code_3": 2,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_18_1",
+        "name": "Connection 18-1",
+        "gps_lat": -30.01655910717569,
+        "gps_lng": 27.90637600009478,
+        "latitude": -30.016594305588903,
+        "longitude": 27.906561716769435,
+        "pole_id": "KET_02_AA2",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_18_2",
+        "name": "Connection 18-2",
+        "gps_lat": -30.01648562339416,
+        "gps_lng": 27.906252962269235,
+        "latitude": -30.016228521587436,
+        "longitude": 27.90650415330728,
+        "pole_id": "KET_02_AA2",
+        "st_code_3": 1,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_19_0",
+        "name": "Connection 19-0",
+        "gps_lat": -30.016560521205946,
+        "gps_lng": 27.905785898064828,
+        "latitude": -30.016282277983464,
+        "longitude": 27.906118809879757,
+        "pole_id": "KET_02_AA3",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_19_1",
+        "name": "Connection 19-1",
+        "gps_lat": -30.016238354060157,
+        "gps_lng": 27.905967328331073,
+        "latitude": -30.016473608879743,
+        "longitude": 27.90595251984952,
+        "pole_id": "KET_02_AA3",
+        "st_code_3": 3,
+        "type": "service_connection"
+      },
+      {
+        "id": "CONN_19_2",
+        "name": "Connection 19-2",
+        "gps_lat": -30.016458202103212,
+        "gps_lng": 27.905958851866494,
+        "latitude": -30.016170731396862,
+        "longitude": 27.905924785580883,
+        "pole_id": "KET_02_AA3",
+        "st_code_3": 3,
+        "type": "service_connection"
+      }
+    ]
   },
   "transformers": {
     "count": 0,
