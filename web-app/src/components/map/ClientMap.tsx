@@ -124,13 +124,14 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
   const layerGroupsRef = useRef<{
     poles?: L.LayerGroup
+    mvPoles?: L.LayerGroup
+    lvPoles?: L.LayerGroup
     connections?: L.LayerGroup
     conductors?: L.LayerGroup
     mvLines?: L.LayerGroup
     lvLines?: L.LayerGroup
     dropLines?: L.LayerGroup
     transformers?: L.LayerGroup
-    generation?: L.LayerGroup
     poleCluster?: L.MarkerClusterGroup
     connectionCluster?: L.MarkerClusterGroup
   }>({})
@@ -439,6 +440,10 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         (pole: any) => {
           if (pole.lat && pole.lng) {
             const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
+            
+            // Determine pane based on pole type (MV or LV)
+            const polePane = pole.type === 'MV' ? 'mvPolesPane' : 'lvPolesPane'
+            
             const circleMarker = L.circleMarker([pole.lat, pole.lng], {
               radius: 3,
               fillColor: color,
@@ -446,7 +451,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
               weight: 1,
               opacity: 1,
               fillOpacity: 0.5,
-              pane: 'polesPane'
+              pane: polePane
             })
             
             circleMarker.on('click', () => {
@@ -465,6 +470,13 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
                 Status: ${pole.st_code_1 || 0} - ${SC1_DESCRIPTIONS[pole.st_code_1 || 0]}
               </div>
             `)
+            
+            // Add to appropriate layer group based on voltage level
+            if (pole.type === 'MV' && layerGroupsRef.current.mvPoles) {
+              layerGroupsRef.current.mvPoles.addLayer(circleMarker)
+            } else if (layerGroupsRef.current.lvPoles) {
+              layerGroupsRef.current.lvPoles.addLayer(circleMarker)
+            }
             
             poleMarkers.push(circleMarker)
             bounds.extend([pole.lat, pole.lng])
@@ -782,13 +794,14 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     layerGroupsRef.current = {
       connections: L.layerGroup().addTo(newMap),
       transformers: L.layerGroup().addTo(newMap),   
-      poles: L.layerGroup().addTo(newMap),
-      generation: L.layerGroup().addTo(newMap),
-      dropLines: L.layerGroup().addTo(newMap),
+      poles: L.layerGroup().addTo(newMap),  // Keep for backward compatibility
+      mvPoles: L.layerGroup().addTo(newMap),  // MV poles layer group
+      lvPoles: L.layerGroup().addTo(newMap),  // LV poles layer group
+      mvLines: L.layerGroup().addTo(newMap),
       lvLines: L.layerGroup().addTo(newMap),
-      mvLines: L.layerGroup().addTo(newMap)
+      dropLines: L.layerGroup().addTo(newMap)
     }
-
+    
     // Add resize observer with proper cleanup
     const resizeObserver = new ResizeObserver(() => {
       if (newMap && newMap.getContainer()) {
