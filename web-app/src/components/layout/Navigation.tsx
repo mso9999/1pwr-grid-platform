@@ -14,7 +14,7 @@ export function Navigation({ currentView, onViewChange }: NavigationProps) {
   ]
 
   return (
-    <nav className="w-64 bg-white border-r border-gray-200">
+    <nav className="h-full w-full bg-white border-r border-gray-200">
       <div className="p-4">
         <div className="flex items-center space-x-2 mb-8">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">

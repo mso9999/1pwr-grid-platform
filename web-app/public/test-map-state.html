@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map State Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        #status { 
+            position: fixed; 
+            top: 10px; 
+            left: 410px; 
+            z-index: 1000; 
+            background: white; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+        }
+        #sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 256px;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            z-index: 50;
+            padding: 20px;
+        }
+        #separator {
+            position: fixed;
+            top: 64px;
+            left: 256px;
+            width: 144px;
+            bottom: 0;
+            background: #f3f4f6;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+        }
+        #map {
+            position: fixed;
+            top: 64px;
+            left: 400px;
+            right: 0;
+            bottom: 0;
+            z-index: 5;
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Initializing map...</div>
+    <div id="sidebar">
+        <h2>Sidebar</h2>
+        <p>256px wide</p>
+    </div>
+    <div id="separator"></div>
+    <div id="map"></div>
+    
+    <script>
+        const statusEl = document.getElementById('status');
+        let map = null;
+        
+        function initMap() {
+            const container = document.getElementById('map');
+            
+            statusEl.innerHTML = `Container found: ${container.offsetWidth}x${container.offsetHeight}`;
+            
+            if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+                statusEl.innerHTML += '<br>Waiting for container dimensions...';
+                setTimeout(initMap, 100);
+                return;
+            }
+            
+            try {
+                map = L.map(container, {
+                    center: [-30.078, 27.859],
+                    zoom: 13,
+                    preferCanvas: true,
+                    renderer: L.canvas({ padding: 0 })
+                });
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // Test map state
+                window.__testMap = map;
+                
+                requestAnimationFrame(() => {
+                    map.invalidateSize();
+                    const size = map.getSize();
+                    statusEl.innerHTML = `✅ Map initialized: ${size.x}x${size.y}`;
+                    
+                    // Add test marker
+                    L.marker([-30.078, 27.859])
+                        .addTo(map)
+                        .bindPopup('Test marker')
+                        .openPopup();
+                });
+                
+            } catch (err) {
+                statusEl.innerHTML = `❌ Error: ${err.message}`;
+            }
+        }
+        
+        // Start initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMap);
+        } else {
+            setTimeout(initMap, 100);
+        }
+    </script>
+</body>
+</html>

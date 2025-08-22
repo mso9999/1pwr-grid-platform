@@ -17,7 +17,11 @@ import { LogOut, User, Shield, Settings } from 'lucide-react';
 export default function UserMenu() {
   const { user, logout, hasRole } = useAuth();
 
-  if (!user) return null;
+  console.log('UserMenu - user:', user);
+  if (!user) {
+    console.log('UserMenu returning null - no user');
+    return null;
+  }
 
   const initials = user.full_name
     .split(' ')
@@ -46,9 +50,13 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-blue-600 text-white">
+        <Button 
+          variant="ghost" 
+          className="relative h-8 w-8 rounded-full" 
+          data-testid="user-avatar-button"
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="bg-primary text-primary-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>

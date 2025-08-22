@@ -31,12 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       setLoading(true);
-      setError(null);
       
       if (authService.isAuthenticated()) {
         const currentUser = await authService.getCurrentUser();
+        console.log('AuthContext - currentUser:', currentUser);
         setUser(currentUser);
       } else {
+        console.log('AuthContext - not authenticated');
         setUser(null);
       }
     } catch (err) {

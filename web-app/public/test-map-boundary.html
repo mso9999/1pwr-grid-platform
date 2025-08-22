@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Boundary Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        /* Simulate header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #1f2937;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        /* Simulate sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 256px;
+            height: calc(100vh - 64px);
+            background: #374151;
+            color: white;
+            padding: 20px;
+            z-index: 50;
+        }
+        
+        /* Gap between sidebar and map */
+        .gap {
+            position: fixed;
+            top: 64px;
+            left: 256px;
+            width: 144px;
+            height: calc(100vh - 64px);
+            background: #f3f4f6;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+            z-index: 4;
+        }
+        
+        /* Test boundary container */
+        .map-boundary {
+            position: fixed;
+            top: 64px;
+            left: 400px;
+            right: 0;
+            bottom: 0;
+            width: calc(100vw - 400px);
+            height: calc(100vh - 64px);
+            background: #e5e7eb;
+            overflow: hidden;
+            clip-path: inset(0);
+            contain: strict;
+            z-index: 5;
+        }
+        
+        /* Inner content to test overflow */
+        .map-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #3b82f6 25%, transparent 25%, transparent 75%, #3b82f6 75%, #3b82f6),
+                        linear-gradient(45deg, #3b82f6 25%, transparent 25%, transparent 75%, #3b82f6 75%, #3b82f6);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            background-color: #dbeafe;
+        }
+        
+        /* Test element that tries to overflow */
+        .overflow-test {
+            position: absolute;
+            top: 50%;
+            left: -100px; /* Tries to extend into sidebar */
+            width: 300px;
+            height: 100px;
+            background: rgba(239, 68, 68, 0.8);
+            border: 2px solid #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .success-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #10b981;
+            color: white;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Header (64px height)</div>
+    <div class="sidebar">
+        <h3>Sidebar</h3>
+        <p>256px wide</p>
+        <p>Map should NOT overlap here</p>
+    </div>
+    <div class="gap"></div>
+    <div class="map-boundary">
+        <div class="map-content">
+            <div class="success-indicator">✓ Map contained at left: 400px</div>
+            <div class="overflow-test">
+                This element tries to overflow<br>
+                but is clipped by boundary
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test that boundary is enforced
+        const boundary = document.querySelector('.map-boundary');
+        const rect = boundary.getBoundingClientRect();
+        console.log('Map boundary:', {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height
+        });
+        
+        if (rect.left >= 400) {
+            console.log('✓ Map boundary correctly positioned');
+        } else {
+            console.error('✗ Map boundary overlapping sidebar!');
+        }
+    </script>
+</body>
+</html>

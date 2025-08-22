@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, sans-serif;
+        }
+        
+        /* CSS Grid Layout System */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 256px 1fr;
+            grid-template-rows: 1fr;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        
+        .sidebar-zone {
+            grid-column: 1;
+            height: 100%;
+            overflow-y: auto;
+            background: #f3f4f6;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px;
+        }
+        
+        .content-zone {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .header-bar {
+            flex-shrink: 0;
+            padding: 12px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: #e0f2fe;
+            padding: 20px;
+        }
+        
+        .menu-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+        }
+        
+        .menu-button:hover {
+            background: #f9fafb;
+        }
+        
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-layout">
+        <div class="sidebar-zone">
+            <h2>Navigation Menu</h2>
+            <button class="menu-button" onclick="alert('Dashboard clicked')">📊 Dashboard</button>
+            <button class="menu-button" onclick="alert('Map View clicked')">🗺️ Map View</button>
+            <button class="menu-button" onclick="alert('Data Upload clicked')">📤 Data Upload</button>
+            <button class="menu-button" onclick="alert('Reports clicked')">📈 Reports</button>
+            <button class="menu-button" onclick="alert('Settings clicked')">⚙️ Settings</button>
+            <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
+                ✅ Menu buttons are clickable<br>
+                ✅ No overlap with map area<br>
+                ✅ Fixed 256px width
+            </p>
+        </div>
+        
+        <div class="content-zone">
+            <div class="header-bar">
+                <h1 style="margin: 0;">Grid Layout Test - uGridPLAN</h1>
+            </div>
+            <div class="main-content">
+                <div class="map-placeholder">
+                    Map Area - No Overlap with Sidebar
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

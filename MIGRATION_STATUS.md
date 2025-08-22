@@ -477,6 +477,17 @@ This document tracks the migration progress from desktop uGridPLAN to the web pl
   - `web-app/src/styles/globals.css` - Added CSS for square connection markers
 - **Result**: Icons now scale smoothly with zoom for better visibility and less clutter
 
+### 5. Map Rendering Fix (August 19, 2025)
+- **Issue**: Map container had zero height, preventing map from rendering
+  - CSS rules with `!important` forced `position: relative` on map container
+  - Leaflet's `L.map()` initialization overrode inline positioning styles
+- **Solution**: 
+  - Removed all CSS `!important` overrides in globals.css
+  - Force fixed positioning after Leaflet initialization in ClientMap.tsx
+  - Set explicit viewport-based dimensions (top: 64px, left: 260px, right: 0, bottom: 0)
+  - Added 4px buffer to prevent sidebar menu overlap
+- **Result**: Map now renders correctly with proper height and positioning
+
 ## References
 - Handover Doc: [DEVELOPER_HANDOVER.md](./DEVELOPER_HANDOVER.md)
 - Field Feedback: [FIELD_TEAM_FEEDBACK.md](./FIELD_TEAM_FEEDBACK.md)

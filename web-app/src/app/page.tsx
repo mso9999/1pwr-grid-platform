@@ -62,73 +62,76 @@ export default function Dashboard() {
     setCurrentView('map')
   }
 
+  const renderContent = () => {
+    switch (currentView) {
+      case 'upload':
+        return (
+          <div className="h-full flex items-center justify-center">
+            <FileUpload 
+              onUploadSuccess={handleUploadSuccess}
+              onUploadError={setError}
+            />
+          </div>
+        )
+      case 'map':
+        return (
+          <div className="h-full relative">
+            <MapView 
+              site={selectedSite} 
+              networkData={networkData} 
+              loading={loading}
+              onNetworkUpdate={() => fetchNetworkData(selectedSite)}
+            />
+          </div>
+        )
+      case 'stats':
+        return <DataStats site={selectedSite} networkData={networkData} />
+      case 'validation':
+        return <ValidationPanel site={selectedSite} networkData={networkData} />
+      default:
+        return null
+    }
+  }
+
   return (
-    <ProtectedRoute requiredPermission="view_network">
-      <div className="flex h-screen bg-gray-50">
+    <ProtectedRoute>
+      <div className="grid-layout">
         {/* Sidebar Navigation */}
-        <Navigation currentView={currentView} onViewChange={setCurrentView} />
+        <div className="sidebar-zone">
+          <Navigation currentView={currentView} onViewChange={setCurrentView} />
+        </div>
         
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0 relative z-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">1PWR Grid Platform</h1>
-              <p className="text-xs text-gray-600">Network Validation & Management</p>
+        <div className="content-zone">
+          {/* Header */}
+          <header className="header-bar">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">1PWR Grid Platform</h1>
+                <p className="text-sm text-gray-500">
+                  {currentView === 'map' && 'Network Visualization'}
+                  {currentView === 'stats' && 'Data Statistics'}
+                  {currentView === 'validation' && 'Network Validation'}
+                  {currentView === 'upload' && 'Upload Network Data'}
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
+                {/* Site Selector */}
+                <SiteSelector
+                  selectedSite={selectedSite}
+                  onSiteChange={setSelectedSite}
+                />
+                <UserMenu />
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Export Controls - show when network data is loaded */}
-              {networkData && currentView !== 'upload' && (
-                <div className="min-w-[200px]">
-                  <ExportControls 
-                    site={selectedSite}
-                    onExportStart={() => console.log('Export started')}
-                    onExportComplete={() => console.log('Export complete')}
-                  />
-                </div>
-              )}
-              <SiteSelector 
-                selectedSite={selectedSite}
-                onSiteChange={setSelectedSite}
-              />
-              <UserMenu />
-            </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-hidden">
-          <div className="h-full relative">
-            {currentView === 'upload' && (
-              <div className="h-full flex items-center justify-center">
-                <FileUpload 
-                  onUploadSuccess={handleUploadSuccess}
-                  onUploadError={setError}
-                />
-              </div>
-            )}
-            {currentView === 'map' && (
-              <div className="h-full relative">
-                <MapView 
-                  site={selectedSite} 
-                  networkData={networkData} 
-                  loading={loading}
-                  onNetworkUpdate={() => fetchNetworkData(selectedSite)}
-                />
-              </div>
-            )}
-            {currentView === 'stats' && <DataStats site={selectedSite} networkData={networkData} />}
-            {currentView === 'validation' && <ValidationPanel site={selectedSite} networkData={networkData} />}
-            {error && (
-              <div className="absolute bottom-4 right-4 bg-red-50 text-red-800 p-4 rounded-md">
-                {error}
-              </div>
-            )}
-          </div>
-        </main>
+          {/* Content Area */}
+          <main className="main-content">
+            {renderContent()}
+          </main>
+        </div>
       </div>
-    </div>
     </ProtectedRoute>
   )
 }

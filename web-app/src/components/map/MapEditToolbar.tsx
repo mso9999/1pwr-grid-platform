@@ -311,7 +311,7 @@ export function MapEditToolbar({
 
   return (
     <>
-      <div className="absolute top-20 left-4 z-[1000] bg-white rounded-lg shadow-lg p-2 space-y-2">
+      <div className="map-edit-toolbar bg-white rounded-lg shadow-lg p-2 flex items-center space-x-2">
         <div className="text-sm font-medium px-2 py-1">Edit Tools</div>
         
         <Button

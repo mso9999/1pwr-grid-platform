@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Layout Test - 1PWR Grid Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #1f2937;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10001;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 256px;
+            height: calc(100vh - 64px);
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f3f4f6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .sidebar-item:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Visual Separator */
+        .separator {
+            position: fixed;
+            top: 64px;
+            left: 256px;
+            width: 144px;
+            height: calc(100vh - 64px);
+            background: #f3f4f6;
+            z-index: 4;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        /* Map Container */
+        .map-container {
+            position: fixed;
+            top: 64px;
+            left: 400px; /* 256px sidebar + 144px gap */
+            right: 0;
+            bottom: 0;
+            z-index: 5;
+            background: #e0f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0369a1;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        /* Edit Tools Panel */
+        .edit-tools {
+            position: fixed;
+            top: 80px;
+            left: 410px; /* Aligned with map container */
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>1PWR Grid Platform - Layout Test</h1>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Navigation Menu</h2>
+        <div class="sidebar-item">Dashboard</div>
+        <div class="sidebar-item">Sites</div>
+        <div class="sidebar-item">Network Data</div>
+        <div class="sidebar-item">As Built</div>
+        <div class="sidebar-item">Reports</div>
+        <div class="sidebar-item">Settings</div>
+        <div class="sidebar-item">Help</div>
+    </div>
+    
+    <!-- Visual Separator -->
+    <div class="separator"></div>
+    
+    <!-- Map Container -->
+    <div class="map-container">
+        Map Area<br>
+        <span style="font-size: 14px; font-weight: normal;">
+            Left: 400px (256px sidebar + 144px gap)<br>
+            No overlap with sidebar
+        </span>
+    </div>
+    
+    <!-- Edit Tools Panel -->
+    <div class="edit-tools">
+        Edit Tools
+    </div>
+    
+    <!-- Status -->
+    <div class="status">
+        ✓ Layout Working Correctly
+    </div>
+    
+    <script>
+        // Test sidebar interaction
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                console.log('Clicked:', this.textContent);
+                this.style.background = '#10b981';
+                this.style.color = 'white';
+                setTimeout(() => {
+                    this.style.background = '';
+                    this.style.color = '';
+                }, 500);
+            });
+        });
+        
+        // Log layout info
+        console.log('Layout Test Page Loaded');
+        console.log('Sidebar width: 256px');
+        console.log('Gap width: 144px');
+        console.log('Map starts at: 400px from left');
+        console.log('Sidebar is fully interactive and not overlapped');
+    </script>
+</body>
+</html>

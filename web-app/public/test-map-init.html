@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Initialization Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #1f2937;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10000;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 256px;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px;
+            z-index: 10000;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Visual Separator */
+        .separator {
+            position: fixed;
+            top: 64px;
+            left: 256px;
+            width: 144px;
+            bottom: 0;
+            background: #f3f4f6;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+            z-index: 4;
+        }
+        
+        /* Map Container with callback ref approach */
+        #map {
+            position: fixed;
+            top: 64px;
+            left: 400px;
+            right: 0;
+            bottom: 0;
+            z-index: 5;
+            background: #f3f4f6;
+        }
+        
+        /* Status display */
+        .status {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .status.success { border-left: 4px solid #10b981; }
+        .status.error { border-left: 4px solid #ef4444; }
+        .status.loading { border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Map Initialization Test - Callback Ref</h1>
+    </div>
+    
+    <div class="sidebar">
+        <h2>Sidebar Content</h2>
+        <p>Width: 256px</p>
+        <p>This sidebar should be fully visible and interactive.</p>
+        <button onclick="alert('Sidebar is interactive!')">Test Button</button>
+    </div>
+    
+    <div class="separator"></div>
+    
+    <div id="map"></div>
+    
+    <div id="status" class="status loading">Initializing map...</div>
+    
+    <script>
+        // Simulate React's callback ref approach
+        function initializeMap(container) {
+            const statusEl = document.getElementById('status');
+            
+            if (!container) {
+                statusEl.className = 'status error';
+                statusEl.textContent = 'Container not found';
+                return;
+            }
+            
+            // Check if already initialized
+            if (container.hasAttribute('data-map-initialized')) {
+                statusEl.className = 'status success';
+                statusEl.textContent = 'Map already initialized';
+                return;
+            }
+            
+            // Check container dimensions
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+            
+            if (width === 0 || height === 0) {
+                statusEl.className = 'status loading';
+                statusEl.textContent = `Waiting for container (${width}x${height})...`;
+                setTimeout(() => initializeMap(container), 100);
+                return;
+            }
+            
+            statusEl.className = 'status loading';
+            statusEl.textContent = `Initializing map (${width}x${height})...`;
+            
+            // Mark as initialized
+            container.setAttribute('data-map-initialized', 'true');
+            
+            try {
+                // Initialize Leaflet map
+                const map = L.map('map').setView([-30.078, 27.859], 13);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // Force size invalidation after init
+                setTimeout(() => {
+                    map.invalidateSize();
+                    const size = map.getSize();
+                    statusEl.className = 'status success';
+                    statusEl.textContent = `Map initialized successfully (${size.x}x${size.y})`;
+                }, 100);
+                
+                // Add test marker
+                L.marker([-30.078, 27.859])
+                    .addTo(map)
+                    .bindPopup('Test marker - map is working!')
+                    .openPopup();
+                    
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = 'Error: ' + error.message;
+                console.error('Map initialization error:', error);
+            }
+        }
+        
+        // Wait for DOM ready then initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                const container = document.getElementById('map');
+                initializeMap(container);
+            });
+        } else {
+            const container = document.getElementById('map');
+            initializeMap(container);
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,10 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import 'leaflet.markercluster';
 import { Button } from '@/components/ui/button';
 import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import { LayerControls } from './LayerControls'
@@ -19,6 +22,8 @@ import {
   SC3_DESCRIPTIONS,
   SC4_COLORS, 
   SC4_DESCRIPTIONS,
+  SC5_COLORS, 
+  SC5_DESCRIPTIONS,
   getLineType 
 } from '@/utils/statusCodes'
 import { Crosshair, Search, Layers, Eye, EyeOff, Zap, Activity } from 'lucide-react';
@@ -63,8 +68,28 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     keys: networkData ? Object.keys(networkData) : 'none',
     loading 
   })
-  const [map, setMap] = useState<L.Map | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
+  // Use ref to persist map instance across re-renders and StrictMode remounts
+  const mapInstanceRef = useRef<L.Map | null>(null)
+  const [map, setMapState] = useState<L.Map | null>(() => {
+    // Check for existing map on initial state
+    if (typeof window !== 'undefined' && (window as any).__leafletMapInstance) {
+      console.log('Found existing map instance on mount')
+      return (window as any).__leafletMapInstance
+    }
+    return null
+  })
+  
+  // Wrapper to track state changes and persist map instance globally
+  const setMap = useCallback((newMap: L.Map | null) => {
+    console.log('setMap called with:', newMap ? 'Leaflet Map instance' : 'null')
+    mapInstanceRef.current = newMap
+    // Store globally to survive StrictMode remounts
+    if (typeof window !== 'undefined') {
+      (window as any).__leafletMapInstance = newMap
+    }
+    setMapState(newMap)
+  }, [])
+  const mapRef = useRef<HTMLDivElement | null>(null)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
   const [selectedElement, setSelectedElement] = useState<ElementDetail | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -95,6 +120,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
   })
   const [elementNames, setElementNames] = useState<Set<string>>(new Set())
   const [voltageOverlayEnabled, setVoltageOverlayEnabled] = useState(false)
+  const [renderProgress, setRenderProgress] = useState<{current: number, total: number} | null>(null)
 
   const layerGroupsRef = useRef<{
     poles?: L.LayerGroup
@@ -105,6 +131,8 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     dropLines?: L.LayerGroup
     transformers?: L.LayerGroup
     generation?: L.LayerGroup
+    poleCluster?: L.MarkerClusterGroup
+    connectionCluster?: L.MarkerClusterGroup
   }>({})
 
   const site = networkData?.site || 'UGRIDPLAN'
@@ -177,154 +205,728 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     setEditDialogOpen(true)
   }, [])
 
-  // Initialize Leaflet map
-  useEffect(() => {
-    if (typeof window === 'undefined') return
+  const updateNetworkData = useCallback(async (data: any) => {
+    if (!map || !data || !layerGroupsRef.current) return
 
-    let retryCount = 0
-    const maxRetries = 10
+    console.log('Updating network data on map', { 
+      map: !!map, 
+      data: !!data,
+      layerGroups: !!layerGroupsRef.current
+    })
+
+    // Clear existing layers
+    Object.values(layerGroupsRef.current).forEach(group => {
+      if (group) {
+        if ('clearLayers' in group) {
+          group.clearLayers()
+        }
+      }
+    })
+
+    const bounds = L.latLngBounds([])
+    let hasValidCoords = false
+    const names = new Set<string>()
+
+    // Store references to markers for zoom updates
+    const connectionMarkers: Array<{marker: L.Marker, baseSize: number}> = []
+    const poleMarkers: L.CircleMarker[] = []
     
-    const initMap = () => {
-      const container = document.getElementById('map')
-      if (!container) {
-        console.log('Map container not found')
-        if (retryCount < maxRetries) {
-          retryCount++
-          setTimeout(initMap, 200)
+    // Defer cluster initialization to avoid blocking
+    const initClusters = () => {
+      if (!layerGroupsRef.current.poleCluster && map) {
+        layerGroupsRef.current.poleCluster = (L as any).markerClusterGroup({
+          maxClusterRadius: 80,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          disableClusteringAtZoom: 18,
+          chunkedLoading: true,
+          chunkInterval: 200,
+          chunkDelay: 50,
+          iconCreateFunction: function(cluster: any) {
+            const count = cluster.getChildCount()
+            let size = 'small'
+            let bgColor = '#b91c1c'
+            
+            if (count > 100) {
+              size = 'large'
+              bgColor = '#7c2d12'
+            } else if (count > 50) {
+              size = 'medium' 
+              bgColor = '#991b1b'
+            }
+            
+            return L.divIcon({
+              html: `<div style="background-color: ${bgColor};"><span>${count}</span></div>`,
+              className: `marker-cluster marker-cluster-${size}`,
+              iconSize: L.point(40, 40)
+            })
+          }
+        })
+        if (layerGroupsRef.current.poleCluster) {
+          map.addLayer(layerGroupsRef.current.poleCluster)
         }
-        return
       }
       
-      // Check if map already exists
-      if (container.hasAttribute('data-map-initialized')) {
-        console.log('Map already initialized')
-        return
-      }
-      
-      // Log current styles
-      const computedStyle = window.getComputedStyle(container)
-      console.log('Container computed styles:', {
-        position: computedStyle.position,
-        top: computedStyle.top,
-        left: computedStyle.left,
-        right: computedStyle.right,
-        bottom: computedStyle.bottom,
-        width: computedStyle.width,
-        height: computedStyle.height,
-        display: computedStyle.display,
-        zIndex: computedStyle.zIndex
-      })
-      console.log('Container inline styles:', container.style.cssText)
-      console.log('Container parent:', container.parentElement)
-      
-      // Ensure container has dimensions (fixed positioning should provide them)
-      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-        console.log(`Container dimensions: ${container.offsetWidth}x${container.offsetHeight}, retry ${retryCount}/${maxRetries}`)
-        
-        if (retryCount < maxRetries) {
-          retryCount++
-          setTimeout(initMap, 300)
+      if (!layerGroupsRef.current.connectionCluster && map) {
+        layerGroupsRef.current.connectionCluster = (L as any).markerClusterGroup({
+          maxClusterRadius: 60,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          disableClusteringAtZoom: 18,
+          chunkedLoading: true,
+          chunkInterval: 200,
+          chunkDelay: 50,
+          iconCreateFunction: function(cluster: any) {
+            const count = cluster.getChildCount()
+            let size = 'small'
+            let bgColor = '#1e40af'
+            
+            if (count > 100) {
+              size = 'large'
+              bgColor = '#1e3a8a'
+            } else if (count > 50) {
+              size = 'medium'
+              bgColor = '#1e40af'
+            }
+            
+            return L.divIcon({
+              html: `<div style="background-color: ${bgColor};"><span>${count}</span></div>`,
+              className: `marker-cluster marker-cluster-${size}`,
+              iconSize: L.point(40, 40)
+            })
+          }
+        })
+        if (layerGroupsRef.current.connectionCluster) {
+          map.addLayer(layerGroupsRef.current.connectionCluster)
         }
-        return
       }
-      
-      container.setAttribute('data-map-initialized', 'true')
+    }
+    
+    // Initialize clusters after a short delay
+    setTimeout(initClusters, 100)
 
-      console.log('Initializing Leaflet map')
-      console.log('Map container:', container)
-      console.log('Container dimensions:', container.offsetWidth, 'x', container.offsetHeight)
+    const counts = {
+      poles: 0,
+      connections: 0,
+      conductors: 0,
+      mvLines: 0,
+      lvLines: 0,
+      dropLines: 0,
+      transformers: 0,
+      generation: 0
+    }
+    
+    // Calculate total items to render
+    const totalItems = (data.poles?.length || 0) + 
+                      (data.connections?.length || 0) + 
+                      (data.conductors?.length || 0)
+    let renderedItems = 0
+    
+    // Show progress indicator
+    setRenderProgress({ current: 0, total: totalItems })
+
+    const renderBatch = async (
+      items: any[],
+      renderFn: (item: any) => void,
+      batchSize: number
+    ) => {
+      const frameTimeLimit = 8 // Target 8ms per frame for smooth UI
       
-      // Start with a default view, will be updated when data loads
-      const newMap = L.map('map', {
-        center: [-30.078, 27.859],
-        zoom: 13,
-        zoomControl: true
+      for (let i = 0; i < items.length; i += batchSize) {
+        const frameStartTime = performance.now();
+        const batch = items.slice(i, Math.min(i + batchSize, items.length));
+        
+        // Process batch
+        for (const item of batch) {
+          renderFn(item);
+          renderedItems++;
+          
+          // Update progress every 25 items to reduce setState overhead
+          if (renderedItems % 25 === 0 || renderedItems === totalItems) {
+            setRenderProgress({ current: renderedItems, total: totalItems })
+          }
+          
+          // Check if we're exceeding frame time limit
+          if (performance.now() - frameStartTime > frameTimeLimit) {
+            // Immediately yield if we exceed time limit
+            await new Promise(resolve => {
+              setTimeout(resolve, 0);
+            });
+            // Start new frame timing
+            break;
+          }
+        }
+        
+        // Always yield between batches to keep UI responsive
+        await new Promise(resolve => {
+          requestAnimationFrame(() => setTimeout(resolve, 0));
+        });
+      }
+    };
+
+    // Build node map for connections and conductors
+    const nodeMap = new Map<string, [number, number]>()
+    
+    if (data.poles) {
+      data.poles.forEach((pole: any) => {
+        if (pole.lat && pole.lng) {
+          nodeMap.set(pole.id, [pole.lat, pole.lng])
+        }
       })
-      
-      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
+    }
+    
+    if (data.connections) {
+      data.connections.forEach((conn: any) => {
+        if (conn.lat && conn.lng) {
+          nodeMap.set(conn.id, [conn.lat, conn.lng])
+        }
       })
+    }
+
+    // Process connections in batches
+    if (data.connections && layerGroupsRef.current.connections) {
+      await renderBatch(
+        data.connections,
+        (connection: any) => {
+          if (connection.lat && connection.lng) {
+            const baseSize = 8
+            const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
+            const squareIcon = L.divIcon({
+              html: `<div style="background-color: ${color}; opacity: 0.5; width: ${baseSize}px; height: ${baseSize}px;"></div>`,
+              className: 'connection-square-marker',
+              iconSize: [baseSize, baseSize],
+              iconAnchor: [baseSize/2, baseSize/2]
+            })
+            
+            const marker = L.marker([connection.lat, connection.lng], {
+              icon: squareIcon,
+              pane: 'connectionsPane',
+              alt: JSON.stringify(connection)
+            })
+            
+            marker.on('click', () => {
+              setSelectedElement({
+                type: 'connection',
+                id: connection.id,
+                data: connection
+              })
+            })
+            
+            marker.bindPopup(`
+              <div>
+                <strong>Connection: ${connection.name || connection.id}</strong><br/>
+                Status: ${connection.st_code_3 || 0} - ${SC3_DESCRIPTIONS[connection.st_code_3 || 0]}
+              </div>
+            `)
+            
+            connectionMarkers.push({marker, baseSize})
+            bounds.extend([connection.lat, connection.lng])
+            hasValidCoords = true
+            names.add(connection.name || connection.id)
+            counts.connections++
+          }
+        },
+        5 // Batch size for connections
+      );
+    }
+
+    // Process poles in batches
+    if (data.poles && layerGroupsRef.current.poles) {
+      await renderBatch(
+        data.poles,
+        (pole: any) => {
+          if (pole.lat && pole.lng) {
+            const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
+            const circleMarker = L.circleMarker([pole.lat, pole.lng], {
+              radius: 3,
+              fillColor: color,
+              color: '#000',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.5,
+              pane: 'polesPane'
+            })
+            
+            circleMarker.on('click', () => {
+              setSelectedElement({
+                type: 'pole',
+                id: pole.id,
+                data: pole
+              })
+            })
+            
+            circleMarker.bindPopup(`
+              <div>
+                <strong>Pole: ${pole.name || pole.id}</strong><br/>
+                Height: ${pole.height || 'Unknown'}m<br/>
+                Type: ${pole.type || 'Unknown'}<br/>
+                Status: ${pole.st_code_1 || 0} - ${SC1_DESCRIPTIONS[pole.st_code_1 || 0]}
+              </div>
+            `)
+            
+            poleMarkers.push(circleMarker)
+            bounds.extend([pole.lat, pole.lng])
+            hasValidCoords = true
+            names.add(pole.name || pole.id)
+            counts.poles++
+          }
+        },
+        10 // Batch size for poles
+      );
+    }
+
+    // Process conductors in batches
+    const conductorBatches: { [key: string]: L.Polyline[] } = {
+      mv: [],
+      lv: [],
+      drop: []
+    }
+    
+    if (data.conductors) {
+      await renderBatch(
+        data.conductors,
+        (conductor: any) => {
+          const fromCoords = nodeMap.get(conductor.from)
+          const toCoords = nodeMap.get(conductor.to)
+          
+          if (fromCoords && toCoords) {
+            const lineType = getLineType(
+              conductor,
+              data.poles || [],
+              data.connections || []
+            )
+            
+            let layerGroup: L.LayerGroup | undefined
+            let color = '#808080'
+            let pane = 'dropLinesPane'  // Default to drop lines pane
+            
+            switch (lineType) {
+              case 'mv':
+                layerGroup = layerGroupsRef.current.mvLines
+                color = '#0000FF'  // Blue for MV
+                pane = 'mvLinesPane'
+                counts.mvLines++
+                break
+              case 'lv':
+                layerGroup = layerGroupsRef.current.lvLines
+                color = '#00FF00'  // Green for LV
+                pane = 'lvLinesPane'
+                counts.lvLines++
+                break
+              case 'drop':
+                layerGroup = layerGroupsRef.current.dropLines
+                color = '#FFA500'  // Orange for Drop
+                pane = 'dropLinesPane'
+                counts.dropLines++
+                break
+            }
+            
+            if (layerGroup) {
+              const polyline = L.polyline([fromCoords, toCoords], {
+                color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
+                weight: 2,
+                pane: pane,
+                opacity: 1,  // No transparency for lines
+                dashArray: conductor.st_code_4 >= 3 ? undefined : '5, 10'  // Solid for installed (SC4>=3), dashed for planned/in-progress
+              })
+              
+              polyline.on('click', () => {
+                setSelectedElement({
+                  type: 'conductor',
+                  id: conductor.id,
+                  data: { ...conductor, line_type: lineType }
+                })
+              })
+              
+              polyline.bindPopup(`
+                <div>
+                  <strong>${lineType.toUpperCase()} Line: ${conductor.id}</strong><br/>
+                  From: ${conductor.from}<br/>
+                  To: ${conductor.to}<br/>
+                  Length: ${conductor.length ? conductor.length.toFixed(2) + 'm' : 'Unknown'}<br/>
+                  Status: ${conductor.st_code_4 || 0} - ${SC4_DESCRIPTIONS[conductor.st_code_4 || 0]}
+                </div>
+              `)
+              conductorBatches[lineType].push(polyline)
+              names.add(conductor.name || conductor.id)
+              counts.conductors++
+            }
+          }
+        },
+        10 // Smaller batch size for conductors to prevent blocking
+      );
+    }
+
+    // Add markers to cluster groups after all are created
+    setTimeout(() => {
+      if (layerGroupsRef.current.poleCluster && poleMarkers.length > 0) {
+        layerGroupsRef.current.poleCluster.addLayers(poleMarkers)
+      } else if (layerGroupsRef.current.poles && poleMarkers.length > 0) {
+        poleMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.poles!))
+      }
       
-      tileLayer.on('load', () => {
-        console.log('Map tiles loaded successfully')
-      })
+      if (layerGroupsRef.current.connectionCluster && connectionMarkers.length > 0) {
+        layerGroupsRef.current.connectionCluster.addLayers(connectionMarkers.map(item => item.marker))
+      } else if (layerGroupsRef.current.connections && connectionMarkers.length > 0) {
+        connectionMarkers.forEach(({marker}) => marker.addTo(layerGroupsRef.current.connections!))
+      }
       
-      tileLayer.on('tileerror', (error) => {
-        console.error('Tile load error:', error)
-      })
+      const addConductorBatch = (type: string, layerGroup: L.LayerGroup | undefined) => {
+        if (!layerGroup) return
+        const batch = conductorBatches[type]
+        if (batch.length === 0) return
+        
+        const batchSize = 50
+        let index = 0
+        
+        const addBatch = () => {
+          const end = Math.min(index + batchSize, batch.length)
+          for (let i = index; i < end; i++) {
+            batch[i].addTo(layerGroup)
+          }
+          index = end
+          
+          if (index < batch.length) {
+            requestAnimationFrame(addBatch)
+          }
+        }
+        
+        requestAnimationFrame(addBatch)
+      }
       
-      tileLayer.addTo(newMap)
-      console.log('Tile layer added to map')
-      
-      // Force map to recalculate its size
+      addConductorBatch('mv', layerGroupsRef.current.mvLines)
+      addConductorBatch('lv', layerGroupsRef.current.lvLines)
+      addConductorBatch('drop', layerGroupsRef.current.dropLines)
+    }, 100)
+
+    // Clear progress after rendering
+    setTimeout(() => {
+      setRenderProgress(null)
+    }, 500)
+
+    // Center map on data bounds if we have valid coordinates
+    if (hasValidCoords) {
       setTimeout(() => {
-        console.log('Invalidating map size')
-        newMap.invalidateSize()
+        map.fitBounds(bounds, { padding: [50, 50] })
+      }, 200)
+    }
+  }, [map, setSelectedElement, setRenderProgress, editMode]);
+
+  // Initialize map using callback ref
+  const setMapContainer = useCallback((container: HTMLDivElement | null) => {
+    if (!container) {
+      return
+    }
+    
+    // Check for globally persisted map instance (survives StrictMode)
+    const globalMap = typeof window !== 'undefined' ? (window as any).__leafletMapInstance : null
+    if (globalMap) {
+      try {
+        const existingContainer = globalMap.getContainer()
+        // Check if map is still valid and attached to DOM
+        if (existingContainer && document.body.contains(existingContainer)) {
+          if (existingContainer === container) {
+            console.log('Map already initialized for this container')
+            setMap(globalMap)
+            mapInstanceRef.current = globalMap
+            return
+          }
+          // Move map to new container if needed
+          if (existingContainer.parentNode) {
+            console.log('Moving existing map to new container')
+            container.appendChild(existingContainer)
+            globalMap.invalidateSize()
+            setMap(globalMap)
+            mapInstanceRef.current = globalMap
+            return
+          }
+        }
+      } catch (e) {
+        console.log('Existing map instance is invalid, creating new one')
+        // Map instance is invalid, will create new one
+      }
+    }
+    
+    // Check if already initialized
+    if (container.hasAttribute('data-map-initialized')) {
+      console.log('Map container already initialized, skipping')
+      return
+    }
+    
+    mapRef.current = container
+    
+    // Get the parent wrapper to check dimensions
+    const wrapper = container.parentElement
+    if (!wrapper) {
+      console.error('Map container has no parent wrapper!')
+      return
+    }
+    
+    // Ensure wrapper has dimensions
+    if (wrapper.offsetWidth === 0 || wrapper.offsetHeight === 0) {
+      console.log(`Wrapper dimensions: ${wrapper.offsetWidth}x${wrapper.offsetHeight}, retrying...`)
+      setTimeout(() => setMapContainer(container), 100)
+      return
+    }
+    
+    console.log('Initializing map with container:', container)
+    console.log('Container parent (wrapper):', wrapper)
+    console.log('Wrapper dimensions:', wrapper.offsetWidth, 'x', wrapper.offsetHeight)
+    
+    container.setAttribute('data-map-initialized', 'true')
+
+    console.log('Initializing Leaflet map')
+    
+    // Start with a default view, will be updated when data loads
+    const newMap = L.map(container, {
+      center: [-30.078, 27.859],
+      zoom: 13,
+      zoomControl: true,
+      preferCanvas: true,  // Use canvas renderer for better containment
+      renderer: L.canvas({ padding: 0 })  // No padding outside container
+    })
+    
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: ' OpenStreetMap contributors',
+      maxZoom: 19,
+    })
+    
+    tileLayer.on('load', () => {
+      console.log('Map tiles loaded successfully')
+    })
+    
+    tileLayer.on('tileerror', (error) => {
+      console.error('Tile load error:', error)
+    })
+    
+    tileLayer.addTo(newMap)
+    console.log('Tile layer added to map')
+    
+    // Ensure the parent boundary container cannot be modified
+    const boundary = document.getElementById('map-boundary')
+    if (boundary) {
+      // Force the boundary to stay at left: 400px
+      boundary.style.setProperty('position', 'fixed', 'important')
+      boundary.style.setProperty('left', '400px', 'important')
+      boundary.style.setProperty('top', '64px', 'important')
+      boundary.style.setProperty('width', 'calc(100vw - 400px)', 'important')
+      boundary.style.setProperty('height', 'calc(100vh - 64px)', 'important')
+      boundary.style.setProperty('z-index', '5', 'important')
+      boundary.style.setProperty('overflow', 'hidden', 'important')
+      boundary.style.setProperty('clip-path', 'inset(0)', 'important')
+      boundary.style.setProperty('contain', 'strict', 'important')
+      // Remove any problematic properties
+      boundary.style.removeProperty('inset')
+      boundary.style.removeProperty('margin-left')
+      boundary.style.removeProperty('padding-left')
+    }
+    
+    // Fix the initial size issue by invalidating immediately and after delay
+    requestAnimationFrame(() => {
+      if (newMap) {
+        newMap.invalidateSize({ pan: false })
+        const size1 = newMap.getSize()
+        console.log('Map size after first invalidate:', size1.x, 'x', size1.y)
+      }
+    })
+    
+    setTimeout(() => {
+      if (newMap && newMap.getContainer()) {
+        const mapContainer = newMap.getContainer()
+        
+        // Re-enforce boundary positioning
+        const boundary = document.getElementById('map-boundary')
+        if (boundary) {
+          boundary.style.setProperty('left', '400px', 'important')
+        }
+        
+        if (mapContainer) {
+          // Remove any inline positioning styles that Leaflet might have added
+          mapContainer.style.position = 'absolute'
+          mapContainer.style.inset = ''
+          mapContainer.style.top = '0'
+          mapContainer.style.left = '0'
+          mapContainer.style.right = '0'
+          mapContainer.style.bottom = '0'
+          mapContainer.style.width = '100%'
+          mapContainer.style.height = '100%'
+          console.log('Reset map container positioning to absolute')
+        }
+        
+        console.log('Invalidating map size after initialization')
+        newMap.invalidateSize({ pan: false })
         const size = newMap.getSize()
         console.log('Map size after invalidate:', size.x, 'x', size.y)
-      }, 100)
-
-      // Create custom panes for proper layer ordering
-      newMap.createPane('connectionsPane')
-      newMap.createPane('lvPolesPane')
-      newMap.createPane('mvPolesPane')
-      newMap.createPane('dropLinesPane')
-      newMap.createPane('lvLinesPane')
-      newMap.createPane('mvLinesPane')
-      
-      // Set z-index for each pane (higher = on top)
-      newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
-      newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
-      newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
-      newMap.getPane('dropLinesPane')!.style.zIndex = '600'     // Drop lines
-      newMap.getPane('lvLinesPane')!.style.zIndex = '650'       // LV lines (above drop)
-      newMap.getPane('mvLinesPane')!.style.zIndex = '700'       // MV lines (top)
-      
-      // Initialize layer groups
-      layerGroupsRef.current = {
-        connections: L.layerGroup().addTo(newMap),
-        transformers: L.layerGroup().addTo(newMap),   
-        poles: L.layerGroup().addTo(newMap),
-        generation: L.layerGroup().addTo(newMap),
-        dropLines: L.layerGroup().addTo(newMap),
-        lvLines: L.layerGroup().addTo(newMap),
-        mvLines: L.layerGroup().addTo(newMap)
       }
+    }, 200)
 
-      // Add resize observer with proper cleanup
-      const resizeObserver = new ResizeObserver(() => {
-        if (newMap && newMap.getContainer()) {
-          console.log('Container resized, invalidating map size')
-          try {
-            newMap.invalidateSize()
-          } catch (e) {
-            console.warn('Error invalidating map size:', e)
+    // Create custom panes for proper layer ordering
+    newMap.createPane('connectionsPane')
+    newMap.createPane('lvPolesPane')
+    newMap.createPane('mvPolesPane')
+    newMap.createPane('dropLinesPane')
+    newMap.createPane('lvLinesPane')
+    newMap.createPane('mvLinesPane')
+    
+    // Set z-index for each pane (higher = on top)
+    newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
+    newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
+    newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
+    newMap.getPane('dropLinesPane')!.style.zIndex = '600'     // Drop lines
+    newMap.getPane('lvLinesPane')!.style.zIndex = '650'       // LV lines (above drop)
+    newMap.getPane('mvLinesPane')!.style.zIndex = '700'       // MV lines (top)
+    
+    // Initialize layer groups
+    layerGroupsRef.current = {
+      connections: L.layerGroup().addTo(newMap),
+      transformers: L.layerGroup().addTo(newMap),   
+      poles: L.layerGroup().addTo(newMap),
+      generation: L.layerGroup().addTo(newMap),
+      dropLines: L.layerGroup().addTo(newMap),
+      lvLines: L.layerGroup().addTo(newMap),
+      mvLines: L.layerGroup().addTo(newMap)
+    }
+
+    // Add resize observer with proper cleanup
+    const resizeObserver = new ResizeObserver(() => {
+      if (newMap && newMap.getContainer()) {
+        console.log('Container resized, invalidating map size')
+        try {
+          newMap.invalidateSize()
+        } catch (e) {
+          console.warn('Error invalidating map size:', e)
+        }
+      }
+    })
+    resizeObserver.observe(container)
+    
+    // Mark container as having resize observer
+    container.setAttribute('data-resize-observer', 'true')
+    
+    // Add click handler for editing
+    newMap.on('click', handleMapClick)
+    
+    // Store reference for cleanup
+    console.log('Setting map state with newMap instance')
+    setMap(newMap)
+    resizeObserverRef.current = resizeObserver
+    
+    // Store in window for debugging and persistence
+    if (typeof window !== 'undefined') {
+      (window as any).__leafletMapInstance = newMap
+      console.log('Map stored in window.__leafletMapInstance for debugging and persistence')
+    }
+  }, [handleMapClick, setMap])
+
+  // Skip cleanup in development to avoid destroying map on hot reload/StrictMode
+  useEffect(() => {
+    return () => {
+      // In development, React StrictMode causes double mounting
+      // Skip cleanup to preserve map instance
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Skipping map cleanup in development')
+        return
+      }
+      
+      // Only clean up in production
+      const mapInstance = typeof window !== 'undefined' ? (window as any).__leafletMap : null
+      if (mapInstance) {
+        console.log('Cleaning up map on unmount')
+        if ((mapInstance as any)._wrapperObserver) {
+          (mapInstance as any)._wrapperObserver.disconnect()
+        }
+        try {
+          mapInstance.remove()
+        } catch (e) {
+          console.warn('Error removing map:', e)
+        }
+      }
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect()
+      }
+    }
+  }, [])
+
+  // Create a MutationObserver to watch for style changes on wrapper and boundary
+  React.useEffect(() => {
+    if (!map) return
+
+    const wrapper = document.getElementById('map-wrapper')
+    const boundary = document.getElementById('map-boundary')
+    if (!wrapper || !boundary) return
+
+    const enforceBoundaryStyles = () => {
+      // Force boundary to stay at left: 400px
+      boundary.style.setProperty('position', 'fixed', 'important')
+      boundary.style.setProperty('left', '400px', 'important')
+      boundary.style.setProperty('top', '64px', 'important')
+      boundary.style.setProperty('right', 'auto', 'important')
+      boundary.style.setProperty('width', 'calc(100vw - 400px)', 'important')
+      boundary.style.setProperty('height', 'calc(100vh - 64px)', 'important')
+      boundary.style.setProperty('z-index', '5', 'important')
+      boundary.style.setProperty('overflow', 'hidden', 'important')
+      boundary.style.setProperty('clip-path', 'inset(0)', 'important')
+      boundary.style.setProperty('contain', 'strict', 'important')
+      // Remove any problematic properties
+      boundary.style.removeProperty('inset')
+      boundary.style.removeProperty('margin')
+      boundary.style.removeProperty('padding')
+      boundary.style.removeProperty('transform')
+    }
+
+    const enforceWrapperStyles = () => {
+      wrapper.style.setProperty('position', 'relative', 'important')
+      wrapper.style.setProperty('width', '100%', 'important')
+      wrapper.style.setProperty('height', '100%', 'important')
+      wrapper.style.setProperty('overflow', 'hidden', 'important')
+      wrapper.style.setProperty('background-color', '#f3f4f6', 'important')
+    }
+
+    // Create observer to watch for style changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          if (mutation.target === boundary) {
+            enforceBoundaryStyles()
+          } else if (mutation.target === wrapper) {
+            enforceWrapperStyles()
           }
         }
       })
-      resizeObserver.observe(container)
-      
-      // Mark container as having resize observer
-      container.setAttribute('data-resize-observer', 'true')
-      
-      // Add click handler for editing
-      newMap.on('click', handleMapClick)
-      
-      // Store reference for cleanup
-      mapRef.current = newMap
-      resizeObserverRef.current = resizeObserver
-      
-      setMap(newMap)
-    }
-    
-    // Start initialization
-    const timer = setTimeout(initMap, 100)
+    })
 
+    // Start observing both elements
+    observer.observe(wrapper, {
+      attributes: true,
+      attributeFilter: ['style']
+    })
+    observer.observe(boundary, {
+      attributes: true,
+      attributeFilter: ['style']
+    })
+
+    // Enforce initially and repeatedly
+    enforceBoundaryStyles()
+    enforceWrapperStyles()
+    
+    // Enforce periodically to counter any overrides
+    const interval = setInterval(() => {
+      enforceBoundaryStyles()
+      enforceWrapperStyles()
+    }, 500)
+
+    // Store observer reference for cleanup
+    ;(map as any)._boundaryObserver = observer
+    ;(map as any)._boundaryInterval = interval
+
+    // Cleanup
     return () => {
-      clearTimeout(timer)
+      observer.disconnect()
+      clearInterval(interval)
     }
-  }, [])  // Empty dependency array - only run once
+  }, [map])
 
   // Show pending location markers
   useEffect(() => {
@@ -379,24 +981,9 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     }
   }, [map, pendingPoleLocation, pendingConnectionLocation])
 
-  // Clean up map on unmount
-  useEffect(() => {
-    return () => {
-      console.log('Cleaning up map on unmount')
-      if (mapRef.current) {
-        try {
-          mapRef.current.remove()
-          mapRef.current = null
-        } catch (e) {
-          console.warn('Error removing map:', e)
-        }
-      }
-      if (resizeObserverRef.current && typeof window !== 'undefined') {
-        resizeObserverRef.current.disconnect()
-        resizeObserverRef.current = null
-      }
-    }
-  }, [])
+  // Map initialization is handled by the main useEffect above
+
+  // Clean up map on unmount - removed duplicate cleanup that was destroying the map
 
   // Update layer visibility
   useEffect(() => {
@@ -432,388 +1019,22 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     return minScale + (scaleRange * zoomProgress)
   }
 
-  // Render network data
+  // Render  // Log map state changes
   useEffect(() => {
-    console.log('Network data effect - map:', !!map, 'networkData:', networkData)
+    console.log('Map state changed to:', map ? 'Map instance exists' : 'null')
+  }, [map])
+
+  // Network data effect - just call updateNetworkData
+  useEffect(() => {
+    console.log('Network data effect - map:', !!map, 'networkData:', !!networkData)
     if (!map || !networkData) {
-      console.log('Cannot render: map=', !!map, 'networkData=', !!networkData, 'data keys:', networkData ? Object.keys(networkData) : 'none')
+      console.log(`Cannot render: map= ${!!map} networkData= ${!!networkData} data keys: ${networkData ? Object.keys(networkData) : 'none'}`)
       return
     }
 
-    const data = networkData
-    console.log('Rendering network data on map:', {
-      poles: data.poles?.length || 0,
-      connections: data.connections?.length || 0,
-      conductors: data.conductors?.length || 0,
-      transformers: data.transformers?.length || 0
-    })
-
-    if (!map || !data || !layerGroupsRef.current) return
-
-    console.log('Updating network data on map', { 
-      map: !!map, 
-      data: !!data,
-      layerGroups: !!layerGroupsRef.current
-    })
-
-    // Clear existing layers
-    Object.values(layerGroupsRef.current).forEach(group => {
-      if (group) group.clearLayers()
-    })
-
-    const bounds = L.latLngBounds([])
-    let hasValidCoords = false
-    const names = new Set<string>()
-
-    // Store references to markers for zoom updates
-    const connectionMarkers: Array<{marker: L.Marker, baseSize: number}> = []
-    const poleMarkers: L.CircleMarker[] = []
-
-    const counts = {
-      poles: 0,
-      connections: 0,
-      conductors: data.conductors?.length || 0,
-      mvLines: 0,
-      lvLines: 0,
-      dropLines: 0,
-      transformers: data.transformers?.length || 0,
-      generation: data.generation?.length || 0
-    }
-
-    // Add connections
-    if (data.connections && layerGroupsRef.current.connections) {
-      const currentZoom = map.getZoom()
-      const scale = getZoomScale(currentZoom)
-      
-      data.connections.forEach((connection: any) => {
-        if (connection.lat && connection.lng) {
-          bounds.extend([connection.lat, connection.lng])
-          hasValidCoords = true
-          const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
-          // Create square icon for connections
-          const squareSize = Math.round(12 * scale) // Base size 12px, scaled
-          const squareIcon = L.divIcon({
-            html: `<div style="background-color: ${color}; opacity: 0.5; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
-            className: 'connection-square-marker',
-            iconSize: [squareSize, squareSize],
-            iconAnchor: [squareSize/2, squareSize/2]
-          })
-          
-          const marker = L.marker([connection.lat, connection.lng], { 
-            icon: squareIcon,
-            pane: 'connectionsPane',
-            alt: JSON.stringify(connection) // Store connection data for zoom updates
-          })
-          
-          marker.on('click', () => {
-            setSelectedElement({
-              type: 'connection',
-              id: connection.id,
-              data: connection
-            })
-          })
-          
-          marker.bindPopup(`
-            <div>
-              <strong>Connection: ${connection.name || connection.id}</strong><br/>
-              Status: ${connection.st_code_3 || 0} - ${SC3_DESCRIPTIONS[connection.st_code_3 || 0]}<br/>
-              Coords: ${connection.lat.toFixed(6)}, ${connection.lng.toFixed(6)}
-            </div>
-          `)
-          if (layerGroupsRef.current.connections) {
-            marker.addTo(layerGroupsRef.current.connections)
-            connectionMarkers.push({marker, baseSize: 12})
-          }
-          
-          names.add(connection.name || connection.id)
-          counts.connections++
-        }
-      })
-    }
-
-    // Add poles
-    if (data.poles && layerGroupsRef.current.poles) {
-      const currentZoom = map.getZoom()
-      const scale = getZoomScale(currentZoom)
-      
-      data.poles.forEach((pole: any) => {
-        if (pole.lat && pole.lng) {
-          bounds.extend([pole.lat, pole.lng])
-          hasValidCoords = true
-          const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
-          // MV poles have "_M" in their ID and keep borders
-          const isMVPole = pole.id && pole.id.includes('_M')
-          const marker = L.circleMarker([pole.lat, pole.lng], {
-            radius: 8 * scale,  // Base size 8, scaled by zoom
-            fillColor: color,
-            color: isMVPole ? '#000' : color,  // MV poles get black border, LV poles borderless
-            weight: isMVPole ? 2 : 0,
-            opacity: 1,
-            fillOpacity: 0.5,  // 50% transparency
-            pane: isMVPole ? 'mvPolesPane' : 'lvPolesPane'  // MV poles render above LV poles
-          })
-          
-          marker.on('click', () => {
-            setSelectedElement({
-              type: 'pole',
-              id: pole.id,
-              data: pole
-            })
-          })
-          
-          marker.bindPopup(`
-            <div>
-              <strong>Pole: ${pole.name || pole.id}</strong><br/>
-              Class: ${pole.pole_class || 'Unknown'}<br/>
-              Type: ${pole.pole_type || 'Unknown'}<br/>
-              Status: ${pole.st_code_1 || 0} - ${SC1_DESCRIPTIONS[pole.st_code_1 || 0]}<br/>
-              Coords: ${pole.lat.toFixed(6)}, ${pole.lng.toFixed(6)}
-            </div>
-          `)
-          if (layerGroupsRef.current.poles) {
-            marker.addTo(layerGroupsRef.current.poles)
-            poleMarkers.push(marker)
-          }
-          
-          names.add(pole.name || pole.id)
-          counts.poles++
-        }
-      })
-    }
-
-    // Add conductors
-    if (data.conductors) {
-      // Create node lookup maps
-      const nodeMap = new Map<string, [number, number]>()
-      
-      data.poles?.forEach((pole: any) => {
-        if (pole.lat && pole.lng) {
-          nodeMap.set(pole.id, [pole.lat, pole.lng])
-        }
-      })
-      
-      data.connections?.forEach((conn: any) => {
-        if (conn.lat && conn.lng) {
-          nodeMap.set(conn.id, [conn.lat, conn.lng])
-        }
-      })
-
-      data.conductors.forEach((conductor: any) => {
-        const fromCoords = nodeMap.get(conductor.from)
-        const toCoords = nodeMap.get(conductor.to)
-        
-        if (fromCoords && toCoords) {
-          const lineType = getLineType(
-            conductor,
-            data.poles || [],
-            data.connections || []
-          )
-          
-          let layerGroup: L.LayerGroup | undefined
-          let color = '#808080'
-          let pane = 'dropLinesPane'  // Default to drop lines pane
-          
-          switch (lineType) {
-            case 'mv':
-              layerGroup = layerGroupsRef.current.mvLines
-              color = '#0000FF'  // Blue for MV
-              pane = 'mvLinesPane'
-              counts.mvLines++
-              break
-            case 'lv':
-              layerGroup = layerGroupsRef.current.lvLines
-              color = '#00FF00'  // Green for LV
-              pane = 'lvLinesPane'
-              counts.lvLines++
-              break
-            case 'drop':
-              layerGroup = layerGroupsRef.current.dropLines
-              color = '#FFA500'  // Orange for Drop
-              pane = 'dropLinesPane'
-              counts.dropLines++
-              break
-          }
-          
-          if (layerGroup) {
-            const polyline = L.polyline([fromCoords, toCoords], {
-              color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
-              weight: 2,
-              pane: pane,
-              opacity: 1,  // No transparency for lines
-              dashArray: conductor.st_code_4 >= 3 ? undefined : '5, 10'  // Solid for installed (SC4>=3), dashed for planned/in-progress
-            })
-            
-            polyline.on('click', () => {
-              if (editMode === 'split-conductor') {
-                // Show split dialog for this conductor
-                setSelectedElement({
-                  type: 'conductor',
-                  id: conductor.id,
-                  data: { ...conductor, line_type: lineType }
-                })
-                // The MapEditToolbar will handle showing the split dialog
-              } else {
-                setSelectedElement({
-                  type: 'conductor',
-                  id: conductor.id,
-                  data: { ...conductor, line_type: lineType }
-                })
-              }
-            })
-            
-            polyline.bindPopup(`
-              <div>
-                <strong>${lineType.toUpperCase()} Line: ${conductor.id}</strong><br/>
-                From: ${conductor.from}<br/>
-                To: ${conductor.to}<br/>
-                Length: ${conductor.length ? conductor.length.toFixed(2) + 'm' : 'Unknown'}<br/>
-                Status: ${conductor.st_code_4 || 0} - ${SC4_DESCRIPTIONS[conductor.st_code_4 || 0]}
-              </div>
-            `)
-            polyline.addTo(layerGroup)
-            
-            names.add(conductor.name || conductor.id)
-          }
-        }
-      })
-    }
-
-    // Add transformers
-    if (data.transformers && layerGroupsRef.current.transformers) {
-      data.transformers.forEach((transformer: any) => {
-        if (transformer.lat && transformer.lng) {
-          const marker = L.marker([transformer.lat, transformer.lng])
-          
-          marker.on('click', () => {
-            setSelectedElement({
-              type: 'transformer',
-              id: transformer.id,
-              data: transformer
-            })
-          })
-          
-          marker.bindPopup(`Transformer: ${transformer.name || transformer.id}`)
-          if (layerGroupsRef.current.transformers) {
-            marker.addTo(layerGroupsRef.current.transformers)
-          }
-          
-          names.add(transformer.name || transformer.id)
-          counts.transformers++
-        }
-      })
-    }
-
-    // Add generation sites (substations)
-    if (data.generation && layerGroupsRef.current.generation) {
-      console.log('Processing generation sites:', data.generation)
-      data.generation.forEach((gen: any) => {
-        if (gen.lat && gen.lng) {
-          console.log('Adding generation marker at:', gen.lat, gen.lng, gen)
-          // Create a distinctive icon for generation/substation
-          const genIcon = L.divIcon({
-            className: 'generation-icon',
-            html: `<div style="
-              width: 24px;
-              height: 24px;
-              background: linear-gradient(135deg, #f59e0b, #dc2626);
-              border: 3px solid white;
-              border-radius: 50%;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "><svg style="width: 14px; height: 14px; fill: white;" viewBox="0 0 24 24">
-              <path d="M11 2v9.4l-6.4-6.4-1.4 1.4L11 14.2V22h2v-7.8l7.8-7.8L19.4 5 13 11.4V2z"/>
-            </svg></div>`,
-            iconSize: [24, 24],
-            iconAnchor: [12, 12],
-            popupAnchor: [0, -12]
-          })
-          
-          const marker = L.marker([gen.lat, gen.lng], { icon: genIcon })
-          
-          marker.on('click', () => {
-            setSelectedElement({
-              type: 'generation',
-              id: gen.id,
-              data: gen
-            })
-          })
-          
-          marker.bindPopup(`
-            <div>
-              <strong>${gen.name || 'Generation Site'}</strong><br/>
-              Type: ${gen.type || 'Substation'}<br/>
-              Pole: ${gen.pole_id}<br/>
-              Capacity: ${gen.capacity || 'Unknown'}
-            </div>
-          `)
-          
-          if (layerGroupsRef.current.generation) {
-            marker.addTo(layerGroupsRef.current.generation)
-          }
-          
-          names.add(gen.name || gen.id)
-          counts.generation++
-        }
-      })
-    }
-
-    setElementNames(names)
-    setElementCounts(counts)
-    
-    // Center map on data bounds if we have valid coordinates
-    if (hasValidCoords && bounds.isValid()) {
-      console.log('Centering map on data bounds:', bounds)
-      map.fitBounds(bounds, {
-        padding: [50, 50],  // Add padding around the bounds
-        maxZoom: 15  // Don't zoom in too far
-      })
-    }
-    
-    // Enforce fixed positioning after network data update
-    const mapContainer = document.getElementById('map-container')
-    if (mapContainer) {
-      mapContainer.style.position = 'fixed'
-      mapContainer.style.top = '64px'
-      mapContainer.style.left = '256px'
-      mapContainer.style.right = '0'
-      mapContainer.style.bottom = '0'
-      mapContainer.style.zIndex = '1'
-    }
-
-    // Add zoom event listener to update marker sizes
-    const onZoomEnd = () => {
-      const currentZoom = map.getZoom()
-      const scale = getZoomScale(currentZoom)
-      
-      // Update connection marker sizes (recreate icons)
-      connectionMarkers.forEach(({marker, baseSize}) => {
-        const squareSize = Math.round(baseSize * scale)
-        const connection = marker.options.alt ? JSON.parse(marker.options.alt) : null
-        const color = SC3_COLORS[connection?.st_code_3 || 0] || '#808080'
-        const newIcon = L.divIcon({
-          html: `<div style="background-color: ${color}; opacity: 0.5; width: ${squareSize}px; height: ${squareSize}px;"></div>`,
-          className: 'connection-square-marker',
-          iconSize: [squareSize, squareSize],
-          iconAnchor: [squareSize/2, squareSize/2]
-        })
-        marker.setIcon(newIcon)
-      })
-      
-      // Update pole marker sizes
-      poleMarkers.forEach(marker => {
-        marker.setRadius(8 * scale)
-      })
-    }
-
-    map.on('zoomend', onZoomEnd)
-
-    // Cleanup
-    return () => {
-      map.off('zoomend', onZoomEnd)
-    }
-  }, [map, networkData, layerGroupsRef])
+    // Call the async updateNetworkData function
+    updateNetworkData(networkData)
+  }, [map, networkData, updateNetworkData])
 
   if (loading) {
     return (
@@ -828,10 +1049,51 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
   return (
     <>
+      {/* Loading indicator */}
+      {renderProgress && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 9999,
+          background: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+            Loading network data...
+          </div>
+          <div style={{
+            width: '200px',
+            height: '4px',
+            background: '#e5e7eb',
+            borderRadius: '2px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${(renderProgress.current / renderProgress.total) * 100}%`,
+              height: '100%',
+              background: '#3b82f6',
+              transition: 'width 0.3s ease'
+            }} />
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '12px', color: '#6b7280' }}>
+            {renderProgress.current} / {renderProgress.total} elements
+          </div>
+        </div>
+      )}
+      
+      {/* Simple map container */}
       <div 
         id="map" 
+        ref={setMapContainer}
         className="map-container"
-      />
+        style={{
+          width: '100%',
+          height: '100%'
+        }} />
       <MapEditToolbar 
         site={site}
         editMode={editMode}

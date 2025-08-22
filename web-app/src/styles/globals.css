@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Grid Layout System */
+.grid-layout {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.sidebar-zone {
+  grid-column: 1;
+  height: 100%;
+  overflow-y: auto;
+  background: white;
+}
+
+.content-zone {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.header-bar {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes pulse-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
 /* Pulse animation for pending markers */
 @keyframes pulse {
   0% {
@@ -15,25 +65,21 @@
   }
 }
 
-/* Map container positioning - Force fixed positioning */
-#map, .map-container, div#map.map-container {
-  position: fixed !important;
-  top: 64px !important;
-  left: 256px !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  z-index: 10 !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: calc(100vw - 256px) !important;
-  max-height: calc(100vh - 64px) !important;
-  overflow: hidden !important;
+/* Leaflet container and controls */
+.leaflet-container {
+  font-family: inherit;
+  width: 100%;
+  height: 100%;
 }
 
-/* Leaflet map fixes */
-.leaflet-container {
-  height: 100%;
+.leaflet-control-container {
+  z-index: 800;
+}
+
+/* Simple map container */
+#map {
   width: 100%;
+  height: 100%;
 }
 
 .leaflet-tile-container img {
@@ -123,15 +169,62 @@ svg .connection-marker-square {
   }
 }
 
-/* Leaflet map container fix */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+/* Marker cluster styles */
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
 }
 
-/* Map container specific */
-#map {
-  width: 100%;
-  height: 100%;
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+  font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.marker-cluster span {
+  line-height: 30px;
+  color: white;
+  font-weight: bold;
+}
+
+.marker-cluster-small {
+  background-color: rgba(181, 226, 140, 0.6);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(110, 204, 57, 0.6);
+}
+
+.marker-cluster-medium {
+  background-color: rgba(241, 211, 87, 0.6);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(240, 194, 12, 0.6);
+}
+
+.marker-cluster-large {
+  background-color: rgba(253, 156, 115, 0.6);
+}
+
+.marker-cluster-large div {
+  background-color: rgba(241, 128, 23, 0.6);
+}
+
+/* Custom pole marker icon */
+.pole-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+/* Map edit toolbar positioning */
+.map-edit-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 60px; /* Offset to avoid zoom controls */
+  z-index: 1000;
 }

@@ -49,6 +49,11 @@ class AuthService {
     if (typeof window !== 'undefined') {
       this.accessToken = localStorage.getItem('access_token');
       this.refreshToken = localStorage.getItem('refresh_token');
+      console.log('AuthService - Loaded tokens:', {
+        hasAccessToken: !!this.accessToken,
+        hasRefreshToken: !!this.refreshToken,
+        accessTokenPreview: this.accessToken ? this.accessToken.substring(0, 20) + '...' : null
+      });
       this.setupTokenRefresh();
     }
   }
@@ -111,9 +116,11 @@ class AuthService {
    */
   async getCurrentUser(): Promise<User> {
     if (!this.accessToken) {
+      console.log('getCurrentUser - No access token');
       throw new Error('Not authenticated');
     }
 
+    console.log('getCurrentUser - Fetching with token:', this.accessToken.substring(0, 20) + '...');
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       headers: {
         'Authorization': `Bearer ${this.accessToken}`,

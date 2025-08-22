@@ -69,7 +69,14 @@ app = FastAPI(title="1PWR Grid Platform API", version="0.1.0")
 # Configure CORS for Next.js frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:3003",
+        "http://localhost:3004",
+        "http://localhost:3005"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -77,6 +84,62 @@ app.add_middleware(
 
 # In-memory storage for voltage data (network storage imported from storage.py)
 voltage_storage: Dict[str, Any] = {}
+
+# Load KET data on startup
+def load_ket_data_on_startup():
+    """Load KET data from JSON file into network storage"""
+    try:
+        import json
+        data_file = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'kml_validation_output',
+            'KET_fixed_data.json'
+        )
+        
+        if os.path.exists(data_file):
+            print(f"Loading KET data from: {data_file}")
+            with open(data_file, 'r') as f:
+                raw_data = json.load(f)
+            
+            # Convert the structure to match what the backend expects
+            network_data = {
+                'poles': raw_data.get('poles', {}).get('list', []),
+                'conductors': raw_data.get('conductors', {}).get('list', []),
+                'connections': raw_data.get('connections', {}).get('list', []),
+                'transformers': raw_data.get('transformers', {}).get('list', []),
+                'generation': []
+            }
+            
+            # Fix field names for compatibility
+            for pole in network_data['poles']:
+                if 'gps_lat' in pole:
+                    pole['latitude'] = pole['gps_lat']
+                if 'gps_lng' in pole:
+                    pole['longitude'] = pole['gps_lng']
+            
+            for connection in network_data['connections']:
+                if 'gps_lat' in connection:
+                    connection['latitude'] = connection['gps_lat']
+                if 'gps_lng' in connection:
+                    connection['longitude'] = connection['gps_lng']
+            
+            # Store in network storage
+            network_storage['KET'] = network_data
+            
+            print(f"Loaded KET network data:")
+            print(f"  - Poles: {len(network_data['poles'])}")
+            print(f"  - Conductors: {len(network_data['conductors'])}")
+            print(f"  - Connections: {len(network_data['connections'])}")
+            print(f"  - Transformers: {len(network_data['transformers'])}")
+        else:
+            print(f"KET data file not found: {data_file}")
+    except Exception as e:
+        print(f"Error loading KET data: {e}")
+        import traceback
+        traceback.print_exc()
+
+# Load KET data on startup
+load_ket_data_on_startup()
 
 class NetworkRequest(BaseModel):
     """Request model for network operations"""
