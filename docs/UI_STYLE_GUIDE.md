@@ -51,39 +51,54 @@ web-app/src/
 --primary-hover: #1d4ed8;  /* Blue 700 - Hover state */
 --secondary: #64748b;      /* Slate 500 - Secondary elements */
 --accent: #10b981;         /* Emerald 500 - Success/positive */
---danger: #ef4444;         /* Red 500 - Errors/destructive */
---warning: #f59e0b;        /* Amber 500 - Warnings */
+--danger: #FF0000;         /* Red - Errors/destructive */
+--warning: #FFFF00;        /* Yellow - Warnings */
 ```
 
 #### Network Element Status Colors (per MIGRATION_STATUS.md)
 ```typescript
-// Status Code 1 (Poles)
+// Status Code 1 (Poles) - Circle markers with 50% fill opacity
 export const SC1_COLORS = {
-  0: '#22c55e', // Green - Standard
-  1: '#eab308', // Yellow - Non-standard
-  2: '#ef4444', // Red - Critical
-  3: '#6b7280'  // Gray - Unknown
+  0: '#808080',   // Gray - Unknown/Undefined
+  1: '#0000FF',   // Blue - Active/Existing
+  2: '#00FF00',   // Green - Planned
+  3: '#FFFF00',   // Yellow - Under Construction
+  4: '#FF0000',   // Red - Faulty/Needs Attention
+  5: '#800080'    // Purple - Decommissioned
 }
 
-// Status Code 3 (Connections)  
+// Status Code 3 (Connections/Junction Boxes) - Square markers with 50% fill opacity
 export const SC3_COLORS = {
-  0: '#22c55e', // Green - Operational
-  1: '#3b82f6', // Blue - Planned
-  2: '#ef4444', // Red - Damaged
-  3: '#6b7280'  // Gray - Unknown
+  0: '#808080',   // Gray - Unknown/Undefined
+  1: '#0000FF',   // Blue - Active/Connected
+  2: '#00FF00',   // Green - Planned
+  3: '#FFFF00',   // Yellow - Under Construction
+  4: '#FF0000',   // Red - Faulty/Needs Attention
+  5: '#800080'    // Purple - Decommissioned
 }
 
-// Status Code 4 (Conductors)
+// Status Code 4 (Conductors/Cables) - Lines (no fill)
 export const SC4_COLORS = {
-  0: '#22c55e', // Green - Good condition
-  1: '#eab308', // Yellow - Maintenance needed
-  2: '#ef4444', // Red - Replace
-  3: '#6b7280'  // Gray - Unknown
+  0: '#808080',   // Gray - Not Specified
+  1: '#FFA500',   // Orange - Planned (dashed line)
+  2: '#FFFF00',   // Yellow - Installation in Progress (dashed line)
+  3: '#00FF00',   // Green - Installed (solid line)
+  4: '#0000FF',   // Blue - Energized
+  5: '#FF0000',   // Red - Faulty
+  6: '#800080'    // Purple - Decommissioned
 }
 
-// Conductor Line Styles
-// Status < 3: Dashed lines (5px dash, 10px gap) - Planned/In-progress
-// Status >= 3: Solid lines - Installed/Operational
+// Element Sizes
+export const ELEMENT_SIZES = {
+  pole: {
+    radius: 6,        // Circle radius in pixels
+    fillOpacity: 0.5  // 50% transparency
+  },
+  connection: {
+    width: 8,         // Square width/height in pixels
+    opacity: 0.5      // 50% transparency
+  }
+}
 ```
 
 ### Typography

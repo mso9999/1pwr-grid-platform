@@ -229,7 +229,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     const names = new Set<string>()
 
     // Store references to markers for zoom updates
-    const connectionMarkers: Array<{marker: L.Marker, baseSize: number}> = []
+    const connectionMarkers: L.CircleMarker[] = []
     const poleMarkers: L.CircleMarker[] = []
     
     // Defer cluster initialization to avoid blocking
@@ -387,24 +387,23 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     }
 
     // Process connections in batches
+    console.log('Processing connections:', data.connections?.length || 0)
     if (data.connections && layerGroupsRef.current.connections) {
       await renderBatch(
         data.connections,
         (connection: any) => {
           if (connection.lat && connection.lng) {
-            const baseSize = 8
             const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
-            const squareIcon = L.divIcon({
-              html: `<div style="background-color: ${color}; opacity: 0.5; width: ${baseSize}px; height: ${baseSize}px;"></div>`,
-              className: 'connection-square-marker',
-              iconSize: [baseSize, baseSize],
-              iconAnchor: [baseSize/2, baseSize/2]
-            })
             
-            const marker = L.marker([connection.lat, connection.lng], {
-              icon: squareIcon,
-              pane: 'connectionsPane',
-              alt: JSON.stringify(connection)
+            // Create square-shaped circle marker for connections
+            const marker = L.circleMarker([connection.lat, connection.lng], {
+              radius: 5,  // Square-like appearance with smaller radius
+              fillColor: color,
+              color: '#000',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.5,  // 50% transparent fill
+              pane: 'connectionsPane'
             })
             
             marker.on('click', () => {
@@ -422,7 +421,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
               </div>
             `)
             
-            connectionMarkers.push({marker, baseSize})
+            connectionMarkers.push(marker)
             bounds.extend([connection.lat, connection.lng])
             hasValidCoords = true
             names.add(connection.name || connection.id)
@@ -445,12 +444,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
             const polePane = pole.type === 'MV' ? 'mvPolesPane' : 'lvPolesPane'
             
             const circleMarker = L.circleMarker([pole.lat, pole.lng], {
-              radius: 3,
+              radius: 6,  // Increased from 3 to 6 for better visibility
               fillColor: color,
               color: '#000',
               weight: 1,
               opacity: 1,
-              fillOpacity: 0.5,
+              fillOpacity: 0.5,  // 50% transparent fill
               pane: polePane
             })
             
@@ -579,10 +578,11 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         poleMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.poles!))
       }
       
+      console.log('Adding connection markers to map:', connectionMarkers.length)
       if (layerGroupsRef.current.connectionCluster && connectionMarkers.length > 0) {
-        layerGroupsRef.current.connectionCluster.addLayers(connectionMarkers.map(item => item.marker))
+        layerGroupsRef.current.connectionCluster.addLayers(connectionMarkers)
       } else if (layerGroupsRef.current.connections && connectionMarkers.length > 0) {
-        connectionMarkers.forEach(({marker}) => marker.addTo(layerGroupsRef.current.connections!))
+        connectionMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.connections!))
       }
       
       const addConductorBatch = (type: string, layerGroup: L.LayerGroup | undefined) => {
@@ -608,6 +608,11 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         requestAnimationFrame(addBatch)
       }
       
+      console.log('Conductor batches:', {
+        mv: conductorBatches.mv.length,
+        lv: conductorBatches.lv.length,
+        drop: conductorBatches.drop.length
+      })
       addConductorBatch('mv', layerGroupsRef.current.mvLines)
       addConductorBatch('lv', layerGroupsRef.current.lvLines)
       addConductorBatch('drop', layerGroupsRef.current.dropLines)
