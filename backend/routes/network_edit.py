@@ -21,7 +21,7 @@ class PoleCreate(BaseModel):
     pole_class: str = "LV"
     st_code_1: int = 0
     st_code_2: int = 0
-    angle_class: str = "T"
+    angle_class: str = "0-15"
     notes: Optional[str] = None
 
 class PoleUpdate(BaseModel):
@@ -229,11 +229,11 @@ async def delete_connection(site: str, connection_id: str):
         connections = network_storage[site].get("connections", [])
         
         # Find and remove connection
-        connection_index = next((i for i, c in enumerate(connections) if c.get("connection_id") == connection_id or c.get("pole_id") == connection_id), None)
-        if connection_index is None:
+        connection_to_delete = next((c for c in connections if c["connection_id"] == connection_id), None)
+        if connection_to_delete is None:
             raise HTTPException(status_code=404, detail=f"Connection {connection_id} not found")
         
-        deleted_connection = connections.pop(connection_index)
+        deleted_connection = connections.remove(connection_to_delete)
         
         return JSONResponse(content={
             "success": True,

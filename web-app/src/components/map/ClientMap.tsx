@@ -88,6 +88,16 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
   const [editingElement, setEditingElement] = useState<ElementDetail | null>(null)
   const [showVoltageOverlay, setShowVoltageOverlay] = useState(false)
   const [editMode, setEditMode] = useState<EditMode>('select')
+  const editModeRef = useRef<EditMode>('select')
+  useEffect(() => {
+    editModeRef.current = editMode
+  }, [editMode])
+  const changeEditMode = useCallback((mode: EditMode) => {
+    // Update ref synchronously to avoid stale mode in map click handler
+    editModeRef.current = mode
+    setEditMode(mode)
+    console.log('Edit mode changed:', mode)
+  }, [])
   const [pendingPoleLocation, setPendingPoleLocation] = useState<{lat: number, lng: number} | null>(null)
   const [pendingConnectionLocation, setPendingConnectionLocation] = useState<{lat: number, lng: number} | null>(null)
   const [showSearchPanel, setShowSearchPanel] = useState(false)
@@ -126,34 +136,39 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     transformers?: L.LayerGroup
   }>({})
 
+  const nodeMapRef = useRef(new Map<string, [number, number]>());
+  const elementLayerRef = useRef(new Map<string, L.Layer>());
+
   const site = networkData?.site || 'UGRIDPLAN'
 
   // Handle map clicks for editing
   const handleMapClick = useCallback((e: L.LeafletMouseEvent) => {
-    if (editMode === 'add-pole') {
+    const mode = editModeRef.current
+    console.log('Leaflet map click', { mode, lat: e.latlng.lat, lng: e.latlng.lng })
+    if (mode === 'add-pole') {
       setPendingPoleLocation({
         lat: e.latlng.lat,
         lng: e.latlng.lng
-      });
-    } else if (editMode === 'add-connection') {
+      })
+    } else if (mode === 'add-connection') {
       setPendingConnectionLocation({
         lat: e.latlng.lat,
         lng: e.latlng.lng
-      });
+      })
     }
-  }, [editMode]);
+  }, [setPendingPoleLocation, setPendingConnectionLocation]);
 
   // Handle pole creation completion
   const handlePoleCreated = useCallback(() => {
     setPendingPoleLocation(null);
-    setEditMode('select');
-  }, []);
+    changeEditMode('select');
+  }, [changeEditMode]);
 
   // Handle connection creation completion
   const handleConnectionCreated = useCallback(() => {
     setPendingConnectionLocation(null);
-    setEditMode('select');
-  }, []);
+    changeEditMode('select');
+  }, [changeEditMode]);
 
   const handleElementUpdate = useCallback(async (id: string, updates: any): Promise<boolean> => {
     // Update the local element data
@@ -183,13 +198,20 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       }
     }
     
-    // Refresh the map
+    // Call the parent callback if provided
     if (onElementUpdate) {
       onElementUpdate()
     }
     
     return true
   }, [networkData, onElementUpdate])
+
+  // Wrapper for callbacks that don't need parameters
+  const handleElementUpdateCallback = useCallback(() => {
+    if (onElementUpdate) {
+      onElementUpdate()
+    }
+  }, [onElementUpdate])
 
   const handleEditElement = useCallback((element: any) => {
     setEditingElement(element)
@@ -284,7 +306,48 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     })
     
     layerGroupsRef.current.connections.addLayer(marker)
-  }, [map, setSelectedElement])
+  }, [map, setSelectedElement]);
+
+  const handleNewConductor = useCallback((conductor: any) => {
+    if (!map || !nodeMapRef.current) return;
+
+    const fromCoords = nodeMapRef.current.get(conductor.from_pole);
+    const toCoords = nodeMapRef.current.get(conductor.to_pole);
+
+    if (fromCoords && toCoords) {
+      const lineType = conductor.conductor_type === 'MV' ? 'mv' : 'lv'; // Simplified
+      const color = lineType === 'mv' ? '#0000FF' : '#00FF00';
+      const pane = lineType === 'mv' ? 'mvLinesPane' : 'lvLinesPane';
+      const layerGroup = lineType === 'mv' ? layerGroupsRef.current.mvLines : layerGroupsRef.current.lvLines;
+
+      if (layerGroup) {
+        const polyline = L.polyline([fromCoords, toCoords], {
+          color: color,
+          weight: 2,
+          pane: pane,
+          opacity: 1,
+          dashArray: conductor.st_code_4 >= 3 ? undefined : '5, 10'
+        });
+
+        polyline.on('click', () => setSelectedElement({ type: 'conductor', id: conductor.conductor_id, data: conductor }));
+        polyline.bindPopup(`<b>${lineType.toUpperCase()} Line: ${conductor.conductor_id}</b>`);
+        
+        layerGroup.addLayer(polyline);
+        elementLayerRef.current.set(conductor.conductor_id, polyline);
+      }
+    }
+  }, [map, setSelectedElement]);
+
+  const handleElementDeleted = useCallback(({ id, type }: { id: string; type: string }) => {
+    const layer = elementLayerRef.current.get(id);
+    if (layer) {
+      layer.remove();
+      elementLayerRef.current.delete(id);
+      if (type !== 'conductor') {
+        nodeMapRef.current.delete(id);
+      }
+    }
+  }, []);
 
   const updateNetworkData = useCallback(async (data: any) => {
     console.log('=== updateNetworkData called ===', {
@@ -316,14 +379,9 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       
       // Clear existing layers first
       console.log('Clearing existing layers');
-      if (layerGroupsRef.current.connections) layerGroupsRef.current.connections.clearLayers()
-      if (layerGroupsRef.current.transformers) layerGroupsRef.current.transformers.clearLayers()
-      if (layerGroupsRef.current.mvPoles) layerGroupsRef.current.mvPoles.clearLayers()
-      if (layerGroupsRef.current.lvPoles) layerGroupsRef.current.lvPoles.clearLayers()
-      if (layerGroupsRef.current.mvLines) layerGroupsRef.current.mvLines.clearLayers()
-      if (layerGroupsRef.current.lvLines) layerGroupsRef.current.lvLines.clearLayers()
-      if (layerGroupsRef.current.dropLines) layerGroupsRef.current.dropLines.clearLayers()
-      if (layerGroupsRef.current.others) layerGroupsRef.current.others.clearLayers()
+      Object.values(layerGroupsRef.current).forEach(group => group?.clearLayers());
+      elementLayerRef.current.clear();
+      nodeMapRef.current.clear();
 
       // Ensure layer groups exist and are added to map
       if (map) {
@@ -559,13 +617,11 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
             // Add popup to marker
             marker.bindPopup(`Connection<br>Status: ${connection.st_code_3 || 'Unknown'}<br>Lat: ${connection.lat}<br>Lng: ${connection.lng}`)
             
-            // Add marker to layer group instead of directly to map
             if (layerGroupsRef.current.connections) {
-              layerGroupsRef.current.connections.addLayer(marker)
-            } else {
-              marker.addTo(map)
+              layerGroupsRef.current.connections.addLayer(marker);
             }
-            connectionMarkers.push(marker)
+            elementLayerRef.current.set(connection.id, marker);
+            nodeMapRef.current.set(connection.id, [connection.lat, connection.lng]);
             
             bounds.extend([connection.lat, connection.lng])
             hasValidCoords = true
@@ -649,12 +705,13 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
               </div>
             `)
             
-            // Add to appropriate layer group based on voltage level
-            if (pole.type === 'MV' && layerGroupsRef.current.mvPoles) {
-              layerGroupsRef.current.mvPoles.addLayer(circleMarker)
+            if (isMV && layerGroupsRef.current.mvPoles) {
+              layerGroupsRef.current.mvPoles.addLayer(circleMarker);
             } else if (layerGroupsRef.current.lvPoles) {
-              layerGroupsRef.current.lvPoles.addLayer(circleMarker)
+              layerGroupsRef.current.lvPoles.addLayer(circleMarker);
             }
+            elementLayerRef.current.set(pole.id, circleMarker);
+            nodeMapRef.current.set(pole.id, [pole.lat, pole.lng]);
             
             // Add to poleMarkers array (type mismatch is intentional)
             poleMarkers.push(circleMarker as any)
@@ -747,9 +804,10 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
                   Status: ${conductor.st_code_4 || 0} - ${SC4_DESCRIPTIONS[conductor.st_code_4 || 0]}
                 </div>
               `)
-              conductorBatches[lineType].push(polyline)
-              names.add(conductor.name || conductor.id)
-              counts.conductors++
+              layerGroup.addLayer(polyline);
+              elementLayerRef.current.set(conductor.id, polyline);
+              names.add(conductor.name || conductor.id);
+              counts.conductors++;
             }
           }
         },
@@ -812,7 +870,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
         setRenderProgress(null);
       }, 500);
     }
-  }, [map, setSelectedElement, setRenderProgress, editMode, SC1_COLORS, SC3_COLORS, SC4_COLORS])
+  }, [map, setSelectedElement, setRenderProgress, SC1_COLORS, SC3_COLORS, SC4_COLORS])
 
   // Update map when networkData prop changes
   useEffect(() => {
@@ -1008,8 +1066,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     // Mark container as having resize observer
     container.setAttribute('data-resize-observer', 'true')
     
-    // Add click handler for editing
-    newMap.on('click', handleMapClick)
+    // Click handler is attached in a separate effect to avoid stale closures
     
     // Store reference for cleanup
     setMap(newMap)
@@ -1020,6 +1077,25 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       (window as any).__leafletMapInstance = newMap
     }
   }, [handleMapClick, setMap])
+
+  // Attach/re-attach map click handler safely to avoid stale closures
+  useEffect(() => {
+    if (!map) return
+    console.log('=== Attaching map click handler ===')
+    const anyMap = map as any
+    if (anyMap._mapEditClickHandler) {
+      map.off('click', anyMap._mapEditClickHandler)
+    }
+    anyMap._mapEditClickHandler = handleMapClick
+    map.on('click', anyMap._mapEditClickHandler)
+    console.log('=== Map click handler attached ===')
+    return () => {
+      if ((anyMap)._mapEditClickHandler) {
+        console.log('=== Removing map click handler ===')
+        map.off('click', anyMap._mapEditClickHandler)
+      }
+    }
+  }, [map, handleMapClick])
 
   // Skip cleanup in development to avoid destroying map on hot reload/StrictMode
   useEffect(() => {
@@ -1314,7 +1390,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       <MapEditToolbar 
         site={site}
         editMode={editMode}
-        onEditModeChange={setEditMode}
+        onEditModeChange={changeEditMode}
         selectedElement={selectedElement}
         pendingPoleLocation={pendingPoleLocation}
         pendingConnectionLocation={pendingConnectionLocation}
@@ -1322,12 +1398,9 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
         onConnectionCreated={handleConnectionCreated}
         onNewPole={handleNewPole}
         onNewConnection={handleNewConnection}
-        onElementUpdate={() => {
-          // Trigger the network data refresh
-          if (onElementUpdate) {
-            onElementUpdate();
-          }
-        }}
+        onNewConductor={handleNewConductor}
+        onElementDeleted={handleElementDeleted}
+        onElementUpdate={handleElementUpdateCallback}
       />
       <LayerControls
         visibility={layerVisibility}
@@ -1368,12 +1441,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
             site={site}
             currentPoleId={networkData.generation?.[0]?.pole_id}
             poles={networkData.poles || []}
-            onUpdate={async () => {
-              // Trigger element update callback to refresh data
-              if (onElementUpdate) {
-                onElementUpdate();
-              }
-            }}
+            onUpdate={handleElementUpdateCallback}
           />
         )}
       </div>
@@ -1408,9 +1476,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
         onElementUpdated={() => {
           setEditDialogOpen(false)
           setEditingElement(null)
-          if (onElementUpdate) {
-            onElementUpdate()
-          }
+          handleElementUpdateCallback()
         }}
       />
     </>

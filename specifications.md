@@ -129,10 +129,54 @@ Migrate and unify three legacy desktop tools (uGridNET, uGridPLAN, uGridPREDICT)
 - `PUT /api/network/{site}/element/{id}` - Update element
 
 ### 3.3 Data Models
-- **Poles**: ID, coordinates, type (MV/LV), status, voltage
-- **Connections**: ID, pole_id, coordinates, load, status
-- **Conductors**: ID, from_pole, to_pole, cable_spec, length, status
-- **Transformers**: ID, pole_id, rating, type
+
+#### 3.3.1 Poles
+- **pole_id**: string (auto-generated if not provided, format: {SITE}_{####})
+- **latitude**: float (required coordinate)
+- **longitude**: float (required coordinate)
+- **pole_type**: string (default: "POLE")
+- **pole_class**: string (voltage class: "LV" or "MV", default: "LV")
+- **st_code_1**: integer (status code 1, default: 0)
+- **st_code_2**: integer (status code 2, default: 0)
+- **angle_class**: string (angle classification in degrees from uGridPLAN AngleClass column, default: "0-15")
+- **notes**: string (optional notes)
+- **created_at**: datetime (auto-generated)
+- **updated_at**: datetime (auto-generated)
+
+#### 3.3.2 Connections
+- **connection_id**: string (auto-generated if not provided)
+- **latitude**: float (required coordinate)
+- **longitude**: float (required coordinate)
+- **pole_id**: string (required - associated pole ID)
+- **customer_name**: string (optional customer name)
+- **st_code_3**: integer (status code 3, default: 0)
+- **meter_number**: string (optional meter number)
+- **notes**: string (optional notes)
+- **created_at**: datetime (auto-generated)
+- **updated_at**: datetime (auto-generated)
+
+#### 3.3.3 Conductors
+- **conductor_id**: string (auto-generated if not provided)
+- **from_pole**: string (required - source pole ID)
+- **to_pole**: string (required - destination pole ID)
+- **conductor_type**: string ("MV", "LV", or "DROP")
+- **conductor_spec**: string (cable specification: "50", "35", "25", "16")
+- **cable_type**: string ("AAC" or "ABC")
+- **st_code_4**: integer (installation status code, default: 0)
+- **length**: float (calculated automatically)
+- **notes**: string (optional notes)
+- **created_at**: datetime (auto-generated)
+- **updated_at**: datetime (auto-generated)
+
+#### 3.3.4 Transformers
+- **transformer_id**: string (auto-generated if not provided)
+- **pole_id**: string (required - associated pole ID)
+- **rating**: float (transformer rating in kVA)
+- **transformer_type**: string (transformer type)
+- **latitude**: float (inherited from pole)
+- **longitude**: float (inherited from pole)
+- **created_at**: datetime (auto-generated)
+- **updated_at**: datetime (auto-generated)
 
 ### 3.4 Conductor Types
 - AAC_50, AAC_35, AAC_25, AAC_16

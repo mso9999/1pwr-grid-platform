@@ -52,6 +52,8 @@ interface MapEditToolbarProps {
   onElementUpdate?: () => void;
   onNewPole?: (pole: any) => void;
   onNewConnection?: (connection: any) => void;
+  onNewConductor?: (conductor: any) => void;
+  onElementDeleted?: (element: { id: string; type: string }) => void;
 }
 
 interface PoleFormData {
@@ -99,18 +101,25 @@ export function MapEditToolbar({
   onConnectionCreated,
   onElementUpdate,
   onNewPole,
-  onNewConnection
+  onNewConnection,
+  onNewConductor,
+  onElementDeleted
 }: MapEditToolbarProps) {
-  const [showPoleDialog, setShowPoleDialog] = useState(false);
-  const [showConnectionDialog, setShowConnectionDialog] = useState(false);
-  const [showConductorDialog, setShowConductorDialog] = useState(false);
+  const [isPoleDialogOpen, setPoleDialogOpen] = useState(false)
+  const [isConnectionDialogOpen, setConnectionDialogOpen] = useState(false)
+  const [isConductorDialogOpen, setConductorDialogOpen] = useState(false)
+  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [showSplitDialog, setShowSplitDialog] = useState(false);
-  const [poleFormData, setPoleFormData] = useState<Partial<PoleFormData>>({
+  const [poleFormData, setPoleFormData] = useState({
+    pole_id: '',
+    latitude: 0,
+    longitude: 0,
     pole_type: 'POLE',
     pole_class: 'LV',
     st_code_1: 0,
-    st_code_2: 0,
-    angle_class: 'T'
+    st_code_2: 'NA',
+    angle_class: '0-15',
+    notes: ''
   });
   const [connectionFormData, setConnectionFormData] = useState<Partial<ConnectionFormData>>({
     st_code_3: 0
@@ -123,20 +132,28 @@ export function MapEditToolbar({
 
   // Show appropriate dialog when location is set or element selected
   useEffect(() => {
+    console.log('=== MapEditToolbar useEffect ===', { pendingPoleLocation, editMode });
     if (pendingPoleLocation && editMode === 'add-pole') {
+      console.log('=== Opening pole dialog ===', pendingPoleLocation);
       setPoleFormData(prev => ({
         ...prev,
         latitude: pendingPoleLocation.lat,
         longitude: pendingPoleLocation.lng
       }));
-      setShowPoleDialog(true);
+      setPoleDialogOpen(true);
+      console.log('=== Pole dialog state set to true ===');
+      // Force a DOM check
+      setTimeout(() => {
+        const modal = document.querySelector('[data-pole-modal]');
+        console.log('=== Modal in DOM ===', modal ? 'Found' : 'Not found');
+      }, 100);
     } else if (pendingConnectionLocation && editMode === 'add-connection') {
       setConnectionFormData(prev => ({
         ...prev,
         latitude: pendingConnectionLocation.lat,
         longitude: pendingConnectionLocation.lng
       }));
-      setShowConnectionDialog(true);
+      setConnectionDialogOpen(true);
     } else if (selectedElement && selectedElement.type === 'conductor' && editMode === 'split-conductor') {
       setShowSplitDialog(true);
     }
@@ -155,20 +172,24 @@ export function MapEditToolbar({
       }
 
       const result = await response.json();
-      toast.success(`Pole "${result.pole_id}" created successfully`);
+      toast.success(`Pole "${result.pole.pole_id}" created successfully`);
       
-      setShowPoleDialog(false);
+      setPoleDialogOpen(false);
       setPoleFormData({
+        pole_id: '',
+        latitude: 0,
+        longitude: 0,
         pole_type: 'POLE',
         pole_class: 'LV',
         st_code_1: 0,
-        st_code_2: 0,
-        angle_class: 'T'
+        st_code_2: 'NA',
+        angle_class: 'T',
+        notes: ''
       });
       
       // Add the new pole to the map without reloading everything
-      if (onNewPole) {
-        onNewPole(result);
+      if (onNewPole && result.pole) {
+        onNewPole(result.pole);
       }
       
       if (onPoleCreated) {
@@ -193,16 +214,16 @@ export function MapEditToolbar({
       }
 
       const result = await response.json();
-      toast.success(`Connection "${result.connection_id}" created successfully`);
+      toast.success(`Connection "${result.connection.connection_id}" created successfully`);
       
-      setShowConnectionDialog(false);
+      setConnectionDialogOpen(false);
       setConnectionFormData({
         st_code_3: 0
       });
       
       // Add the new connection to the map without reloading everything
-      if (onNewConnection) {
-        onNewConnection(result);
+      if (onNewConnection && result.connection) {
+        onNewConnection(result.connection);
       }
       
       if (onConnectionCreated) {
@@ -229,15 +250,20 @@ export function MapEditToolbar({
       const result = await response.json();
       toast.success(`Conductor created successfully`);
       
-      setShowConductorDialog(false);
+      setConductorDialogOpen(false);
       setConductorFormData({
         conductor_type: 'LV',
         conductor_spec: '50',
         st_code_4: 0
       });
       
+      // Add the new conductor to the map without reloading everything
+      if (onNewConductor && result.conductor) {
+        onNewConductor(result.conductor);
+      }
+      
       if (onElementUpdate) {
-        onElementUpdate();
+        onElementUpdate(); // Kept for now as a fallback
       }
     } catch (error) {
       toast.error('Failed to create conductor');
@@ -272,52 +298,50 @@ export function MapEditToolbar({
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedElement) return;
-    
+  const performDelete = async (force = false) => {
+    if (!selectedElement) return
+
+    const { type: elementType, id: elementId } = selectedElement
+    let url = `/api/network/${elementType}s/${site}/${elementId}`
+
+    if (elementType === 'pole' && force) {
+      url += '?force=true'
+    }
+
     try {
-      const elementType = selectedElement.type;
-      const elementId = selectedElement.id;
-      
-      // Determine API endpoint based on element type
-      let endpoint = '';
-      if (elementType === 'pole') {
-        endpoint = 'poles';
-      } else if (elementType === 'connection') {
-        endpoint = 'connections';
-      } else if (elementType === 'conductor') {
-        endpoint = 'conductors';
+      const response = await fetch(url, { method: 'DELETE' })
+      const result = await response.json()
+
+      if (response.ok) {
+        toast.success(result.message || `${elementType} deleted successfully.`)
+        if (onElementDeleted) {
+          onElementDeleted({ id: elementId, type: elementType })
+        }
+        setDeleteConfirmOpen(false)
       } else {
-        toast.error('Unknown element type');
-        return;
-      }
-      
-      const response = await fetch(
-        `http://localhost:8000/api/network/${site}/${endpoint}/${elementId}`,
-        { method: 'DELETE' }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete ${elementType}`);
-      }
-
-      toast.success(`${elementType.charAt(0).toUpperCase() + elementType.slice(1)} deleted successfully`);
-      
-      // Reset edit mode and refresh map
-      onEditModeChange('select');
-      if (onElementUpdate) {
-        onElementUpdate();
+        if (response.status === 409 && elementType === 'pole' && result.detail?.includes('connected conductors')) {
+          setDeleteConfirmOpen(true)
+        } else {
+          toast.error(result.detail || 'Failed to delete element.')
+        }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      toast.error(`Failed to delete element: ${errorMessage}`);
-      console.error(error);
+      console.error(`Failed to delete ${elementType}:`, error)
+      toast.error(`An error occurred while deleting the ${elementType}.`)
     }
-  };
+  }
+
+  const handleDelete = () => {
+    if (!selectedElement) {
+      toast.error('No element selected for deletion.')
+      return
+    }
+    performDelete(false)
+  }
 
   return (
     <>
-      <div className="map-edit-toolbar bg-white rounded-lg shadow-lg p-2 flex items-center space-x-2">
+      <div className="map-edit-toolbar bg-white rounded-lg shadow-lg p-2 flex items-center space-x-2 absolute top-4 left-[60px] z-50">
         <div className="text-sm font-medium px-2 py-1">Edit Tools</div>
         
         <Button
@@ -361,7 +385,7 @@ export function MapEditToolbar({
           size="sm"
           onClick={() => {
             onEditModeChange('add-conductor');
-            setShowConductorDialog(true);
+            setConductorDialogOpen(true);
           }}
           className="w-full justify-start"
         >
@@ -383,26 +407,197 @@ export function MapEditToolbar({
         </Button>
 
         <Button
-          variant={editMode === 'delete' ? 'destructive' : 'outline'}
-          size="sm"
-          onClick={() => {
-            if (editMode === 'delete' && selectedElement) {
-              handleDelete();
-            } else {
-              onEditModeChange('delete');
-              toast.info('Click on an element to delete');
-            }
-          }}
-          className="w-full justify-start"
+          variant="destructive"
+          onClick={handleDelete}
+          disabled={!selectedElement}
         >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete Selected
         </Button>
       </div>
 
-      {/* Pole Creation Dialog */}
-      <Dialog open={showPoleDialog} onOpenChange={setShowPoleDialog}>
+      {/* Confirmation Dialog for Force Deleting Poles */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Force Delete</DialogTitle>
+            <DialogDescription>
+              This pole has connected conductors. Deleting it will also delete all associated conductors. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => performDelete(true)}>
+              Force Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogs for creating elements */}
+      {isPoleDialogOpen && (
+        <div 
+          data-pole-modal
+          className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center"
+          onClick={() => setPoleDialogOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-semibold mb-4">Create New Pole</h2>
+            <p className="text-sm text-gray-600 mb-4">Enter details for the new pole</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Pole ID</label>
+                <input 
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="Auto-generated if empty"
+                  value={poleFormData.pole_id || ''}
+                  onChange={(e) => setPoleFormData({...poleFormData, pole_id: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Latitude</label>
+                <input 
+                  type="number"
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.latitude}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Longitude</label>
+                <input 
+                  type="number"
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.longitude}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Pole Type</label>
+                <select 
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.pole_type}
+                  onChange={(e) => setPoleFormData({...poleFormData, pole_type: e.target.value})}
+                >
+                  <option value="POLE">POLE</option>
+                  <option value="STRUCTURE">STRUCTURE</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Pole Class</label>
+                <select 
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.pole_class}
+                  onChange={(e) => setPoleFormData({...poleFormData, pole_class: e.target.value})}
+                >
+                  <option value="LV">LV</option>
+                  <option value="MV">MV</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Status Code 1 (Construction Progress)</label>
+                <select 
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.st_code_1}
+                  onChange={(e) => setPoleFormData({...poleFormData, st_code_1: parseInt(e.target.value)})}
+                >
+                  <option value={0}>0: uGridNET output (as designed)</option>
+                  <option value={1}>1: Updated planned location</option>
+                  <option value={2}>2: Marked with label onsite</option>
+                  <option value={3}>3: Consent withheld</option>
+                  <option value={4}>4: Consented</option>
+                  <option value={5}>5: Hard Rock</option>
+                  <option value={6}>6: Excavated</option>
+                  <option value={7}>7: Pole planted</option>
+                  <option value={8}>8: Poletop dressed</option>
+                  <option value={9}>9: Conductor attached</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Status Code 2 (Further Progress)</label>
+                <select 
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.st_code_2}
+                  onChange={(e) => setPoleFormData({...poleFormData, st_code_2: e.target.value})}
+                >
+                  <option value="NA">NA: None</option>
+                  <option value="SP">SP: Stay wires planned</option>
+                  <option value="SI">SI: Stay wires installed</option>
+                  <option value="KP">KP: Kicker pole planned</option>
+                  <option value="KI">KI: Kicker pole installed</option>
+                  <option value="TP">TP: Transformer planned</option>
+                  <option value="TI">TI: Transformer installed</option>
+                  <option value="TC">TC: Transformer commissioned</option>
+                  <option value="MP">MP: Meter planned</option>
+                  <option value="MI">MI: Meter installed</option>
+                  <option value="MC">MC: Meter commissioned</option>
+                  <option value="EP">EP: Earth planned</option>
+                  <option value="EI">EI: Earth installed</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Angle Class</label>
+                <select 
+                  className="w-full border rounded px-3 py-2"
+                  value={poleFormData.angle_class}
+                  onChange={(e) => setPoleFormData({...poleFormData, angle_class: e.target.value})}
+                >
+                  <option value="0-15">0-15° (Straight/minimal angle)</option>
+                  <option value="15-30">15-30° (Small angle)</option>
+                  <option value="30-45">30-45° (Medium angle)</option>
+                  <option value="45-60">45-60° (Large angle)</option>
+                  <option value="60-90">60-90° (Sharp angle)</option>
+                  <option value="90+">90°+ (Dead end/termination)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Notes</label>
+                <textarea 
+                  className="w-full border rounded px-3 py-2 h-20"
+                  value={poleFormData.notes || ''}
+                  onChange={(e) => setPoleFormData({...poleFormData, notes: e.target.value})}
+                  placeholder="Optional notes..."
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <button 
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={handleCreatePole}
+                >
+                  Create Pole
+                </button>
+                <button 
+                  className="px-4 py-2 border rounded hover:bg-gray-50"
+                  onClick={() => setPoleDialogOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <Dialog open={false} onOpenChange={setPoleDialogOpen}>
+        <DialogContent className="z-[9999] max-w-md" style={{zIndex: 9999, position: 'fixed'}}>
           <DialogHeader>
             <DialogTitle>Create New Pole</DialogTitle>
             <DialogDescription>
@@ -489,7 +684,7 @@ export function MapEditToolbar({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPoleDialog(false)}>
+            <Button variant="outline" onClick={() => setPoleDialogOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleCreatePole}>Create Pole</Button>
@@ -498,7 +693,7 @@ export function MapEditToolbar({
       </Dialog>
 
       {/* Connection Creation Dialog */}
-      <Dialog open={showConnectionDialog} onOpenChange={setShowConnectionDialog}>
+      <Dialog open={isConnectionDialogOpen} onOpenChange={setConnectionDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Connection</DialogTitle>
@@ -544,7 +739,7 @@ export function MapEditToolbar({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConnectionDialog(false)}>
+            <Button variant="outline" onClick={() => setConnectionDialogOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleCreateConnection}>Create Connection</Button>
@@ -553,7 +748,7 @@ export function MapEditToolbar({
       </Dialog>
 
       {/* Conductor Creation Dialog */}
-      <Dialog open={showConductorDialog} onOpenChange={setShowConductorDialog}>
+      <Dialog open={isConductorDialogOpen} onOpenChange={setConductorDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Conductor</DialogTitle>
@@ -627,7 +822,7 @@ export function MapEditToolbar({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConductorDialog(false)}>
+            <Button variant="outline" onClick={() => setConductorDialogOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleCreateConductor}>Create Conductor</Button>
