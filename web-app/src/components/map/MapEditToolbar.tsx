@@ -161,6 +161,8 @@ export function MapEditToolbar({
 
   const handleCreatePole = async () => {
     try {
+      console.log('=== Sending pole data ===', JSON.stringify(poleFormData, null, 2));
+      
       const response = await fetch(`http://localhost:8000/api/network/poles/${site}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -168,7 +170,13 @@ export function MapEditToolbar({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create pole');
+        const errorText = await response.text();
+        console.error('=== API Error Response ===', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`Failed to create pole: ${response.status} ${errorText}`);
       }
 
       const result = await response.json();
@@ -183,7 +191,7 @@ export function MapEditToolbar({
         pole_class: 'LV',
         st_code_1: 0,
         st_code_2: 'NA',
-        angle_class: 'T',
+        angle_class: '0-15',
         notes: ''
       });
       

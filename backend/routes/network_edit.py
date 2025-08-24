@@ -20,7 +20,7 @@ class PoleCreate(BaseModel):
     pole_type: str = "POLE"
     pole_class: str = "LV"
     st_code_1: int = 0
-    st_code_2: int = 0
+    st_code_2: str = "NA"
     angle_class: str = "0-15"
     notes: Optional[str] = None
 
@@ -31,7 +31,7 @@ class PoleUpdate(BaseModel):
     pole_type: Optional[str] = None
     pole_class: Optional[str] = None
     st_code_1: Optional[int] = None
-    st_code_2: Optional[int] = None
+    st_code_2: Optional[str] = None
     angle_class: Optional[str] = None
     notes: Optional[str] = None
 

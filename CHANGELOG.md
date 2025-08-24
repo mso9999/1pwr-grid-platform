@@ -1,24 +1,37 @@
 # Changelog
 
-## [2024-08-24] - Add Pole Dialog and uGridPLAN Compatibility
+## [2024-08-24] - Add Pole Dialog Implementation & API Fix
 
 ### Added
-- **Add Pole Dialog**: Fully functional pole creation modal with all required fields
-- **uGridPLAN Backwards Compatibility**: Implemented proper angle class system using degree ranges (0-15°, 15-30°, etc.)
-- **Status Code Descriptions**: User-friendly descriptions for all status codes in form dropdowns
-- **Custom Modal System**: Replaced problematic Shadcn Dialog with custom modal for reliable rendering
-
-### Fixed
-- **Pole Dialog Visibility**: Resolved z-index and rendering issues preventing modal from appearing
-- **Infinite Render Loop**: Eliminated performance issues caused by inline function references
-- **Map Click Handler**: Fixed premature removal of click handlers during pole creation workflow
-- **TypeScript Errors**: Corrected form data types to match backend API requirements
-- **Angle Class System**: Replaced incorrect T/A/D/I system with actual uGridPLAN degree-based classification
+- **Add Pole Dialog**: Complete pole creation form with all required fields
+  - Pole ID (auto-generated if empty)
+  - Pole Type dropdown (POLE, STAY, ANCHOR, etc.)
+  - Pole Class dropdown (LV, MV, HV)
+  - Status Code 1 with descriptions (0-9 construction progress)
+  - Status Code 2 with descriptions (NA, SP, SI, KP, etc.)
+  - Angle Class with degree ranges (0-15, 15-30, 30-45, 45-60, 60-90)
+  - Notes field for additional information
 
 ### Changed
-- **Backend API**: Updated default angle_class from "T" to "0-15" for uGridPLAN compatibility
-- **Specifications**: Updated angle class documentation to reflect degree-based system
-- **Form Validation**: Enhanced pole creation form with proper field validation and descriptions
+- **uGridPLAN Compatibility**: Updated angle_class to use degree-based classification
+  - Changed from T/A/D/I system to degree ranges (0-15, 15-30, 30-45, 45-60, 60-90)
+  - Updated backend PoleCreate model default from "T" to "0-15"
+  - Maintains backwards compatibility with original uGridPLAN AngleClass column
+- **API Data Types**: Fixed st_code_2 field type mismatch
+  - Changed backend from integer to string to match uGridPLAN format
+  - Updated frontend form data types for consistency
+
+### Fixed
+- **Pole Creation API**: Resolved 422 Unprocessable Entity error
+  - Fixed data type mismatch between frontend and backend for st_code_2 field
+  - Backend now accepts string status codes (NA, SP, SI, etc.) as per uGridPLAN
+  - Added enhanced error logging for better debugging
+- **Modal Dialog Issues**: Replaced Shadcn Dialog with custom modal implementation
+  - Fixed z-index conflicts preventing dialog visibility
+  - Added inline styles and DOM verification
+  - Resolved infinite render loops from console.log statements
+- **Map Click Handler**: Fixed premature removal of click handlers during mode changes
+- **TypeScript Errors**: Corrected form data types and state management
 
 ## [2024-08-22] - Map Rendering and Authentication Fixes
 
