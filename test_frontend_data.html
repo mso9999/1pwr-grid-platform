@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Frontend Data</title>
+</head>
+<body>
+    <h1>Testing Frontend Data Flow</h1>
+    <button onclick="testAPI()">Test API Call</button>
+    <div id="output"></div>
+
+    <script>
+        async function testAPI() {
+            const output = document.getElementById('output');
+            
+            try {
+                // Test direct API call without auth
+                const response = await fetch('http://localhost:8000/api/network/KET');
+                const data = await response.json();
+                
+                output.innerHTML = `
+                    <h2>Response:</h2>
+                    <p>Status: ${response.status}</p>
+                    <p>Site: ${data.site}</p>
+                    <p>Poles: ${data.data?.poles?.length || 0}</p>
+                    <p>Connections: ${data.data?.connections?.length || 0}</p>
+                    <p>Conductors: ${data.data?.conductors?.length || 0}</p>
+                    <h3>First Connection:</h3>
+                    <pre>${JSON.stringify(data.data?.connections?.[0], null, 2)}</pre>
+                `;
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

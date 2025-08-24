@@ -436,11 +436,15 @@ def get_network(site: str):
     # Process connections separately
     connections_list = network_data.get('connections', [])
     print(f"Processing {len(connections_list)} connections...")
-    for connection in connections_list:
+    for idx, connection in enumerate(connections_list):
+        lat = sanitize_value(connection.get('latitude', connection.get('gps_lat')))
+        lng = sanitize_value(connection.get('longitude', connection.get('gps_lng')))
+        if idx < 3:  # Debug first 3 connections
+            print(f"Connection {idx}: lat={lat}, lng={lng}, raw_lat={connection.get('latitude')}, raw_gps_lat={connection.get('gps_lat')}")
         formatted_data['connections'].append({
             "id": connection.get('survey_id'),
-            "lat": sanitize_value(connection.get('latitude', connection.get('gps_lat'))),
-            "lng": sanitize_value(connection.get('longitude', connection.get('gps_lng'))),
+            "lat": lat,
+            "lng": lng,
             "type": 'customer_connection',
             "status": connection.get('status', 'planned'),
             "st_code_1": connection.get('st_code_1', 0),

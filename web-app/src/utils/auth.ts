@@ -49,12 +49,24 @@ class AuthService {
     if (typeof window !== 'undefined') {
       this.accessToken = localStorage.getItem('access_token');
       this.refreshToken = localStorage.getItem('refresh_token');
-      console.log('AuthService - Loaded tokens:', {
-        hasAccessToken: !!this.accessToken,
-        hasRefreshToken: !!this.refreshToken,
-        accessTokenPreview: this.accessToken ? this.accessToken.substring(0, 20) + '...' : null
-      });
-      this.setupTokenRefresh();
+      
+      // Only setup refresh if tokens are valid
+      if (this.accessToken && this.refreshToken) {
+        try {
+          const decoded = jwtDecode<JWTPayload>(this.accessToken);
+          if (decoded.exp * 1000 > Date.now()) {
+            this.setupTokenRefresh();
+          } else {
+            // Token expired, clear and redirect
+            this.clearTokens();
+            window.location.href = '/login';
+          }
+        } catch (error) {
+          // Invalid token, clear and redirect
+          this.clearTokens();
+          window.location.href = '/login';
+        }
+      }
     }
   }
 
@@ -105,7 +117,6 @@ class AuthService {
         });
       }
     } catch (error) {
-      console.error('Logout error:', error);
     } finally {
       this.clearTokens();
     }
@@ -116,11 +127,9 @@ class AuthService {
    */
   async getCurrentUser(): Promise<User> {
     if (!this.accessToken) {
-      console.log('getCurrentUser - No access token');
       throw new Error('Not authenticated');
     }
 
-    console.log('getCurrentUser - Fetching with token:', this.accessToken.substring(0, 20) + '...');
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       headers: {
         'Authorization': `Bearer ${this.accessToken}`,
@@ -220,10 +229,16 @@ class AuthService {
       }
 
       this.refreshTimer = setTimeout(() => {
-        this.refreshAccessToken().catch(console.error);
+        this.refreshAccessToken().catch((error) => {
+          console.error('Token refresh failed:', error);
+          // Clear tokens and redirect to login on refresh failure
+          this.clearTokens();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        });
       }, refreshIn);
     } catch (error) {
-      console.error('Failed to setup token refresh:', error);
     }
   }
 

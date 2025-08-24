@@ -58,22 +58,17 @@ if (typeof window !== 'undefined') {
 
 export interface ClientMapProps {
   networkData?: any
-  onElementUpdate?: () => void
+  onElementUpdate?: () => Promise<void>
   loading?: boolean
+  onElementDelete?: () => Promise<void>
 }
 
-export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapProps) {
-  console.log('ClientMap received props:', { 
-    hasNetworkData: !!networkData,
-    keys: networkData ? Object.keys(networkData) : 'none',
-    loading 
-  })
+export function ClientMap({ networkData, onElementUpdate, loading, onElementDelete }: ClientMapProps) {
   // Use ref to persist map instance across re-renders and StrictMode remounts
   const mapInstanceRef = useRef<L.Map | null>(null)
   const [map, setMapState] = useState<L.Map | null>(() => {
     // Check for existing map on initial state
     if (typeof window !== 'undefined' && (window as any).__leafletMapInstance) {
-      console.log('Found existing map instance on mount')
       return (window as any).__leafletMapInstance
     }
     return null
@@ -81,7 +76,6 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
   
   // Wrapper to track state changes and persist map instance globally
   const setMap = useCallback((newMap: L.Map | null) => {
-    console.log('setMap called with:', newMap ? 'Leaflet Map instance' : 'null')
     mapInstanceRef.current = newMap
     // Store globally to survive StrictMode remounts
     if (typeof window !== 'undefined') {
@@ -91,6 +85,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
   }, [])
   const mapRef = useRef<HTMLDivElement | null>(null)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
+  const retryCountRef = useRef<number>(0)
   const [selectedElement, setSelectedElement] = useState<ElementDetail | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editingElement, setEditingElement] = useState<ElementDetail | null>(null)
@@ -207,33 +202,76 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
   }, [])
 
   const updateNetworkData = useCallback(async (data: any) => {
-    if (!map || !data || !layerGroupsRef.current) return
-
-    console.log('Updating network data on map', { 
-      map: !!map, 
-      data: !!data,
-      layerGroups: !!layerGroupsRef.current
-    })
-
-    // Clear existing layers
-    Object.values(layerGroupsRef.current).forEach(group => {
-      if (group) {
-        if ('clearLayers' in group) {
-          group.clearLayers()
-        }
-      }
-    })
-
-    const bounds = L.latLngBounds([])
-    let hasValidCoords = false
-    const names = new Set<string>()
-
-    // Store references to markers for zoom updates
-    const connectionMarkers: L.CircleMarker[] = []
-    const poleMarkers: L.CircleMarker[] = []
+    console.log('=== updateNetworkData called ===', {
+      hasMap: !!map,
+      hasData: !!data
+    });
+    console.log('Network data received:', {
+      connections: data.connections?.length || 0,
+      poles: data.poles?.length || 0,
+      conductors: data.conductors?.length || 0
+    });
     
-    // Defer cluster initialization to avoid blocking
-    const initClusters = () => {
+    // Create unique render ID for this call
+    const renderID = Date.now() + Math.random();
+    (window as any).currentRenderID = renderID;
+    
+    // Cancel any pending retry timeouts
+    if ((window as any).pendingRetryTimeout) {
+      clearTimeout((window as any).pendingRetryTimeout);
+      (window as any).pendingRetryTimeout = null;
+    }
+
+    try {
+      // Check if this render has been superseded
+      if ((window as any).currentRenderID !== renderID) {
+        console.log('Render superseded, exiting');
+        return;
+      }
+      
+      // Clear existing layers first
+      console.log('Clearing existing layers');
+      if (layerGroupsRef.current.connections) layerGroupsRef.current.connections.clearLayers()
+      if (layerGroupsRef.current.transformers) layerGroupsRef.current.transformers.clearLayers()
+      if (layerGroupsRef.current.mvPoles) layerGroupsRef.current.mvPoles.clearLayers()
+      if (layerGroupsRef.current.lvPoles) layerGroupsRef.current.lvPoles.clearLayers()
+      if (layerGroupsRef.current.mvLines) layerGroupsRef.current.mvLines.clearLayers()
+      if (layerGroupsRef.current.lvLines) layerGroupsRef.current.lvLines.clearLayers()
+      if (layerGroupsRef.current.dropLines) layerGroupsRef.current.dropLines.clearLayers()
+      if (layerGroupsRef.current.others) layerGroupsRef.current.others.clearLayers()
+      if (layerGroupsRef.current.poleCluster) layerGroupsRef.current.poleCluster.clearLayers()
+      if (layerGroupsRef.current.connectionCluster) layerGroupsRef.current.connectionCluster.clearLayers()
+
+      // Ensure layer groups exist and are added to map
+      if (!layerGroupsRef.current.connections || !map.hasLayer(layerGroupsRef.current.connections)) {
+        layerGroupsRef.current.connections = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.poles || !map.hasLayer(layerGroupsRef.current.poles)) {
+        layerGroupsRef.current.poles = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.mvPoles || !map.hasLayer(layerGroupsRef.current.mvPoles)) {
+        layerGroupsRef.current.mvPoles = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.lvPoles || !map.hasLayer(layerGroupsRef.current.lvPoles)) {
+        layerGroupsRef.current.lvPoles = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.mvLines || !map.hasLayer(layerGroupsRef.current.mvLines)) {
+        layerGroupsRef.current.mvLines = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.lvLines || !map.hasLayer(layerGroupsRef.current.lvLines)) {
+        layerGroupsRef.current.lvLines = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.dropLines || !map.hasLayer(layerGroupsRef.current.dropLines)) {
+        layerGroupsRef.current.dropLines = L.layerGroup().addTo(map);
+      }
+      if (!layerGroupsRef.current.transformers || !map.hasLayer(layerGroupsRef.current.transformers)) {
+        layerGroupsRef.current.transformers = L.layerGroup().addTo(map);
+      }
+      
+      setRenderProgress({ current: 0, total: 0 });
+    
+      // Defer cluster initialization to avoid blocking
+      const initClusters = () => {
       if (!layerGroupsRef.current.poleCluster && map) {
         layerGroupsRef.current.poleCluster = (L as any).markerClusterGroup({
           maxClusterRadius: 80,
@@ -307,22 +345,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     
     // Initialize clusters after a short delay
     setTimeout(initClusters, 100)
-
-    const counts = {
-      poles: 0,
-      connections: 0,
-      conductors: 0,
-      mvLines: 0,
-      lvLines: 0,
-      dropLines: 0,
-      transformers: 0,
-      generation: 0
-    }
     
     // Calculate total items to render
     const totalItems = (data.poles?.length || 0) + 
                       (data.connections?.length || 0) + 
                       (data.conductors?.length || 0)
+    
     let renderedItems = 0
     
     // Show progress indicator
@@ -333,7 +361,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       renderFn: (item: any) => void,
       batchSize: number
     ) => {
-      const frameTimeLimit = 8 // Target 8ms per frame for smooth UI
+      const frameTimeLimit = 16 // Target 16ms per frame for 60fps
       
       for (let i = 0; i < items.length; i += batchSize) {
         const frameStartTime = performance.now();
@@ -367,6 +395,45 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       }
     };
 
+    // Initialize tracking variables
+    const connectionMarkers: L.Marker[] = []
+    const poleMarkers: any[] = [] // Using any[] since we're mixing L.CircleMarker types
+    const conductorLines: L.Polyline[] = []
+    const bounds = L.latLngBounds([])
+    let hasValidCoords = false
+    const names = new Set<string>()
+    const counts = {
+      connections: 0,
+      poles: 0,
+      conductors: 0,
+      mvLines: 0,
+      lvLines: 0,
+      dropLines: 0
+    }
+
+    // Helper function to determine line type
+    const getLineType = (conductor: any, poles: any[], connections: any[]): 'mv' | 'lv' | 'drop' => {
+      const isFromConnection = connections.some((conn: any) => conn.id === conductor.from)
+      const isToConnection = connections.some((conn: any) => conn.id === conductor.to)
+      
+      // If either end connects to a connection (customer), it's a drop line
+      if (isFromConnection || isToConnection) {
+        return 'drop'
+      }
+      
+      // Check if both ends are poles
+      const fromPole = poles.find((p: any) => p.id === conductor.from)
+      const toPole = poles.find((p: any) => p.id === conductor.to)
+      
+      // If both are MV poles, it's MV line
+      if (fromPole?.type === 'MV' && toPole?.type === 'MV') {
+        return 'mv'
+      }
+      
+      // Default to LV for pole-to-pole connections that aren't MV
+      return 'lv'
+    }
+
     // Build node map for connections and conductors
     const nodeMap = new Map<string, [number, number]>()
     
@@ -386,51 +453,153 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       })
     }
 
-    // Process connections in batches
-    console.log('Processing connections:', data.connections?.length || 0)
-    if (data.connections && layerGroupsRef.current.connections) {
+    // Render connections
+    if (data.connections?.length > 0) {
+      console.log('Starting to render connections...');
+      
+      // Ensure map is ready before adding markers
+      if (!map || !map.getContainer()) {
+        console.log('Map or container not ready');
+        return;
+      }
+      
+      const containerHeight = map.getContainer().offsetHeight;
+      const containerWidth = map.getContainer().offsetWidth;
+      
+      if (containerHeight === 0 || containerWidth === 0) {
+        console.log('Map container has no size:', { width: containerWidth, height: containerHeight });
+        
+        // Try to force the map to update its size
+        map.invalidateSize();
+        
+        // Use a unique key for retry tracking based on data signature
+        const dataKey = `${data.connections?.length}-${data.poles?.length}-${data.conductors?.length}`;
+        
+        if (!retryCountRef.current) {
+          retryCountRef.current = 0;
+        }
+        
+        // Reset retry count if this is different data
+        if ((window as any).lastDataKey !== dataKey) {
+          retryCountRef.current = 0;
+          (window as any).lastDataKey = dataKey;
+        }
+        
+        retryCountRef.current++;
+        
+        if (retryCountRef.current < 15) { // Increased retry limit
+          console.log(`Retrying updateNetworkData, attempt ${retryCountRef.current}`);
+          // Store timeout reference to cancel if needed
+          (window as any).pendingRetryTimeout = setTimeout(() => {
+            (window as any).pendingRetryTimeout = null;
+            updateNetworkData(data)
+          }, 1000) // Increased delay to give map more time to initialize
+        } else {
+          console.log('Max retries reached, forcing render anyway');
+          // Continue with rendering even if container has no size
+          // The map will update when it gets proper size
+        }
+        
+        if (retryCountRef.current < 15) {
+          return;
+        }
+      }
+      
+      // Reset retry count on successful render
+      retryCountRef.current = 0
+      console.log('Map ready, starting batch render of connections');
+      
+      // Check if this render has been superseded before starting batch
+      if ((window as any).currentRenderID !== renderID) {
+        console.log('Render superseded before batch, exiting');
+        return;
+      }
+      
       await renderBatch(
         data.connections,
         (connection: any) => {
+          // Check if render was superseded during batch
+          if ((window as any).currentRenderID !== renderID) {
+            return;
+          }
+          
           if (connection.lat && connection.lng) {
-            const color = SC3_COLORS[connection.st_code_3 || 0] || '#808080'
+            const color = connection.st_code_3 === 'Energized' ? '#4ade80' : '#94a3b8'
             
-            // Create square-shaped circle marker for connections
-            const marker = L.circleMarker([connection.lat, connection.lng], {
-              radius: 5,  // Square-like appearance with smaller radius
-              fillColor: color,
-              color: '#000',
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.5,  // 50% transparent fill
-              pane: 'connectionsPane'
-            })
+            // Create square marker for connections (per specifications)
+            const iconHtml = `<div style="
+              width: 12px;
+              height: 12px;
+              background-color: ${color};
+              opacity: 0.5;
+              border: none;
+              transform: translate(-50%, -50%);
+            "></div>`
             
-            marker.on('click', () => {
-              setSelectedElement({
-                type: 'connection',
-                id: connection.id,
-                data: connection
-              })
-            })
+            const marker = L.marker(
+              [connection.lat, connection.lng],
+              {
+                icon: L.divIcon({
+                  html: iconHtml,
+                  className: 'connection-marker',
+                  iconSize: [12, 12],
+                  iconAnchor: [6, 6]
+                }),
+                pane: 'markerPane'
+              }
+            )
             
-            marker.bindPopup(`
-              <div>
-                <strong>Connection: ${connection.name || connection.id}</strong><br/>
-                Status: ${connection.st_code_3 || 0} - ${SC3_DESCRIPTIONS[connection.st_code_3 || 0]}
-              </div>
-            `)
+            // Add popup to marker
+            marker.bindPopup(`Connection<br>Status: ${connection.st_code_3 || 'Unknown'}<br>Lat: ${connection.lat}<br>Lng: ${connection.lng}`)
             
+            // Add marker to layer group instead of directly to map
+            if (layerGroupsRef.current.connections) {
+              layerGroupsRef.current.connections.addLayer(marker)
+            } else {
+              marker.addTo(map)
+            }
             connectionMarkers.push(marker)
+            
             bounds.extend([connection.lat, connection.lng])
             hasValidCoords = true
-            names.add(connection.name || connection.id)
+            names.add(connection.name || connection.id || 'Connection')
             counts.connections++
           }
         },
-        5 // Batch size for connections
-      );
+        20
+      )
+      
     }
+
+    // Final debug check
+    if (layerGroupsRef.current.connections && map) {
+      const layerCount = layerGroupsRef.current.connections.getLayers().length
+      
+      // Try to manually ensure visibility
+      if (!map.hasLayer(layerGroupsRef.current.connections)) {
+        layerGroupsRef.current.connections.addTo(map)
+      }
+      
+      // Force a delayed update to ensure map is ready
+      setTimeout(() => {
+        if (layerGroupsRef.current.connections && map) {
+          const layers = layerGroupsRef.current.connections.getLayers()
+          
+          // Force map refresh
+          map.invalidateSize()
+          
+          // If we have connections, ensure we're zoomed to see them
+          if (data.connections.length > 0 && bounds.isValid()) {
+            map.fitBounds(bounds, { padding: [50, 50] })
+          }
+        }
+      }, 100) // Reduced delay for faster map update
+    }
+    
+    // Force map to redraw after a short delay
+    setTimeout(() => {
+      map.invalidateSize()
+    }, 50) // Reduced delay for faster redraw
 
     // Process poles in batches
     if (data.poles && layerGroupsRef.current.poles) {
@@ -477,14 +646,15 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
               layerGroupsRef.current.lvPoles.addLayer(circleMarker)
             }
             
-            poleMarkers.push(circleMarker)
+            // Add to poleMarkers array (type mismatch is intentional)
+            poleMarkers.push(circleMarker as any)
             bounds.extend([pole.lat, pole.lng])
             hasValidCoords = true
             names.add(pole.name || pole.id)
             counts.poles++
           }
         },
-        10 // Batch size for poles
+        20 // Batch size for poles - optimized for performance
       );
     }
 
@@ -502,8 +672,6 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       return isFromConnection || isToConnection
     }).length || 0
     
-    console.log('Processing conductors:', data.conductors?.length || 0)
-    console.log('Expected droplines:', dropLineCount)
     if (data.conductors && (layerGroupsRef.current.mvLines || layerGroupsRef.current.lvLines || layerGroupsRef.current.dropLines)) {
       await renderBatch(
         data.conductors,
@@ -540,7 +708,6 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
                 color = '#FFA500'  // Orange for Drop
                 pane = 'dropLinesPane'
                 counts.dropLines++
-                console.log('Found dropline:', conductor.id, 'from:', conductor.from, 'to:', conductor.to)
                 break
             }
             
@@ -585,45 +752,79 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       if (layerGroupsRef.current.poleCluster && poleMarkers.length > 0) {
         layerGroupsRef.current.poleCluster.addLayers(poleMarkers)
       } else if (layerGroupsRef.current.poles && poleMarkers.length > 0) {
-        poleMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.poles!))
+        poleMarkers.forEach((marker: any) => marker.addTo(layerGroupsRef.current.poles!))  
       }
       
-      console.log('Adding connection markers to map:', connectionMarkers.length)
       if (layerGroupsRef.current.connectionCluster && connectionMarkers.length > 0) {
         layerGroupsRef.current.connectionCluster.addLayers(connectionMarkers)
       } else if (layerGroupsRef.current.connections && connectionMarkers.length > 0) {
-        connectionMarkers.forEach(marker => marker.addTo(layerGroupsRef.current.connections!))
+        connectionMarkers.forEach((marker) => {
+          marker.addTo(layerGroupsRef.current.connections!)
+        })
       }
       
       // Add conductor batches to their respective layer groups
       if (conductorBatches.mv.length > 0 && layerGroupsRef.current.mvLines) {
-        console.log('Adding MV lines to layer group:', conductorBatches.mv.length)
         conductorBatches.mv.forEach(line => line.addTo(layerGroupsRef.current.mvLines!))
       }
       
       if (conductorBatches.lv.length > 0 && layerGroupsRef.current.lvLines) {
-        console.log('Adding LV lines to layer group:', conductorBatches.lv.length)
         conductorBatches.lv.forEach(line => line.addTo(layerGroupsRef.current.lvLines!))
       }
       
       if (conductorBatches.drop.length > 0 && layerGroupsRef.current.dropLines) {
-        console.log('Adding drop lines to layer group:', conductorBatches.drop.length)
         conductorBatches.drop.forEach(line => line.addTo(layerGroupsRef.current.dropLines!))
       }
     }, 0)
     
-    // Clear progress after rendering
-    setTimeout(() => {
-      setRenderProgress(null)
-    }, 500)
-
     // Center map on data bounds if we have valid coordinates
     if (hasValidCoords) {
+      console.log('Fitting bounds, hasValidCoords:', hasValidCoords, 'bounds:', bounds.toBBoxString());
       setTimeout(() => {
-        map.fitBounds(bounds, { padding: [50, 50] })
-      }, 200)
+        try {
+          map.fitBounds(bounds, { padding: [50, 50] });
+          console.log('Map fitBounds called successfully');
+          
+          // Also ensure layer groups are visible
+          Object.entries(layerGroupsRef.current).forEach(([name, layer]) => {
+            if (layer && 'getLayers' in layer) {
+              const layerCount = layer.getLayers().length;
+              if (layerCount > 0) {
+                console.log(`Layer ${name} has ${layerCount} items`);
+                if (!map.hasLayer(layer)) {
+                  console.log(`Adding ${name} layer to map`);
+                  layer.addTo(map);
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error fitting bounds:', error);
+        }
+      }, 500)
+    } else {
+      console.log('No valid coordinates to fit bounds');
     }
-  }, [map, setSelectedElement, setRenderProgress, editMode]);
+  } catch (error) {
+      console.error('Error in updateNetworkData:', error);
+    } finally {
+      // Clear progress after a delay
+      setTimeout(() => {
+        setRenderProgress(null);
+      }, 500);
+    }
+  }, [map, setSelectedElement, setRenderProgress, editMode, SC1_COLORS, SC3_COLORS, SC4_COLORS])
+
+  // Update map when networkData prop changes
+  useEffect(() => {
+    console.log('=== ClientMap networkData useEffect ===', {
+      hasNetworkData: !!networkData,
+      hasMap: !!map
+    });
+    if (networkData && map) {
+      updateNetworkData(networkData);
+    }
+  }, [networkData, map]); // Remove updateNetworkData from deps to avoid infinite loop
 
   // Initialize map using callback ref
   const setMapContainer = useCallback((container: HTMLDivElement | null) => {
@@ -639,14 +840,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
         // Check if map is still valid and attached to DOM
         if (existingContainer && document.body.contains(existingContainer)) {
           if (existingContainer === container) {
-            console.log('Map already initialized for this container')
             setMap(globalMap)
             mapInstanceRef.current = globalMap
             return
           }
           // Move map to new container if needed
           if (existingContainer.parentNode) {
-            console.log('Moving existing map to new container')
             container.appendChild(existingContainer)
             globalMap.invalidateSize()
             setMap(globalMap)
@@ -655,14 +854,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           }
         }
       } catch (e) {
-        console.log('Existing map instance is invalid, creating new one')
         // Map instance is invalid, will create new one
       }
     }
     
     // Check if already initialized
     if (container.hasAttribute('data-map-initialized')) {
-      console.log('Map container already initialized, skipping')
       return
     }
     
@@ -671,24 +868,18 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     // Get the parent wrapper to check dimensions
     const wrapper = container.parentElement
     if (!wrapper) {
-      console.error('Map container has no parent wrapper!')
       return
     }
     
     // Ensure wrapper has dimensions
     if (wrapper.offsetWidth === 0 || wrapper.offsetHeight === 0) {
-      console.log(`Wrapper dimensions: ${wrapper.offsetWidth}x${wrapper.offsetHeight}, retrying...`)
       setTimeout(() => setMapContainer(container), 100)
       return
     }
     
-    console.log('Initializing map with container:', container)
-    console.log('Container parent (wrapper):', wrapper)
-    console.log('Wrapper dimensions:', wrapper.offsetWidth, 'x', wrapper.offsetHeight)
     
     container.setAttribute('data-map-initialized', 'true')
 
-    console.log('Initializing Leaflet map')
     
     // Start with a default view, will be updated when data loads
     const newMap = L.map(container, {
@@ -699,21 +890,18 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       renderer: L.canvas({ padding: 0 })  // No padding outside container
     })
     
+    // Add tile layer
     const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: ' OpenStreetMap contributors',
-      maxZoom: 19,
-    })
+      attribution: ' OpenStreetMap contributors'
+    }).addTo(newMap)
     
+    // Log when tiles load
     tileLayer.on('load', () => {
-      console.log('Map tiles loaded successfully')
     })
     
-    tileLayer.on('tileerror', (error) => {
-      console.error('Tile load error:', error)
+    tileLayer.on('tileerror', (error: any) => {
     })
     
-    tileLayer.addTo(newMap)
-    console.log('Tile layer added to map')
     
     // Ensure the parent boundary container cannot be modified
     const boundary = document.getElementById('map-boundary')
@@ -739,11 +927,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       if (newMap) {
         newMap.invalidateSize({ pan: false })
         const size1 = newMap.getSize()
-        console.log('Map size after first invalidate:', size1.x, 'x', size1.y)
+        console.log('Map size after requestAnimationFrame:', size1);
       }
     })
     
-    setTimeout(() => {
+    // Multiple attempts to ensure map has proper size
+    const ensureMapSize = () => {
       if (newMap && newMap.getContainer()) {
         const mapContainer = newMap.getContainer()
         
@@ -763,15 +952,20 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
           mapContainer.style.bottom = '0'
           mapContainer.style.width = '100%'
           mapContainer.style.height = '100%'
-          console.log('Reset map container positioning to absolute')
         }
         
-        console.log('Invalidating map size after initialization')
         newMap.invalidateSize({ pan: false })
         const size = newMap.getSize()
-        console.log('Map size after invalidate:', size.x, 'x', size.y)
+        console.log('Map size after invalidateSize:', size);
+        
+        // If map still has no height, try again
+        if (size.y === 0) {
+          setTimeout(ensureMapSize, 100);
+        }
       }
-    }, 200)
+    };
+    
+    setTimeout(ensureMapSize, 200)
 
     // Create custom panes for proper layer ordering
     newMap.createPane('connectionsPane')
@@ -782,7 +976,7 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     newMap.createPane('mvLinesPane')
     
     // Set z-index for each pane (higher = on top)
-    newMap.getPane('connectionsPane')!.style.zIndex = '400'  // Bottom
+    newMap.getPane('connectionsPane')!.style.zIndex = '800'  // Temporarily highest for debugging
     newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
     newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
     newMap.getPane('dropLinesPane')!.style.zIndex = '600'     // Drop lines
@@ -804,11 +998,9 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     // Add resize observer with proper cleanup
     const resizeObserver = new ResizeObserver(() => {
       if (newMap && newMap.getContainer()) {
-        console.log('Container resized, invalidating map size')
         try {
           newMap.invalidateSize()
         } catch (e) {
-          console.warn('Error invalidating map size:', e)
         }
       }
     })
@@ -821,14 +1013,12 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
     newMap.on('click', handleMapClick)
     
     // Store reference for cleanup
-    console.log('Setting map state with newMap instance')
     setMap(newMap)
     resizeObserverRef.current = resizeObserver
     
     // Store in window for debugging and persistence
     if (typeof window !== 'undefined') {
       (window as any).__leafletMapInstance = newMap
-      console.log('Map stored in window.__leafletMapInstance for debugging and persistence')
     }
   }, [handleMapClick, setMap])
 
@@ -838,21 +1028,18 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       // In development, React StrictMode causes double mounting
       // Skip cleanup to preserve map instance
       if (process.env.NODE_ENV === 'development') {
-        console.log('Skipping map cleanup in development')
         return
       }
       
       // Only clean up in production
       const mapInstance = typeof window !== 'undefined' ? (window as any).__leafletMap : null
       if (mapInstance) {
-        console.log('Cleaning up map on unmount')
         if ((mapInstance as any)._wrapperObserver) {
           (mapInstance as any)._wrapperObserver.disconnect()
         }
         try {
           mapInstance.remove()
         } catch (e) {
-          console.warn('Error removing map:', e)
         }
       }
       if (resizeObserverRef.current) {
@@ -860,6 +1047,27 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       }
     }
   }, [])
+
+  // Handle layer visibility changes
+  React.useEffect(() => {
+    if (!map || !layerGroupsRef.current) return
+
+    // Toggle layer visibility based on state
+    Object.entries(layerVisibility).forEach(([layer, visible]) => {
+      const layerGroup = layerGroupsRef.current[layer as keyof typeof layerGroupsRef.current]
+      if (layerGroup) {
+        if (visible) {
+          if (!map.hasLayer(layerGroup)) {
+            layerGroup.addTo(map)
+          }
+        } else {
+          if (map.hasLayer(layerGroup)) {
+            map.removeLayer(layerGroup)
+          }
+        }
+      }
+    })
+  }, [map, layerVisibility])
 
   // Create a MutationObserver to watch for style changes on wrapper and boundary
   React.useEffect(() => {
@@ -879,20 +1087,21 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
       boundary.style.setProperty('height', 'calc(100vh - 64px)', 'important')
       boundary.style.setProperty('z-index', '5', 'important')
       boundary.style.setProperty('overflow', 'hidden', 'important')
-      boundary.style.setProperty('clip-path', 'inset(0)', 'important')
-      boundary.style.setProperty('contain', 'strict', 'important')
+      // Use contain: layout instead of strict to allow rendering but prevent size changes
+      boundary.style.setProperty('contain', 'layout', 'important')
       // Remove any problematic properties
       boundary.style.removeProperty('inset')
       boundary.style.removeProperty('margin')
       boundary.style.removeProperty('padding')
       boundary.style.removeProperty('transform')
+      boundary.style.removeProperty('clip-path')  // Remove clip-path to allow SVG rendering
     }
 
     const enforceWrapperStyles = () => {
       wrapper.style.setProperty('position', 'relative', 'important')
       wrapper.style.setProperty('width', '100%', 'important')
       wrapper.style.setProperty('height', '100%', 'important')
-      wrapper.style.setProperty('overflow', 'hidden', 'important')
+      wrapper.style.setProperty('overflow', 'visible', 'important')  // Allow overflow for markers
       wrapper.style.setProperty('background-color', '#f3f4f6', 'important')
     }
 
@@ -1033,14 +1242,11 @@ export function ClientMap({ networkData, onElementUpdate, loading }: ClientMapPr
 
   // Render  // Log map state changes
   useEffect(() => {
-    console.log('Map state changed to:', map ? 'Map instance exists' : 'null')
   }, [map])
 
   // Network data effect - just call updateNetworkData
   useEffect(() => {
-    console.log('Network data effect - map:', !!map, 'networkData:', !!networkData)
     if (!map || !networkData) {
-      console.log(`Cannot render: map= ${!!map} networkData= ${!!networkData} data keys: ${networkData ? Object.keys(networkData) : 'none'}`)
       return
     }
 

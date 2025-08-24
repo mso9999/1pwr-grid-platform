@@ -34,14 +34,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (authService.isAuthenticated()) {
         const currentUser = await authService.getCurrentUser();
-        console.log('AuthContext - currentUser:', currentUser);
         setUser(currentUser);
       } else {
-        console.log('AuthContext - not authenticated');
         setUser(null);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
       setUser(null);
     } finally {
       setLoading(false);
@@ -74,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       router.push('/login');
     } catch (err) {
-      console.error('Logout failed:', err);
     } finally {
       setLoading(false);
     }

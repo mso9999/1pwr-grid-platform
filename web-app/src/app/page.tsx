@@ -36,22 +36,23 @@ export default function Dashboard() {
   }, [selectedSite, currentView])
 
   const fetchNetworkData = async (site: string) => {
-    console.log('Fetching network data for site:', site)
+    if (!site) return
+    
+    console.log('=== Dashboard fetchNetworkData called ===', { site })
     setLoading(true)
     setError(null)
+    
     try {
       const response = await api.getNetwork(site)
-      console.log('API response:', response)
-      console.log('Network data fetched:', {
-        poles: response.data?.poles?.length || 0,
-        conductors: response.data?.conductors?.length || 0,
-        connections: response.data?.connections?.length || 0
+      console.log('=== Dashboard network data received ===', {
+        connections: response?.data?.connections?.length || 0,
+        poles: response?.data?.poles?.length || 0,
+        conductors: response?.data?.conductors?.length || 0
       })
-      console.log('Setting networkData to:', response.data)
-      setNetworkData(response.data)
-    } catch (err) {
-      console.error('Failed to fetch network data:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load network data')
+      setNetworkData(response)
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch network data')
+      console.error('Error fetching network data:', err)
     } finally {
       setLoading(false)
     }

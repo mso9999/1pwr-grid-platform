@@ -32,7 +32,6 @@ export function GenerationSiteEditor({
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  console.log('GenerationSiteEditor rendered', { site, currentPoleId, polesCount: poles.length, isOpen });
 
   const handleUpdate = async () => {
     if (!selectedPoleId) {

@@ -17,9 +17,7 @@ import { LogOut, User, Shield, Settings } from 'lucide-react';
 export default function UserMenu() {
   const { user, logout, hasRole } = useAuth();
 
-  console.log('UserMenu - user:', user);
   if (!user) {
-    console.log('UserMenu returning null - no user');
     return null;
   }
 

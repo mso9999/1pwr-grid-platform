@@ -40,61 +40,37 @@ export function MapView({ site, networkData, loading, onNetworkUpdate }: MapView
   
   // Transform backend field names to frontend expected names
   useEffect(() => {
-    if (!networkData) {
-      setTransformedData(null)
-      return
-    }
-
-    console.log('Raw network data:', networkData)
-
-    const transformed = {
-      poles: networkData.poles?.map((pole: any) => ({
-        id: pole.pole_id || pole.id,
-        lat: pole.latitude || pole.lat,
-        lng: pole.longitude || pole.lng,
-        type: pole.pole_type || pole.type,
-        status: pole.status,
-        pole_class: pole.angle_class || pole.pole_class,
-        st_code_1: pole.st_code_1,
-        st_code_2: pole.st_code_2,
-        ...pole
-      })) || [],
-      connections: networkData.connections?.map((conn: any) => ({
-        id: conn.survey_id || conn.id,
-        lat: conn.latitude || conn.lat,
-        lng: conn.longitude || conn.lng,
-        name: conn.customer_name || conn.name,
-        st_code_3: conn.st_code_3,
-        ...conn
-      })) || [],
-      conductors: networkData.conductors?.map((cond: any) => ({
-        id: cond.conductor_id || cond.id,
-        from: cond.from_pole || cond.from,
-        to: cond.to_pole || cond.to,
-        type: cond.conductor_type || cond.type,
-        st_code_4: cond.st_code_4,
-        length: cond.length,
-        ...cond
-      })) || [],
-      transformers: networkData.transformers || [],
-      generation: networkData.generation || []
-    }
-
-    console.log('Transformed data:', {
-      poles: transformed.poles.length,
-      connections: transformed.connections.length,
-      conductors: transformed.conductors.length
+    console.log('=== MapView useEffect triggered ===', { 
+      hasNetworkData: !!networkData?.data,
+      dataKeys: networkData?.data ? Object.keys(networkData.data) : [] 
     })
-
-    setTransformedData(transformed)
+    if (networkData?.data) {
+      // Transform the data to match frontend expectations
+      const transformedData = {
+        ...networkData.data,
+        poles: networkData.data.poles?.map((pole: any) => ({
+          ...pole,
+          statusCode: pole.st_code_1,
+          constructionStatus: pole.st_code_4
+        })) || [],
+        connections: networkData.data.connections?.map((conn: any) => ({
+          ...conn,
+          statusCode: conn.st_code_3
+        })) || [],
+        conductors: networkData.data.conductors?.map((cond: any) => ({
+          ...cond,
+          constructionStatus: cond.st_code_4
+        })) || []
+      }
+      console.log('=== MapView transformed data ===', {
+        connections: transformedData.connections?.length || 0,
+        poles: transformedData.poles?.length || 0,
+        conductors: transformedData.conductors?.length || 0
+      })
+      setTransformedData(transformedData)
+    }
   }, [networkData])
   
-  console.log('MapView props:', { 
-    site, 
-    hasNetworkData: !!networkData, 
-    dataKeys: networkData ? Object.keys(networkData) : 'none',
-    loading 
-  })
   
   if (!mounted) {
     return (
@@ -112,7 +88,7 @@ export function MapView({ site, networkData, loading, onNetworkUpdate }: MapView
       <ClientMap
         networkData={transformedData ? {...transformedData, site} : null}
         loading={loading}
-        onElementUpdate={onNetworkUpdate}
+        onElementUpdate={onNetworkUpdate ? async () => { onNetworkUpdate() } : undefined}
       />
       {showIssues && transformedData && (
         <IssuesList
