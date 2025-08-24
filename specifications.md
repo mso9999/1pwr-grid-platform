@@ -238,9 +238,49 @@ Migrate and unify three legacy desktop tools (uGridNET, uGridPLAN, uGridPREDICT)
 - Cost calculations
 - Advanced material takeoff reports
 
-## 11. Implementation Discrepancies
+## 11. Map Rendering Rules
 
-### 11.1 API Endpoint Differences
+### 11.1 Visual Styling Rules
+**Lines (Conductors):**
+- **MV Lines**: Blue (#0000FF)
+- **LV Lines**: Green (#00FF00)  
+- **Drop Lines**: Orange (#FFA500) - connections to houses/buildings
+- **Line Style**: 
+  - Solid lines for installed conductors (SC4 >= 3)
+  - Dashed lines (5,10 pattern) for uninstalled conductors (SC4 < 3)
+- **Opacity**: Lines are 100% opaque (no transparency)
+
+**Poles:**
+- **MV Poles (Medium Voltage)**: 
+  - **Border**: Black solid border (1px weight)
+  - **Fill**: 50% transparent, color based on SC1 status code
+  - **Identification**: Type='MV' or ID contains '_M'
+- **LV Poles (Low Voltage)**: 
+  - **Border**: NO BORDER (transparent color, 0 weight)
+  - **Fill**: 50% transparent, color based on SC1 status code
+  - **Identification**: All poles not identified as MV
+- **Size**: 6px radius circles for both MV and LV poles
+
+**Connections (House/Building Points):**
+- **Shape**: Square markers (12x12px)
+- **Fill**: 50% transparent
+- **Border**: None
+- **Color**: Green for energized, gray for de-energized
+
+**Layer Order (z-index from bottom to top):**
+1. Map tiles (base)
+2. Connections (600)
+3. LV poles (700)
+4. MV poles (750)
+5. Drop lines (800)
+6. LV lines (850)
+7. MV lines (900)
+8. Generation Site (950)
+9. Transformers (1000)
+
+## 12. Implementation Discrepancies
+
+### 12.1 API Endpoint Differences
 **Note: These differences exist between the specification and current implementation. The implementation is working correctly.**
 
 | Specification | Implementation | Status |

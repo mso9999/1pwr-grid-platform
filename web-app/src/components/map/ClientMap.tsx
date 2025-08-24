@@ -3,9 +3,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
-import 'leaflet.markercluster/dist/MarkerCluster.css'
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import 'leaflet.markercluster';
 import { Button } from '@/components/ui/button';
 import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import { LayerControls } from './LayerControls'
@@ -127,8 +124,6 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     lvLines?: L.LayerGroup
     dropLines?: L.LayerGroup
     transformers?: L.LayerGroup
-    poleCluster?: L.MarkerClusterGroup
-    connectionCluster?: L.MarkerClusterGroup
   }>({})
 
   const site = networkData?.site || 'UGRIDPLAN'
@@ -201,6 +196,96 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     setEditDialogOpen(true)
   }, [])
 
+  // Add new pole to map without reloading
+  const handleNewPole = useCallback((pole: any) => {
+    if (!map || !layerGroupsRef.current.poles) return
+    
+    // Determine if MV or LV pole
+    const isMV = pole.pole_class === 'MV' || (pole.pole_id && pole.pole_id.includes('_M'))
+    const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
+    
+    const circleMarker = L.circleMarker([pole.latitude, pole.longitude], {
+      radius: 6,
+      fillColor: color,
+      color: isMV ? '#000000' : 'transparent',
+      weight: isMV ? 1 : 0,
+      opacity: 1,
+      fillOpacity: 0.5,
+      pane: isMV ? 'mvPolesPane' : 'lvPolesPane'
+    })
+    
+    circleMarker.on('click', () => {
+      setSelectedElement({
+        type: 'pole',
+        id: pole.pole_id,
+        data: pole
+      })
+    })
+    
+    circleMarker.bindPopup(`
+      <div>
+        <strong>Pole: ${pole.pole_id}</strong><br/>
+        Type: ${pole.pole_class || 'Unknown'}<br/>
+        Status: ${pole.st_code_1 || 0} - ${SC1_DESCRIPTIONS[pole.st_code_1 || 0]}
+      </div>
+    `)
+    
+    // Add to appropriate layer group
+    if (isMV && layerGroupsRef.current.mvPoles) {
+      layerGroupsRef.current.mvPoles.addLayer(circleMarker)
+    } else if (layerGroupsRef.current.lvPoles) {
+      layerGroupsRef.current.lvPoles.addLayer(circleMarker)
+    }
+  }, [map, setSelectedElement, SC1_COLORS, SC1_DESCRIPTIONS])
+
+  // Add new connection to map without reloading
+  const handleNewConnection = useCallback((connection: any) => {
+    if (!map || !layerGroupsRef.current.connections) return
+    // Add test marker directly to map for debugging
+    if (connection.lat && connection.lng && map) {
+      const testMarker = L.circleMarker([connection.lat, connection.lng], {
+        radius: 8,
+        fillColor: '#ff0000',
+        color: '#ffffff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      })
+      testMarker.addTo(map)
+    }
+    
+    const color = connection.st_code_3 === 'Energized' ? '#4ade80' : '#94a3b8'
+    
+    const marker = L.circleMarker([connection.latitude, connection.longitude], {
+      radius: 6,
+      fillColor: color,
+      color: 'transparent',
+      weight: 0,
+      opacity: 1,
+      fillOpacity: 0.5,
+      pane: 'connectionsPane'
+    })
+    
+    marker.bindPopup(`
+      <div>
+        <strong>Connection: ${connection.connection_id}</strong><br/>
+        Status: ${connection.st_code_3 || 'Unknown'}<br/>
+        Lat: ${connection.latitude.toFixed(6)}<br/>
+        Lng: ${connection.longitude.toFixed(6)}
+      </div>
+    `)
+    
+    marker.on('click', () => {
+      setSelectedElement({
+        type: 'connection',
+        id: connection.connection_id,
+        data: connection
+      })
+    })
+    
+    layerGroupsRef.current.connections.addLayer(marker)
+  }, [map, setSelectedElement])
+
   const updateNetworkData = useCallback(async (data: any) => {
     console.log('=== updateNetworkData called ===', {
       hasMap: !!map,
@@ -239,114 +324,36 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       if (layerGroupsRef.current.lvLines) layerGroupsRef.current.lvLines.clearLayers()
       if (layerGroupsRef.current.dropLines) layerGroupsRef.current.dropLines.clearLayers()
       if (layerGroupsRef.current.others) layerGroupsRef.current.others.clearLayers()
-      if (layerGroupsRef.current.poleCluster) layerGroupsRef.current.poleCluster.clearLayers()
-      if (layerGroupsRef.current.connectionCluster) layerGroupsRef.current.connectionCluster.clearLayers()
 
       // Ensure layer groups exist and are added to map
-      if (!layerGroupsRef.current.connections || !map.hasLayer(layerGroupsRef.current.connections)) {
-        layerGroupsRef.current.connections = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.poles || !map.hasLayer(layerGroupsRef.current.poles)) {
-        layerGroupsRef.current.poles = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.mvPoles || !map.hasLayer(layerGroupsRef.current.mvPoles)) {
-        layerGroupsRef.current.mvPoles = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.lvPoles || !map.hasLayer(layerGroupsRef.current.lvPoles)) {
-        layerGroupsRef.current.lvPoles = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.mvLines || !map.hasLayer(layerGroupsRef.current.mvLines)) {
-        layerGroupsRef.current.mvLines = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.lvLines || !map.hasLayer(layerGroupsRef.current.lvLines)) {
-        layerGroupsRef.current.lvLines = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.dropLines || !map.hasLayer(layerGroupsRef.current.dropLines)) {
-        layerGroupsRef.current.dropLines = L.layerGroup().addTo(map);
-      }
-      if (!layerGroupsRef.current.transformers || !map.hasLayer(layerGroupsRef.current.transformers)) {
-        layerGroupsRef.current.transformers = L.layerGroup().addTo(map);
-      }
-      
-      setRenderProgress({ current: 0, total: 0 });
-    
-      // Defer cluster initialization to avoid blocking
-      const initClusters = () => {
-      if (!layerGroupsRef.current.poleCluster && map) {
-        layerGroupsRef.current.poleCluster = (L as any).markerClusterGroup({
-          maxClusterRadius: 80,
-          spiderfyOnMaxZoom: true,
-          showCoverageOnHover: false,
-          zoomToBoundsOnClick: true,
-          disableClusteringAtZoom: 18,
-          chunkedLoading: true,
-          chunkInterval: 200,
-          chunkDelay: 50,
-          iconCreateFunction: function(cluster: any) {
-            const count = cluster.getChildCount()
-            let size = 'small'
-            let bgColor = '#b91c1c'
-            
-            if (count > 100) {
-              size = 'large'
-              bgColor = '#7c2d12'
-            } else if (count > 50) {
-              size = 'medium' 
-              bgColor = '#991b1b'
-            }
-            
-            return L.divIcon({
-              html: `<div style="background-color: ${bgColor};"><span>${count}</span></div>`,
-              className: `marker-cluster marker-cluster-${size}`,
-              iconSize: L.point(40, 40)
-            })
-          }
-        })
-        if (layerGroupsRef.current.poleCluster) {
-          map.addLayer(layerGroupsRef.current.poleCluster)
+      if (map) {
+        if (!layerGroupsRef.current.connections || !map.hasLayer(layerGroupsRef.current.connections)) {
+          layerGroupsRef.current.connections = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.poles || !map.hasLayer(layerGroupsRef.current.poles)) {
+          layerGroupsRef.current.poles = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.mvPoles || !map.hasLayer(layerGroupsRef.current.mvPoles)) {
+          layerGroupsRef.current.mvPoles = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.lvPoles || !map.hasLayer(layerGroupsRef.current.lvPoles)) {
+          layerGroupsRef.current.lvPoles = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.mvLines || !map.hasLayer(layerGroupsRef.current.mvLines)) {
+          layerGroupsRef.current.mvLines = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.lvLines || !map.hasLayer(layerGroupsRef.current.lvLines)) {
+          layerGroupsRef.current.lvLines = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.dropLines || !map.hasLayer(layerGroupsRef.current.dropLines)) {
+          layerGroupsRef.current.dropLines = L.layerGroup().addTo(map);
+        }
+        if (!layerGroupsRef.current.transformers || !map.hasLayer(layerGroupsRef.current.transformers)) {
+          layerGroupsRef.current.transformers = L.layerGroup().addTo(map);
         }
       }
       
-      if (!layerGroupsRef.current.connectionCluster && map) {
-        layerGroupsRef.current.connectionCluster = (L as any).markerClusterGroup({
-          maxClusterRadius: 60,
-          spiderfyOnMaxZoom: true,
-          showCoverageOnHover: false,
-          zoomToBoundsOnClick: true,
-          disableClusteringAtZoom: 18,
-          chunkedLoading: true,
-          chunkInterval: 200,
-          chunkDelay: 50,
-          iconCreateFunction: function(cluster: any) {
-            const count = cluster.getChildCount()
-            let size = 'small'
-            let bgColor = '#1e40af'
-            
-            if (count > 100) {
-              size = 'large'
-              bgColor = '#1e3a8a'
-            } else if (count > 50) {
-              size = 'medium'
-              bgColor = '#1e40af'
-            }
-            
-            return L.divIcon({
-              html: `<div style="background-color: ${bgColor};"><span>${count}</span></div>`,
-              className: `marker-cluster marker-cluster-${size}`,
-              iconSize: L.point(40, 40)
-            })
-          }
-        })
-        if (layerGroupsRef.current.connectionCluster) {
-          map.addLayer(layerGroupsRef.current.connectionCluster)
-        }
-      }
-    }
-    
-    // Initialize clusters after a short delay
-    setTimeout(initClusters, 100)
-    
-    // Calculate total items to render
+      // Calculate total items to render
     const totalItems = (data.poles?.length || 0) + 
                       (data.connections?.length || 0) + 
                       (data.conductors?.length || 0)
@@ -589,7 +596,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
           map.invalidateSize()
           
           // If we have connections, ensure we're zoomed to see them
-          if (data.connections.length > 0 && bounds.isValid()) {
+          if (data.connections.length > 0 && bounds.isValid() && map) {
             map.fitBounds(bounds, { padding: [50, 50] })
           }
         }
@@ -598,7 +605,9 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     
     // Force map to redraw after a short delay
     setTimeout(() => {
-      map.invalidateSize()
+      if (map) {
+        map.invalidateSize()
+      }
     }, 50) // Reduced delay for faster redraw
 
     // Process poles in batches
@@ -609,14 +618,15 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
           if (pole.lat && pole.lng) {
             const color = SC1_COLORS[pole.st_code_1 || 0] || '#808080'
             
-            // Determine pane based on pole type (MV or LV)
-            const polePane = pole.type === 'MV' ? 'mvPolesPane' : 'lvPolesPane'
+            // Determine pane and border based on pole type (MV or LV)
+            const isMV = pole.type === 'MV' || (pole.id && pole.id.includes('_M'))
+            const polePane = isMV ? 'mvPolesPane' : 'lvPolesPane'
             
             const circleMarker = L.circleMarker([pole.lat, pole.lng], {
               radius: 6,  // Increased from 3 to 6 for better visibility
               fillColor: color,
-              color: '#000',
-              weight: 1,
+              color: isMV ? '#000000' : 'transparent',  // Black border for MV, no border for LV
+              weight: isMV ? 1 : 0,  // 1px weight for MV, 0 for LV
               opacity: 1,
               fillOpacity: 0.5,  // 50% transparent fill
               pane: polePane
@@ -713,7 +723,7 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
             
             if (layerGroup) {
               const polyline = L.polyline([fromCoords, toCoords], {
-                color: conductor.st_code_4 && conductor.st_code_4 > 0 ? SC4_COLORS[conductor.st_code_4] : color,
+                color: color,  // Use line type color (MV=blue, LV=green, Drop=orange) per specifications
                 weight: 2,
                 pane: pane,
                 opacity: 1,  // No transparency for lines
@@ -747,38 +757,30 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
       );
     }
 
-    // Add markers to cluster groups after all are created
-    setTimeout(() => {
-      if (layerGroupsRef.current.poleCluster && poleMarkers.length > 0) {
-        layerGroupsRef.current.poleCluster.addLayers(poleMarkers)
-      } else if (layerGroupsRef.current.poles && poleMarkers.length > 0) {
-        poleMarkers.forEach((marker: any) => marker.addTo(layerGroupsRef.current.poles!))  
-      }
+    // Add markers directly to layer groups (no clustering)
+    if (layerGroupsRef.current.poles && poleMarkers.length > 0) {
+      poleMarkers.forEach((marker: any) => marker.addTo(layerGroupsRef.current.poles!))  
+    }
+    
+    if (layerGroupsRef.current.connections && connectionMarkers.length > 0) {
+      connectionMarkers.forEach((marker: any) => marker.addTo(layerGroupsRef.current.connections!))
+    }
+    
+    // Add conductor batches to their respective layer groups
+    if (conductorBatches.mv.length > 0 && layerGroupsRef.current.mvLines) {
+      conductorBatches.mv.forEach(line => line.addTo(layerGroupsRef.current.mvLines!))
+    }
       
-      if (layerGroupsRef.current.connectionCluster && connectionMarkers.length > 0) {
-        layerGroupsRef.current.connectionCluster.addLayers(connectionMarkers)
-      } else if (layerGroupsRef.current.connections && connectionMarkers.length > 0) {
-        connectionMarkers.forEach((marker) => {
-          marker.addTo(layerGroupsRef.current.connections!)
-        })
-      }
+    if (conductorBatches.lv.length > 0 && layerGroupsRef.current.lvLines) {
+      conductorBatches.lv.forEach(line => line.addTo(layerGroupsRef.current.lvLines!))
+    }
       
-      // Add conductor batches to their respective layer groups
-      if (conductorBatches.mv.length > 0 && layerGroupsRef.current.mvLines) {
-        conductorBatches.mv.forEach(line => line.addTo(layerGroupsRef.current.mvLines!))
-      }
-      
-      if (conductorBatches.lv.length > 0 && layerGroupsRef.current.lvLines) {
-        conductorBatches.lv.forEach(line => line.addTo(layerGroupsRef.current.lvLines!))
-      }
-      
-      if (conductorBatches.drop.length > 0 && layerGroupsRef.current.dropLines) {
-        conductorBatches.drop.forEach(line => line.addTo(layerGroupsRef.current.dropLines!))
-      }
-    }, 0)
+    if (conductorBatches.drop.length > 0 && layerGroupsRef.current.dropLines) {
+      conductorBatches.drop.forEach(line => line.addTo(layerGroupsRef.current.dropLines!))
+    }
     
     // Center map on data bounds if we have valid coordinates
-    if (hasValidCoords) {
+    if (hasValidCoords && map) {
       console.log('Fitting bounds, hasValidCoords:', hasValidCoords, 'bounds:', bounds.toBBoxString());
       setTimeout(() => {
         try {
@@ -786,15 +788,12 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
           console.log('Map fitBounds called successfully');
           
           // Also ensure layer groups are visible
-          Object.entries(layerGroupsRef.current).forEach(([name, layer]) => {
-            if (layer && 'getLayers' in layer) {
+          Object.entries(layerGroupsRef.current).forEach(([key, layer]) => {
+            if (layer && 'getLayers' in layer && typeof layer.getLayers === 'function' && map) {
               const layerCount = layer.getLayers().length;
-              if (layerCount > 0) {
-                console.log(`Layer ${name} has ${layerCount} items`);
-                if (!map.hasLayer(layer)) {
-                  console.log(`Adding ${name} layer to map`);
-                  layer.addTo(map);
-                }
+              if (layerCount > 0 && !map.hasLayer(layer)) {
+                console.log(`Adding ${key} layer with ${layerCount} items`);
+                layer.addTo(map);
               }
             }
           });
@@ -975,13 +974,13 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
     newMap.createPane('lvLinesPane')
     newMap.createPane('mvLinesPane')
     
-    // Set z-index for each pane (higher = on top)
-    newMap.getPane('connectionsPane')!.style.zIndex = '800'  // Temporarily highest for debugging
-    newMap.getPane('lvPolesPane')!.style.zIndex = '500'       // LV poles
-    newMap.getPane('mvPolesPane')!.style.zIndex = '550'       // MV poles (above LV)
-    newMap.getPane('dropLinesPane')!.style.zIndex = '600'     // Drop lines
-    newMap.getPane('lvLinesPane')!.style.zIndex = '650'       // LV lines (above drop)
-    newMap.getPane('mvLinesPane')!.style.zIndex = '700'       // MV lines (top)
+    // Set z-index for each pane according to specifications (from bottom to top)
+    newMap.getPane('connectionsPane')!.style.zIndex = '600'   // Connections (bottom)
+    newMap.getPane('lvPolesPane')!.style.zIndex = '700'       // LV poles
+    newMap.getPane('mvPolesPane')!.style.zIndex = '750'       // MV poles
+    newMap.getPane('dropLinesPane')!.style.zIndex = '800'     // Drop lines
+    newMap.getPane('lvLinesPane')!.style.zIndex = '850'       // LV lines
+    newMap.getPane('mvLinesPane')!.style.zIndex = '900'       // MV lines (top)
     
     // Initialize layer groups
     layerGroupsRef.current = {
@@ -1321,6 +1320,8 @@ export function ClientMap({ networkData, onElementUpdate, loading, onElementDele
         pendingConnectionLocation={pendingConnectionLocation}
         onPoleCreated={handlePoleCreated}
         onConnectionCreated={handleConnectionCreated}
+        onNewPole={handleNewPole}
+        onNewConnection={handleNewConnection}
         onElementUpdate={() => {
           // Trigger the network data refresh
           if (onElementUpdate) {

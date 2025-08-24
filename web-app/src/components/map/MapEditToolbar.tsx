@@ -50,6 +50,8 @@ interface MapEditToolbarProps {
   onPoleCreated?: () => void;
   onConnectionCreated?: () => void;
   onElementUpdate?: () => void;
+  onNewPole?: (pole: any) => void;
+  onNewConnection?: (connection: any) => void;
 }
 
 interface PoleFormData {
@@ -95,7 +97,9 @@ export function MapEditToolbar({
   pendingConnectionLocation,
   onPoleCreated,
   onConnectionCreated,
-  onElementUpdate
+  onElementUpdate,
+  onNewPole,
+  onNewConnection
 }: MapEditToolbarProps) {
   const [showPoleDialog, setShowPoleDialog] = useState(false);
   const [showConnectionDialog, setShowConnectionDialog] = useState(false);
@@ -162,8 +166,9 @@ export function MapEditToolbar({
         angle_class: 'T'
       });
       
-      if (onElementUpdate) {
-        onElementUpdate();
+      // Add the new pole to the map without reloading everything
+      if (onNewPole) {
+        onNewPole(result);
       }
       
       if (onPoleCreated) {
@@ -195,8 +200,9 @@ export function MapEditToolbar({
         st_code_3: 0
       });
       
-      if (onElementUpdate) {
-        onElementUpdate();
+      // Add the new connection to the map without reloading everything
+      if (onNewConnection) {
+        onNewConnection(result);
       }
       
       if (onConnectionCreated) {

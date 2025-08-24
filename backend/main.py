@@ -466,6 +466,7 @@ def get_network(site: str):
             "to": conductor.get('to_pole'),
             "type": conductor.get('conductor_type', 'distribution'),
             "status": conductor.get('status', 'as_designed'),
+            "st_code_4": conductor.get('st_code_4', conductor.get('status_code', 0)),  # Include SC4 for line rendering
             "length": sanitize_value(conductor.get('length_m'))
         })
     
